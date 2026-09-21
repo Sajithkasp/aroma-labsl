@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.s3.org/2001/XMLSchema/sitemap"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.s3.org/2001/XMLSchema/sitemap
+        http://www.s3.org/2001/XMLSchema/sitemap.xsd">
+  <url>
+    <loc>https://sajithkasp.github.io/aroma-labsl/</loc>
+    <lastmod>2026-05-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
