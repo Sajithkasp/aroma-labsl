@@ -3,7 +3,7 @@ const { createRoot } = ReactDOM;
 
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
-const ADMIN_PASSWORD = "Sajith@95";
+const ADMIN_PASSWORD = "Sajithprasanna";
 const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
 
 const defaultProducts = [
