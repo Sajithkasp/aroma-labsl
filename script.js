@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
+const { useState, useEffect, useRef } = React;
+const { createRoot } = ReactDOM;
 
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
