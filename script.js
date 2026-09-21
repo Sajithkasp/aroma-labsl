@@ -4,6 +4,7 @@ const { createRoot } = ReactDOM;
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
 const ADMIN_PASSWORD = "Sajith@95";
+const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
 
 const defaultProducts = [
   { id: "good-girl", name: "Good Girl", for: "FOR LADIES", filter: "Ladies", tagline: "Sweet, Floral & Sensual", top: "Almond, Coffee", heart: "Jasmine, Tuberose", base: "Cocoa, Vanilla, Tonka Bean", image: "https://sajithkasp.github.io/aroma-labsl/good-girl.jpg", accent: "#E8A8C0" },
@@ -57,29 +58,30 @@ function App() {
         .font-body { font-family: 'Inter', sans-serif; }
         .admin-btn {
           position: fixed;
-          bottom: 90px;
-          right: 20px;
-          width: 50px;
-          height: 50px;
-          background: #0A2E1F;
-          color: #FFFBF5;
+          bottom: 100px;
+          right: 15px;
+          width: 56px;
+          height: 56px;
+          background: #B8963E;
+          color: #0A2E1F;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 24px;
-          z-index: 100;
+          font-size: 26px;
+          z-index: 9999;
           cursor: pointer;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+          border: 3px solid #0A2E1F;
           transition: all 0.3s;
         }
-        .admin-btn:hover { background: #123a28; transform: scale(1.1); }
+        .admin-btn:hover { transform: scale(1.1); }
       `}</style>
       
       <div className="admin-btn" onClick={() => { if(adminState === 'locked') setAdminState('authenticating'); }} title="Admin Panel">⚙️</div>
 
       {adminState === 'authenticating' && (
-        <div className="fixed inset-0 z-[999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl font-body">
             <h2 className="text-xl font-bold mb-4 text-center">Admin Access Required</h2>
             <form onSubmit={handlePasswordSubmit}>
@@ -112,11 +114,7 @@ function App() {
             <div className="max-w-[1320px] mx-auto px-6 sm:px-8 py-5 sm:py-7 flex flex-col items-center">
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full border border-[#0A2E1F]/20 flex items-center justify-center">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A2E1F" strokeWidth="1.2">
-                      <path d="M9 3h6v4a6 6 0 0 1-6 6V9a3 3 0 0 0 3-3V3z" /><path d="M12 13v6" /><path d="M9 19h6" /><path d="M7 8c1.2 1 2 2.2 2 3.5" opacity="0.4" />
-                    </svg>
-                  </div>
+                  <img src={LOGO_URL} alt="Aroma Lab Logo" className="w-12 h-12 rounded-full object-cover border border-[#0A2E1F]/20" />
                   <div className="text-center leading-none">
                     <div className="font-display text-[22px] sm:text-[26px] font-[600] tracking-[0.18em]">AROMA LAB</div>
                     <div className="font-body text-[9px] tracking-[0.35em] mt-1 opacity-70">FINE FRAGRANCES</div>
@@ -266,9 +264,7 @@ function App() {
             <div className="max-w-[1320px] mx-auto px-6 sm:px-8 py-12 sm:py-16 grid sm:grid-cols-[1.2fr_0.8fr_0.8fr] gap-10">
               <div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full border border-[#0A2E1F]/20 flex items-center justify-center">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A2E1F" strokeWidth="1.2"><path d="M9 3h6v4a6 6 0 0 1-6 6V9a3 3 0 0 0 3-3V3z" /><path d="M12 13v6" /><path d="M9 19h6" /></svg>
-                  </div>
+                  <img src={LOGO_URL} alt="Aroma Lab Logo" className="w-10 h-10 rounded-full object-cover border border-[#0A2E1F]/20" />
                   <div className="font-display text-[18px] tracking-[0.18em] font-semibold">AROMA LAB</div>
                 </div>
                 <div className="font-body text-[12px] text-[#0A2E1F]/60 leading-[1.7] mt-4 max-w-[340px]">Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.</div>
