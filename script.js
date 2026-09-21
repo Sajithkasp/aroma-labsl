@@ -6,11 +6,11 @@ const WHATSAPP_LINK = "https://wa.me/94777804705";
 const ADMIN_PASSWORD = "Sajith@95";
 
 const defaultProducts = [
-  { id: "good-girl", name: "Good Girl", for: "FOR LADIES", filter: "Ladies", tagline: "Sweet, Floral & Sensual", top: "Almond, Coffee", heart: "Jasmine, Tuberose", base: "Cocoa, Vanilla, Tonka Bean", image: "", accent: "#E8A8C0" },
-  { id: "black-temptation", name: "Black Temptation", for: "FOR LADIES", filter: "Ladies", tagline: "Dark, Mysterious & Seductive", top: "Blackcurrant, Pear", heart: "Jasmine, Orange Blossom", base: "Vanilla, Praline, Musk", image: "", accent: "#2A2A2A" },
-  { id: "hunters-dusk", name: "Hunters Dusk", for: "FOR MEN", filter: "Men", tagline: "Woody, Smoky & Adventurous", top: "Bergamot, Pine", heart: "Cedarwood, Leather", base: "Amber, Musk, Vetiver", image: "", accent: "#4A5A3A" },
-  { id: "million-gold", name: "Million Gold", for: "FOR MEN", filter: "Men", tagline: "Rich, Luxurious & Powerful", top: "Blood Mandarin, Grapefruit", heart: "Cinnamon, Rose", base: "Amber, Leather, Patchouli", image: "", accent: "#B8963E" },
-  { id: "vanilla", name: "Vanilla", for: "FOR UNISEX", filter: "Unisex", tagline: "Warm, Sweet & Cozy", top: "Vanilla Orchid, Mandarin", heart: "Vanilla, Jasmine", base: "Sandalwood, Musk", image: "", accent: "#D4B896" }
+  { id: "good-girl", name: "Good Girl", for: "FOR LADIES", filter: "Ladies", tagline: "Sweet, Floral & Sensual", top: "Almond, Coffee", heart: "Jasmine, Tuberose", base: "Cocoa, Vanilla, Tonka Bean", image: "https://sajithkasp.github.io/aroma-labsl/good-girl.jpg", accent: "#E8A8C0" },
+  { id: "black-temptation", name: "Black Temptation", for: "FOR LADIES", filter: "Ladies", tagline: "Dark, Mysterious & Seductive", top: "Blackcurrant, Pear", heart: "Jasmine, Orange Blossom", base: "Vanilla, Praline, Musk", image: "https://sajithkasp.github.io/aroma-labsl/black-temptation.jpg", accent: "#2A2A2A" },
+  { id: "hunters-dusk", name: "Hunters Dusk", for: "FOR MEN", filter: "Men", tagline: "Woody, Smoky & Adventurous", top: "Bergamot, Pine", heart: "Cedarwood, Leather", base: "Amber, Musk, Vetiver", image: "https://sajithkasp.github.io/aroma-labsl/hunters-dusk.jpg", accent: "#4A5A3A" },
+  { id: "million-gold", name: "Million Gold", for: "FOR MEN", filter: "Men", tagline: "Rich, Luxurious & Powerful", top: "Blood Mandarin, Grapefruit", heart: "Cinnamon, Rose", base: "Amber, Leather, Patchouli", image: "https://sajithkasp.github.io/aroma-labsl/million-gold.jpg", accent: "#B8963E" },
+  { id: "vanilla", name: "Vanilla", for: "FOR UNISEX", filter: "Unisex", tagline: "Warm, Sweet & Cozy", top: "Vanilla Orchid, Mandarin", heart: "Vanilla, Jasmine", base: "Sandalwood, Musk", image: "https://sajithkasp.github.io/aroma-labsl/vanilla.jpg", accent: "#D4B896" }
 ];
 
 const HERO_IMAGE = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
@@ -31,17 +31,6 @@ function App() {
       try { setProducts(JSON.parse(saved)); } catch (e) { setProducts(defaultProducts); }
     } else { setProducts(defaultProducts); }
   }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-        e.preventDefault();
-        if (adminState === 'locked') setAdminState('authenticating');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [adminState]);
 
   const handleFilter = (filter) => {
     setActiveFilter(filter);
@@ -66,11 +55,28 @@ function App() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
         .font-display { font-family: 'Playfair Display', serif; }
         .font-body { font-family: 'Inter', sans-serif; }
-        .admin-secret-btn { position: fixed; bottom: 20px; right: 20px; width: 20px; height: 20px; opacity: 0.05; z-index: 100; cursor: pointer; }
-        .admin-secret-btn:hover { opacity: 0.1; }
+        .admin-btn {
+          position: fixed;
+          bottom: 90px;
+          right: 20px;
+          width: 50px;
+          height: 50px;
+          background: #0A2E1F;
+          color: #FFFBF5;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          z-index: 100;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+          transition: all 0.3s;
+        }
+        .admin-btn:hover { background: #123a28; transform: scale(1.1); }
       `}</style>
       
-      <div className="admin-secret-btn" onClick={() => { if(adminState === 'locked') setAdminState('authenticating'); }} title="Secret Admin Area" />
+      <div className="admin-btn" onClick={() => { if(adminState === 'locked') setAdminState('authenticating'); }} title="Admin Panel">⚙️</div>
 
       {adminState === 'authenticating' && (
         <div className="fixed inset-0 z-[999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
