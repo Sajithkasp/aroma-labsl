@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://sajithkasp.github.io/aroma-labsl/sitemap.xml
