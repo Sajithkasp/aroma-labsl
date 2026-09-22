@@ -16,6 +16,7 @@ const defaultProducts = [
 
 const HERO_IMAGE = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
 const LIFESTYLE_IMAGE = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
+const LIFESTYLE_IMAGE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -246,6 +247,23 @@ function App() {
               </div>
             </div>
           </section>
+                <section className="max-w-[1320px] mx-auto px-4 sm:px-8 mt-16 sm:mt-28">
+  <div className="rounded-[24px] sm:rounded-[32px] overflow-hidden bg-[#0A2E1F] grid sm:grid-cols-[0.9fr_1.1fr] items-stretch">
+    <div className="p-8 sm:p-12 lg:p-14 flex flex-col justify-center order-1 sm:order-1">
+      <div className="inline-flex self-start bg-[#FFFBF5]/10 border border-[#FFFBF5]/10 rounded-full px-4 py-2 font-body text-[10px] tracking-[0.2em] uppercase text-[#FFFBF5]/70">Muse — Hunters Dusk</div>
+      <h3 className="font-display text-[#FFFBF5] text-[32px] sm:text-[44px] leading-[0.95] tracking-[-0.02em] mt-6">Woody, smoky,<br /><span className="italic font-[300] text-[#B8963E]">& adventurous.</span></h3>
+      <p className="font-body text-[#FFFBF5]/60 text-[14px] leading-[1.7] mt-6 max-w-[380px]">"Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man."</p>
+      <div className="mt-6 flex gap-2">
+        <a href={DARAZ_LINK} target="_blank" rel="noopener" className="flex-1 bg-[#B8963E] text-[#0A2E1F] rounded-full py-3 font-body text-[12px] tracking-[0.12em] uppercase font-semibold text-center hover:bg-[#c9a84a] transition">Buy on Daraz</a>
+        <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Hunters Dusk - Rs. 1,500")}`} target="_blank" rel="noopener" className="flex-1 bg-white text-[#0A2E1F] rounded-full py-3 font-body text-[12px] tracking-[0.12em] uppercase font-medium text-center hover:bg-[#FFFBF5] transition">WhatsApp</a>
+      </div>
+    </div>
+    <div className="relative aspect-[4/5] sm:aspect-auto sm:min-h-[560px] order-2 sm:order-2">
+      <img src={LIFESTYLE_IMAGE_2} alt="Hunters Dusk lifestyle" className="w-full h-full object-cover object-top" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0A2E1F]/60 to-transparent sm:hidden"></div>
+    </div>
+  </div>
+</section>
 
           <section className="max-w-[1320px] mx-auto px-4 sm:px-8 mt-8 sm:mt-10">
             <div className="rounded-[20px] bg-[#B8963E]/10 border border-[#B8963E]/20 px-6 sm:px-10 py-6 sm:py-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
