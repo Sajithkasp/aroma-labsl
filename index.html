@@ -33,6 +33,83 @@
 
   <script type="text/babel" src="script.js"></script>
 
+  <!-- Review Section -->
+<section id="review-section" style="padding: 40px 20px; background: #111; color: #fff; text-align: center; font-family: 'Poppins', sans-serif;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 20px; color: #d4af37;">Customer Reviews</h2>
+    
+    <!-- Review Form -->
+    <form id="reviewForm" style="max-width: 500px; margin: 0 auto 40px; display: flex; flex-direction: column; gap: 15px;">
+        <input type="text" id="name" placeholder="Your Name" required style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff;">
+        <select id="rating" required style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff;">
+            <option value="">Select Rating</option>
+            <option value="5">★★★★★ (5)</option>
+            <option value="4">★★★★☆ (4)</option>
+            <option value="3">★★★☆☆ (3)</option>
+            <option value="2">★★☆☆☆ (2)</option>
+            <option value="1">★☆☆☆☆ (1)</option>
+        </select>
+        <textarea id="comment" placeholder="Write your review..." required style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; min-height: 100px;"></textarea>
+        <button type="submit" id="submitBtn" style="padding: 12px; background: #d4af37; color: #111; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Submit Review</button>
+    </form>
+
+    <!-- Reviews List -->
+    <div id="reviewsList" style="max-width: 600px; margin: auto; text-align: left;"></div>
+</section>
+
+<!-- Supabase Script -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ⚠️ ඔයාගේ Supabase විස්තර මෙතන දාලා තියෙනවා
+    const SUPABASE_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.textContent = 'Submitting...';
+        btn.disabled = true;
+
+        const name = document.getElementById('name').value;
+        const rating = document.getElementById('rating').value;
+        const comment = document.getElementById('comment').value;
+
+        const { error } = await supabaseClient.from('reviews').insert([{ name, rating, comment }]);
+
+        if (error) {
+            alert('Error: ' + error.message);
+        } else {
+            document.getElementById('reviewForm').reset();
+            loadReviews();
+        }
+        btn.textContent = 'Submit Review';
+        btn.disabled = false;
+    });
+
+    async function loadReviews() {
+        const { data, error } = await supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+        if (error) { console.error(error); return; }
+
+        const container = document.getElementById('reviewsList');
+        container.innerHTML = '';
+        data.forEach(rev => {
+            const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+            const date = new Date(rev.created_at).toLocaleDateString();
+            const div = document.createElement('div');
+            div.style.cssText = "background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #d4af37;";
+            div.innerHTML = `
+                <h4 style="margin: 0 0 5px; color: #d4af37;">${rev.name}</h4>
+                <p style="color: #f5a623; margin: 0 0 10px; font-size: 1.2rem;">${stars}</p>
+                <p style="margin: 0 0 10px; color: #ccc;">${rev.comment}</p>
+                <small style="color: #666;">${date}</small>
+            `;
+            container.appendChild(div);
+        });
+    }
+    loadReviews();
+      </script>
+  
   <script>
     (function(){
       function m(a){
