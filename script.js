@@ -315,14 +315,11 @@ function App() {
 <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-[12px] border-t border-[#0A2E1F]/10 px-3 py-3 sm:px-6 shadow-[0_-8px_32px_rgba(0,0,0,0.08)]">
   <div className="max-w-[1320px] mx-auto flex items-center gap-2 sm:gap-3">
 
-    {/* Facebook */}
-    <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
-       className="flex-1 flex items-center justify-center gap-1.5 bg-[#0866FF] text-white rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#0f66d0] transition">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="white" className="shrink-0">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-      </svg>
-      <span className="truncate">Facebook</span>
-    </a>
+{/* Facebook */}
+<a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
+   className="flex-1 flex items-center justify-center gap-1.5 bg-[#0866FF] text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#0f66d0] transition">
+  <span className="truncate">Facebook</span>
+</a>
 
     {/* Daraz */}
     <a href={DARAZ_LINK} target="_blank" rel="noopener"
