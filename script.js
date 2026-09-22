@@ -317,7 +317,7 @@ function App() {
 
 {/* Facebook */}
 <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
-   className="flex-1 flex items-center justify-center gap-1.5 bg-[#0866FF] text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#123a28] transition">
+   className="flex-1 flex items-center justify-center gap-1.5 bg-[#0866FF] text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#0f66d0] transition">
   <span className="truncate">Facebook</span>
 </a>
 
