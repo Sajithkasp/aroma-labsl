@@ -342,6 +342,11 @@ function App() {
   </div>
 </div>
 <div className="h-[72px]"></div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function AdminPanel({ products, setProducts, onLock }) {
   const [jsonInput, setJsonInput] = useState(JSON.stringify(products, null, 2));
