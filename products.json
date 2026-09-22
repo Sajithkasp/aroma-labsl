@@ -1,6 +1,6 @@
 [
   {
-    "id": "good-girl",
+    "id": "goodgirl",
     "name": "Good Girl",
     "for": "FOR LADIES",
     "filter": "Ladies",
@@ -12,7 +12,7 @@
     "accent": "#E8A8C0"
   },
   {
-    "id": "black-temptation",
+    "id": "black",
     "name": "Black Temptation",
     "for": "FOR LADIES",
     "filter": "Ladies",
@@ -24,7 +24,7 @@
     "accent": "#2A2A2A"
   },
   {
-    "id": "hunters-dusk",
+    "id": "hunter",
     "name": "Hunters Dusk",
     "for": "FOR MEN",
     "filter": "Men",
@@ -36,7 +36,7 @@
     "accent": "#4A5A3A"
   },
   {
-    "id": "million-gold",
+    "id": "gold",
     "name": "Million Gold",
     "for": "FOR MEN",
     "filter": "Men",
