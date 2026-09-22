@@ -311,12 +311,24 @@ function App() {
             </div>
           </footer>
 
+{/* Facebook Follow Bar - Blue */}
+<div className="fixed bottom-[72px] left-0 right-0 z-50 bg-[#1877F2] border-t-2 border-[#B8963E] px-4 py-2.5 sm:px-6 flex items-center justify-center shadow-[0_-8px_32px_rgba(0,0,0,0.2)]">
+  <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
+     className="flex items-center gap-2.5 text-white font-body text-[11px] sm:text-[12px] tracking-[0.15em] uppercase font-semibold hover:opacity-90 transition-opacity duration-300">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+    Follow Us on Facebook
+    <span>→</span>
+  </a>
+</div>
+                
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-[12px] border-t border-[#0A2E1F]/10 px-4 py-3 sm:px-6 flex items-center gap-2 sm:gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.08)]">
             <div className="hidden sm:flex items-center gap-2 font-body text-[11px] text-[#0A2E1F]/60 mr-2"><span className="w-2 h-2 bg-[#B8963E] rounded-full"></span>5 Scents • Rs. 1,500</div>
             <a href={DARAZ_LINK} target="_blank" rel="noopener" className="flex-1 sm:flex-none bg-[#0A2E1F] text-[#FFFBF5] rounded-full px-5 py-3.5 font-body text-[12px] tracking-[0.14em] uppercase font-semibold text-center hover:bg-[#123a28] transition flex items-center justify-center gap-2">Order on Daraz<span className="hidden sm:inline">→</span></a>
             <a href={`${WHATSAPP_LINK}?text=Hi%20Aroma%20Lab!%20I%20want%20to%20order%20perfumes.%20Rs.%201,500%20each`} target="_blank" rel="noopener" className="flex-1 sm:flex-none bg-white border border-[#0A2E1F]/15 text-[#0A2E1F] rounded-full px-5 py-3.5 font-body text-[12px] tracking-[0.12em] uppercase font-medium text-center hover:bg-[#FFFBF5] transition flex items-center justify-center gap-2"><span className="w-5 h-5 rounded-full bg-[#25D366] flex items-center justify-center text-[10px] text-white">✆</span>WhatsApp</a>
           </div>
-          <div className="h-[72px]"></div>
+          <div className="h-[125px]"></div>
         </>
       )}
     </div>
