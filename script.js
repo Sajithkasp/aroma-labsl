@@ -42,6 +42,110 @@ const districts = [
   "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
   "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
 ];
+  // === CART FUNCTIONS ===
+
+// Cart එකට Product එකක් එකතු කරන්න
+const addToCart = (product) => {
+  setCartItems(prev => {
+    const existing = prev.find(item => item.id === product.id);
+    if (existing) {
+      return prev.map(item => 
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    }
+    return [...prev, { ...product, quantity: 1 }];
+  });
+};
+
+// Cart එකෙන් Product එකක් අයින් කරන්න
+const removeFromCart = (id) => {
+  setCartItems(prev => prev.filter(item => item.id !== id));
+};
+
+// Quantity එක වෙනස් කරන්න
+const updateQuantity = (id, newQty) => {
+  if (newQty < 1) return;
+  setCartItems(prev => prev.map(item => 
+    item.id === id ? { ...item, quantity: newQty } : item
+  ));
+};
+
+// Subtotal එක ගණනය කරන්න
+const getSubtotal = () => {
+  return cartItems.reduce((sum, item) => sum + (1500 * item.quantity), 0);
+};
+
+// Delivery Charge එක ගණනය කරන්න
+const getDeliveryCharge = () => {
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  return totalItems >= 3 ? 0 : 350;
+};
+
+// Total එක ගණනය කරන්න
+const getTotal = () => {
+  return getSubtotal() + getDeliveryCharge();
+};
+
+// Cart එකේ අංකය
+const getCartCount = () => {
+  return cartItems.reduce((sum, item) => sum + item.quantity, 0);
+};
+
+// WhatsApp Order එක යවන්න
+const sendWhatsAppOrder = () => {
+  if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
+    alert("Please fill all customer details (Name, Phone, Address, District).");
+    return;
+  }
+  if (cartItems.length === 0) {
+    alert("Your cart is empty.");
+    return;
+  }
+  
+  let message = "Hi Aroma Lab! I want to order:\n\n";
+  cartItems.forEach(item => {
+    message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
+  });
+  message += `\nSubtotal: Rs. ${getSubtotal()}`;
+  message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
+  message += `\nTotal: Rs. ${getTotal()}`;
+  message += `\n\nName: ${customerName}`;
+  message += `\nPhone: ${customerPhone}`;
+  message += `\nAddress: ${customerAddress}`;
+  message += `\nDistrict: ${customerDistrict}`;
+  
+  const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+};
+
+// Bank Deposit Order එක යවන්න
+const sendBankDepositOrder = () => {
+  if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
+    alert("Please fill all customer details (Name, Phone, Address, District).");
+    return;
+  }
+  if (cartItems.length === 0) {
+    alert("Your cart is empty.");
+    return;
+  }
+  
+  let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
+  cartItems.forEach(item => {
+    message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
+  });
+  message += `\nSubtotal: Rs. ${getSubtotal()}`;
+  message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
+  message += `\nTotal: Rs. ${getTotal()}`;
+  message += `\n\nName: ${customerName}`;
+  message += `\nPhone: ${customerPhone}`;
+  message += `\nAddress: ${customerAddress}`;
+  message += `\nDistrict: ${customerDistrict}`;
+  message += `\n\nI will send the bank deposit slip shortly.`;
+  
+  const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+};
+// === END CART FUNCTIONS ===
 // === END CART STATES ===
 
   useEffect(() => {
