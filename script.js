@@ -18,7 +18,7 @@ const DEFAULT_HERO = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
 const DEFAULT_LIFESTYLE_1 = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
 const DEFAULT_LIFESTYLE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
 
-// === CART MODAL COMPONENT ===
+// === CART MODAL ===
 function CartModal({ 
   isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
   getSubtotal, getDeliveryCharge, getTotal, getCartCount,
@@ -115,19 +115,44 @@ function CartModal({
 function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, heroImage, setHeroImage, lifestyle1, setLifestyle1, lifestyle2, setLifestyle2 }) {
   const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: ''
   });
 
   if (!isAdminOpen) return null;
 
+  const handleImageUpload = async (file, callback) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fileName = `${Date.now()}-${file.name.replace(/\s/g, '-')}`;
+      const { error } = await window.supabaseClient.storage
+        .from('product-images')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: urlData } = window.supabaseClient.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+      callback(urlData.publicUrl);
+      setMessage('✅ Image uploaded!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('❌ Upload error: ' + err.message);
+    }
+    setUploading(false);
+  };
+
   const handleAddProduct = async () => {
     if (!newProduct.name || !newProduct.image) {
-      setMessage('❌ Product name and image URL are required.');
+      setMessage('❌ Product name and image are required.');
       return;
     }
     try {
-      const { data, error } = await window.supabaseClient.from('products').insert([{
+      const { error } = await window.supabaseClient.from('products').insert([{
         name: newProduct.name,
         price: 'Rs. 1,500',
         category: newProduct.category,
@@ -136,12 +161,20 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
         heart_notes: newProduct.heart,
         base_notes: newProduct.base,
         image_url: newProduct.image
-      }]).select();
+      }]);
 
       if (error) throw error;
 
       const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
-      setProducts(fresh.data || []);
+      if (fresh.data) {
+        setProducts(fresh.data.map(p => ({
+          id: p.id, name: p.name,
+          for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
+          filter: p.category, tagline: p.description || '',
+          top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+          image: p.image_url || '', accent: '#B8963E'
+        })));
+      }
       setNewProduct({ name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: '' });
       setMessage('✅ Product added successfully!');
       setTimeout(() => setMessage(''), 3000);
@@ -156,7 +189,15 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
       const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
       if (error) throw error;
       const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
-      setProducts(fresh.data || []);
+      if (fresh.data) {
+        setProducts(fresh.data.map(p => ({
+          id: p.id, name: p.name,
+          for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
+          filter: p.category, tagline: p.description || '',
+          top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+          image: p.image_url || '', accent: '#B8963E'
+        })));
+      }
       setMessage('✅ Product deleted.');
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
@@ -203,12 +244,20 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
                 <option value="Men">Men</option>
                 <option value="Unisex">Unisex</option>
               </select>
-              <input type="text" placeholder="Tagline (e.g. Sweet, Floral & Sensual)" value={newProduct.tagline} onChange={(e) => setNewProduct({ ...newProduct, tagline: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Tagline" value={newProduct.tagline} onChange={(e) => setNewProduct({ ...newProduct, tagline: e.target.value })} className="admin-input" />
               <input type="text" placeholder="Top Notes" value={newProduct.top} onChange={(e) => setNewProduct({ ...newProduct, top: e.target.value })} className="admin-input" />
               <input type="text" placeholder="Heart Notes" value={newProduct.heart} onChange={(e) => setNewProduct({ ...newProduct, heart: e.target.value })} className="admin-input" />
               <input type="text" placeholder="Base Notes" value={newProduct.base} onChange={(e) => setNewProduct({ ...newProduct, base: e.target.value })} className="admin-input" />
-              <input type="text" placeholder="Image URL *" value={newProduct.image} onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })} className="admin-input admin-input-full" />
             </div>
+
+            <div className="admin-upload-section">
+              <label className="admin-upload-label">
+                {uploading ? 'Uploading...' : '📤 Upload Product Image *'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], (url) => setNewProduct({ ...newProduct, image: url }))} />
+              </label>
+              {newProduct.image && <img src={newProduct.image} alt="Preview" className="admin-preview-img" />}
+            </div>
+
             <button onClick={handleAddProduct} className="admin-btn-primary">+ Add Product</button>
 
             <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Products</h3>
@@ -230,13 +279,31 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
         {activeTab === 'images' && (
           <div>
             <h3 className="admin-subtitle">Hero Image</h3>
-            <input type="text" value={heroImage} onChange={(e) => setHeroImage(e.target.value)} className="admin-input admin-input-full" placeholder="Hero image URL" />
+            <div className="admin-upload-section">
+              <label className="admin-upload-label">
+                {uploading ? 'Uploading...' : '📤 Upload Hero Image'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], setHeroImage)} />
+              </label>
+              {heroImage && <img src={heroImage} alt="Hero" className="admin-preview-img" />}
+            </div>
 
-            <h3 className="admin-subtitle" style={{ marginTop: '20px' }}>Lifestyle Image 1</h3>
-            <input type="text" value={lifestyle1} onChange={(e) => setLifestyle1(e.target.value)} className="admin-input admin-input-full" placeholder="Lifestyle image 1 URL" />
+            <h3 className="admin-subtitle">Lifestyle Image 1</h3>
+            <div className="admin-upload-section">
+              <label className="admin-upload-label">
+                {uploading ? 'Uploading...' : '📤 Upload Lifestyle Image 1'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], setLifestyle1)} />
+              </label>
+              {lifestyle1 && <img src={lifestyle1} alt="Lifestyle 1" className="admin-preview-img" />}
+            </div>
 
-            <h3 className="admin-subtitle" style={{ marginTop: '20px' }}>Lifestyle Image 2</h3>
-            <input type="text" value={lifestyle2} onChange={(e) => setLifestyle2(e.target.value)} className="admin-input admin-input-full" placeholder="Lifestyle image 2 URL" />
+            <h3 className="admin-subtitle">Lifestyle Image 2</h3>
+            <div className="admin-upload-section">
+              <label className="admin-upload-label">
+                {uploading ? 'Uploading...' : '📤 Upload Lifestyle Image 2'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], setLifestyle2)} />
+              </label>
+              {lifestyle2 && <img src={lifestyle2} alt="Lifestyle 2" className="admin-preview-img" />}
+            </div>
 
             <button onClick={handleSaveSiteSettings} className="admin-btn-primary" style={{ marginTop: '20px' }}>Save Site Settings</button>
           </div>
@@ -252,12 +319,10 @@ function App() {
   const [renderCount, setRenderCount] = useState(0);
   const collectionRef = useRef(null);
 
-  // Hero & Lifestyle Images
   const [heroImage, setHeroImage] = useState(DEFAULT_HERO);
   const [lifestyle1, setLifestyle1] = useState(DEFAULT_LIFESTYLE_1);
   const [lifestyle2, setLifestyle2] = useState(DEFAULT_LIFESTYLE_2);
 
-  // Cart States
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
@@ -268,7 +333,6 @@ function App() {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [showAddedPopup, setShowAddedPopup] = useState(false);
 
-  // Admin States
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
@@ -278,31 +342,22 @@ function App() {
     "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
   ];
 
-  // === LOAD FROM SUPABASE ===
   useEffect(() => {
     async function loadData() {
       try {
-        // Load Products
         const { data: prodData, error: prodErr } = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
         if (!prodErr && prodData && prodData.length > 0) {
-          const mapped = prodData.map(p => ({
-            id: p.id,
-            name: p.name,
+          setProducts(prodData.map(p => ({
+            id: p.id, name: p.name,
             for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-            filter: p.category,
-            tagline: p.description || '',
-            top: p.top_notes || '',
-            heart: p.heart_notes || '',
-            base: p.base_notes || '',
-            image: p.image_url || '',
-            accent: '#B8963E'
-          }));
-          setProducts(mapped);
+            filter: p.category, tagline: p.description || '',
+            top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+            image: p.image_url || '', accent: '#B8963E'
+          })));
         } else {
           setProducts(defaultProducts);
         }
 
-        // Load Site Settings
         const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
         if (siteData) {
           if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImage(siteData.hero_images[0]);
@@ -317,7 +372,6 @@ function App() {
     loadData();
   }, []);
 
-  // === CART FUNCTIONS ===
   const addToCart = (product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
@@ -367,7 +421,6 @@ function App() {
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  // === FIREBASE USER CONNECTION ===
   window.setAppUser = function(user) {
     if (user) {
       setIsLoggedIn(true);
@@ -419,7 +472,6 @@ function App() {
         <div className="added-popup">✅ Added to Cart!</div>
       )}
 
-      {/* Top Bar */}
       <div className="top-bar">
         <div className="top-bar-inner">
           <span>🚚 FREE DELIVERY ISLANDWIDE</span>
@@ -430,7 +482,6 @@ function App() {
         </div>
       </div>
 
-      {/* Header */}
       <header className="site-header">
         <div className="header-inner">
           <div className="header-logo">
@@ -465,7 +516,6 @@ function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="hero-section">
         <img src={heroImage} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
@@ -486,7 +536,6 @@ function App() {
         </div>
       </section>
 
-      {/* Trust Badges */}
       <section className="trust-badges">
         <div className="trust-grid">
           {[
@@ -506,7 +555,6 @@ function App() {
         </div>
       </section>
 
-      {/* Collection Section */}
       <section ref={collectionRef} id="collection" className="collection-section">
         <div className="collection-header">
           <div className="collection-eyebrow">OUR COLLECTION</div>
@@ -549,7 +597,6 @@ function App() {
         </div>
       </section>
 
-      {/* Lifestyle Section 1 */}
       <section className="lifestyle-section">
         <div className="lifestyle-grid">
           <div className="lifestyle-img">
@@ -567,7 +614,6 @@ function App() {
         </div>
       </section>
 
-      {/* Lifestyle Section 2 */}
       <section className="lifestyle-section">
         <div className="lifestyle-grid reverse">
           <div className="lifestyle-content">
@@ -585,7 +631,6 @@ function App() {
         </div>
       </section>
 
-      {/* KOKO Section */}
       <section className="koko-section">
         <div className="koko-box">
           <div className="koko-info">
@@ -599,7 +644,6 @@ function App() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer id="contact" className="site-footer">
         <div className="footer-inner">
           <div>
@@ -631,7 +675,6 @@ function App() {
         </div>
       </footer>
 
-      {/* Fixed Bottom Bar */}
       <div className="bottom-bar">
         <div className="bottom-bar-inner">
           <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="bottom-btn facebook">Facebook</a>
