@@ -67,20 +67,22 @@
     };
 
     onAuthStateChanged(auth, (user) => {
-      const loginBtn = document.getElementById('google-login-btn');
-      const logoutBtn = document.getElementById('google-logout-btn');
-      if (user) {
-        if(loginBtn) loginBtn.style.display = 'none';
-        if(logoutBtn) logoutBtn.style.display = 'block';
-        // ලොග් වුණාම රිවිව් ෆෝම් එක පෙන්නන්න
-        if (window.showReviewForm) window.showReviewForm(user);
-      } else {
-        if(loginBtn) loginBtn.style.display = 'block';
-        if(logoutBtn) logoutBtn.style.display = 'none';
-        // ලොග් අවුට් වුණාම රිවිව් ෆෝම් එක හංගන්න
-        if (window.hideReviewForm) window.hideReviewForm();
-      }
-    });
+  const loginBtn = document.getElementById('google-login-btn');
+  const logoutBtn = document.getElementById('google-logout-btn');
+  if (user) {
+    if(loginBtn) loginBtn.style.display = 'none';
+    if(logoutBtn) logoutBtn.style.display = 'block';
+    if (window.showReviewForm) window.showReviewForm(user);
+    // Cart Popup එකට User ව යවන්න
+    if (window.setAppUser) window.setAppUser(user);
+  } else {
+    if(loginBtn) loginBtn.style.display = 'block';
+    if(logoutBtn) logoutBtn.style.display = 'none';
+    if (window.hideReviewForm) window.hideReviewForm();
+    // Cart Popup එකට null යවන්න
+    if (window.setAppUser) window.setAppUser(null);
+  }
+});
   </script>
 </head>
 <body>
