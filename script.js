@@ -172,6 +172,239 @@ const sendBankDepositOrder = () => {
 
   const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.filter === activeFilter);
 
+  // === CART POPUP (MODAL) ===
+const CartModal = () => {
+  if (!isCartOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.7)',
+      zIndex: 99999,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      overflowY: 'auto'
+    }}>
+      <div style={{
+        background: '#FFFBF5',
+        borderRadius: '20px',
+        maxWidth: '600px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        position: 'relative',
+        padding: '30px'
+      }}>
+        {/* Close Button */}
+        <button 
+          onClick={() => setIsCartOpen(false)}
+          style={{
+            position: 'absolute',
+            top: '15px', right: '15px',
+            background: '#0A2E1F',
+            color: '#FFFBF5',
+            border: 'none',
+            borderRadius: '50%',
+            width: '35px', height: '35px',
+            fontSize: '18px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >×</button>
+
+        <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', marginBottom: '20px', color: '#0A2E1F' }}>
+          Your Cart
+        </h2>
+
+        {/* Daraz Banner */}
+        <div style={{
+          background: '#0A2E1F',
+          color: '#FFFBF5',
+          padding: '15px',
+          borderRadius: '12px',
+          marginBottom: '20px',
+          textAlign: 'center'
+        }}>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>
+            🏆 Best Option: Order on Daraz
+          </p>
+          <p style={{ margin: '5px 0 0', fontSize: '12px', opacity: 0.8 }}>
+            Cash on Delivery & KOKO Pay Later available • Safe returns
+          </p>
+        </div>
+
+        {/* Cart Items */}
+        {cartItems.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#666', padding: '20px' }}>Your cart is empty.</p>
+        ) : (
+          <div>
+            {cartItems.map(item => (
+              <div key={item.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px',
+                background: '#fff',
+                borderRadius: '10px',
+                marginBottom: '10px',
+                border: '1px solid #eee'
+              }}>
+                <img src={item.image} alt={item.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{item.name}</div>
+                  <div style={{ fontSize: '12px', color: '#666' }}>Rs. 1,500 each</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>-</button>
+                  <span style={{ fontWeight: 'bold' }}>{item.quantity}</span>
+                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>+</button>
+                </div>
+                <div style={{ fontWeight: 'bold', minWidth: '70px', textAlign: 'right' }}>Rs. {(1500 * item.quantity).toLocaleString()}</div>
+                <button onClick={() => removeFromCart(item.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '16px' }}>✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Totals */}
+        <div style={{ marginTop: '20px', padding: '15px', background: '#fff', borderRadius: '10px', border: '1px solid #eee' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span>Subtotal</span>
+            <span>Rs. {getSubtotal().toLocaleString()}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span>Delivery</span>
+            <span>{getDeliveryCharge() === 0 ? 'FREE 🎉' : `Rs. ${getDeliveryCharge()}`}</span>
+          </div>
+          {getDeliveryCharge() > 0 && (
+            <p style={{ fontSize: '11px', color: '#B8963E', margin: '5px 0' }}>
+              Add {3 - getCartCount()} more item(s) for FREE delivery!
+            </p>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '18px', borderTop: '1px solid #eee', paddingTop: '10px', marginTop: '10px' }}>
+            <span>Total</span>
+            <span>Rs. {getTotal().toLocaleString()}</span>
+          </div>
+        </div>
+
+        {/* Customer Details Form */}
+        {isLoggedIn ? (
+          <div style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>Customer Details</h3>
+            <input 
+              type="text" 
+              placeholder="Your Name" 
+              value={customerName} 
+              onChange={(e) => setCustomerName(e.target.value)}
+              style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
+            />
+            <input 
+              type="tel" 
+              placeholder="Phone Number" 
+              value={customerPhone} 
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
+            />
+            <textarea 
+              placeholder="Address" 
+              value={customerAddress} 
+              onChange={(e) => setCustomerAddress(e.target.value)}
+              style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '8px', border: '1px solid #ccc', minHeight: '60px' }}
+            />
+            <select 
+              value={customerDistrict} 
+              onChange={(e) => setCustomerDistrict(e.target.value)}
+              style={{ width: '100%', padding: '10px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #ccc' }}
+            >
+              <option value="">Select District</option>
+              {districts.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+        ) : (
+          <div style={{ marginTop: '20px', padding: '15px', background: '#FFF3CD', borderRadius: '10px', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: '14px', color: '#856404' }}>
+              Please sign in with Google to place an order.
+            </p>
+          </div>
+        )}
+
+        {/* Payment Options */}
+        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Daraz Button */}
+          <a 
+            href={DARAZ_LINK} 
+            target="_blank" 
+            rel="noopener"
+            style={{
+              display: 'block',
+              textAlign: 'center',
+              padding: '15px',
+              background: '#0A2E1F',
+              color: '#FFFBF5',
+              borderRadius: '12px',
+              textDecoration: 'none',
+              fontWeight: 'bold',
+              fontSize: '14px'
+            }}
+          >
+            🛒 Order on Daraz (COD / KOKO)
+          </a>
+
+          {/* Bank Deposit */}
+          {isLoggedIn && (
+            <div style={{ padding: '15px', background: '#fff', borderRadius: '12px', border: '1px solid #eee' }}>
+              <p style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '14px' }}>🏦 Bank Deposit Details:</p>
+              <p style={{ margin: '3px 0', fontSize: '13px' }}>Account Holder: <strong>K.A.S.P. Wijerathne</strong></p>
+              <p style={{ margin: '3px 0', fontSize: '13px' }}>Bank: <strong>Sampath Bank</strong></p>
+              <p style={{ margin: '3px 0', fontSize: '13px' }}>Account No: <strong>100252479872</strong></p>
+              <p style={{ margin: '3px 0', fontSize: '13px' }}>Branch: <strong>Pettah</strong></p>
+              <button 
+                onClick={sendBankDepositOrder}
+                style={{
+                  width: '100%',
+                  marginTop: '10px',
+                  padding: '12px',
+                  background: '#B8963E',
+                  color: '#0A2E1F',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontSize: '13px'
+                }}
+              >
+                📤 Send Slip via WhatsApp
+              </button>
+            </div>
+          )}
+
+          {/* WhatsApp Order */}
+          {isLoggedIn && (
+            <button 
+              onClick={sendWhatsAppOrder}
+              style={{
+                padding: '15px',
+                background: '#25D366',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '12px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              💬 Order via WhatsApp
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+// === END CART POPUP ===
   return (
     <div className="min-h-screen bg-[#FFFBF5] text-[#0A2E1F] selection:bg-[#B8963E]/20">
       <style>{`
