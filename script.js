@@ -474,7 +474,7 @@ function App() {
 
       <div className="top-bar">
         <div className="top-bar-inner">
-          <span>🚚 FREE DELIVERY ISLANDWIDE</span>
+          <span>🚚 FREE DELIVERY ON 3+ ITEMS</span>
           <span className="divider">|</span>
           <span>🛡️ PREMIUM QUALITY</span>
           <span className="divider">|</span>
