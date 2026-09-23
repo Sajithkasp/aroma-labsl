@@ -18,6 +18,23 @@ const DEFAULT_HERO = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
 const DEFAULT_LIFESTYLE_1 = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
 const DEFAULT_LIFESTYLE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
 
+const defaultLifestyleDetails = [
+  {
+    eyebrow: "MUSE — BLACK TEMPTATION",
+    title: "Dark, mysterious,",
+    titleAccent: "& seductive.",
+    description: "Blackcurrant and pear open with a bright bite, jasmine and orange blossom bloom at the heart, and vanilla, praline, and musk leave a soft, unforgettable trail. Perfect for evenings.",
+    image: DEFAULT_LIFESTYLE_1
+  },
+  {
+    eyebrow: "MUSE — HUNTERS DUSK",
+    title: "Woody, smoky,",
+    titleAccent: "& adventurous.",
+    description: "Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man.",
+    image: DEFAULT_LIFESTYLE_2
+  }
+];
+
 // === CART MODAL ===
 function CartModal({ 
   isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
@@ -112,13 +129,19 @@ function CartModal({
 }
 
 // === ADMIN PANEL MODAL ===
-function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, heroImage, setHeroImage, lifestyle1, setLifestyle1, lifestyle2, setLifestyle2 }) {
+function AdminPanelModal({ 
+  isAdminOpen, setIsAdminOpen, products, setProducts, 
+  heroImages, setHeroImages, lifestyleImages, setLifestyleImages, 
+  lifestyleDetails, setLifestyleDetails 
+}) {
   const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: ''
   });
+  const [newHeroUploading, setNewHeroUploading] = useState(false);
+  const [newLifestyleUploading, setNewLifestyleUploading] = useState(false);
 
   if (!isAdminOpen) return null;
 
@@ -144,6 +167,90 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
       setMessage('❌ Upload error: ' + err.message);
     }
     setUploading(false);
+  };
+
+  const saveSiteSettings = async (newHeroImages, newLifestyleImages, newLifestyleDetails) => {
+    try {
+      const { error } = await window.supabaseClient.from('site_settings').update({
+        hero_images: newHeroImages,
+        lifestyle_images: newLifestyleImages,
+        lifestyle_details: newLifestyleDetails,
+        updated_at: new Date().toISOString()
+      }).eq('id', 1);
+      if (error) throw error;
+      setMessage('✅ Saved successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleAddHeroImage = async (file) => {
+    if (!file) return;
+    setNewHeroUploading(true);
+    try {
+      const fileName = `hero-${Date.now()}-${file.name.replace(/\s/g, '-')}`;
+      const { error } = await window.supabaseClient.storage.from('product-images').upload(fileName, file);
+      if (error) throw error;
+      const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
+      const updated = [...heroImages, urlData.publicUrl];
+      setHeroImages(updated);
+      await saveSiteSettings(updated, lifestyleImages, lifestyleDetails);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+    setNewHeroUploading(false);
+  };
+
+  const handleDeleteHeroImage = async (index) => {
+    if (!window.confirm('Delete this Hero Image?')) return;
+    const updated = heroImages.filter((_, i) => i !== index);
+    setHeroImages(updated);
+    await saveSiteSettings(updated, lifestyleImages, lifestyleDetails);
+  };
+
+  const handleAddLifestyleImage = async (file) => {
+    if (!file) return;
+    setNewLifestyleUploading(true);
+    try {
+      const fileName = `lifestyle-${Date.now()}-${file.name.replace(/\s/g, '-')}`;
+      const { error } = await window.supabaseClient.storage.from('product-images').upload(fileName, file);
+      if (error) throw error;
+      const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
+      const updated = [...lifestyleImages, urlData.publicUrl];
+      const newDetail = {
+        eyebrow: "NEW COLLECTION",
+        title: "New Fragrance,",
+        titleAccent: "& elegant.",
+        description: "Discover our latest addition.",
+        image: urlData.publicUrl
+      };
+      const updatedDetails = [...lifestyleDetails, newDetail];
+      setLifestyleImages(updated);
+      setLifestyleDetails(updatedDetails);
+      await saveSiteSettings(heroImages, updated, updatedDetails);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+    setNewLifestyleUploading(false);
+  };
+
+  const handleDeleteLifestyleImage = async (index) => {
+    if (!window.confirm('Delete this Lifestyle Image?')) return;
+    const updated = lifestyleImages.filter((_, i) => i !== index);
+    const updatedDetails = lifestyleDetails.filter((_, i) => i !== index);
+    setLifestyleImages(updated);
+    setLifestyleDetails(updatedDetails);
+    await saveSiteSettings(heroImages, updated, updatedDetails);
+  };
+
+  const handleUpdateLifestyleDetail = (index, field, value) => {
+    const updated = lifestyleDetails.map((d, i) => i === index ? { ...d, [field]: value } : d);
+    setLifestyleDetails(updated);
+  };
+
+  const handleSaveLifestyleDetails = async () => {
+    await saveSiteSettings(heroImages, lifestyleImages, lifestyleDetails);
   };
 
   const handleAddProduct = async () => {
@@ -205,22 +312,6 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
     }
   };
 
-  const handleSaveSiteSettings = async () => {
-    try {
-      const { error } = await window.supabaseClient.from('site_settings').update({
-        hero_images: [heroImage],
-        lifestyle_image_1: lifestyle1,
-        lifestyle_image_2: lifestyle2,
-        updated_at: new Date().toISOString()
-      }).eq('id', 1);
-      if (error) throw error;
-      setMessage('✅ Site settings saved!');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      setMessage('❌ Error: ' + err.message);
-    }
-  };
-
   return (
     <div className="admin-overlay">
       <div className="admin-box">
@@ -229,7 +320,8 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
 
         <div className="admin-tabs">
           <button className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>Products</button>
-          <button className={`admin-tab ${activeTab === 'images' ? 'active' : ''}`} onClick={() => setActiveTab('images')}>Site Images</button>
+          <button className={`admin-tab ${activeTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveTab('hero')}>Hero Images</button>
+          <button className={`admin-tab ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>Lifestyle</button>
         </div>
 
         {message && <div className="admin-message">{message}</div>}
@@ -276,36 +368,51 @@ function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, h
           </div>
         )}
 
-        {activeTab === 'images' && (
+        {activeTab === 'hero' && (
           <div>
-            <h3 className="admin-subtitle">Hero Image</h3>
+            <h3 className="admin-subtitle">Hero Images (Auto Slide)</h3>
             <div className="admin-upload-section">
               <label className="admin-upload-label">
-                {uploading ? 'Uploading...' : '📤 Upload Hero Image'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], setHeroImage)} />
+                {newHeroUploading ? 'Uploading...' : '📤 Add Hero Image'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAddHeroImage(e.target.files[0])} />
               </label>
-              {heroImage && <img src={heroImage} alt="Hero" className="admin-preview-img" />}
             </div>
 
-            <h3 className="admin-subtitle">Lifestyle Image 1</h3>
+            <div className="admin-image-grid">
+              {heroImages.map((img, i) => (
+                <div key={i} className="admin-image-item">
+                  <img src={img} alt={`Hero ${i + 1}`} className="admin-preview-img" />
+                  <button onClick={() => handleDeleteHeroImage(i)} className="admin-btn-delete" style={{ marginTop: '8px', display: 'block', width: '100%' }}>Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'lifestyle' && (
+          <div>
+            <h3 className="admin-subtitle">Lifestyle Images & Details</h3>
             <div className="admin-upload-section">
               <label className="admin-upload-label">
-                {uploading ? 'Uploading...' : '📤 Upload Lifestyle Image 1'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], setLifestyle1)} />
+                {newLifestyleUploading ? 'Uploading...' : '📤 Add Lifestyle Image'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAddLifestyleImage(e.target.files[0])} />
               </label>
-              {lifestyle1 && <img src={lifestyle1} alt="Lifestyle 1" className="admin-preview-img" />}
             </div>
 
-            <h3 className="admin-subtitle">Lifestyle Image 2</h3>
-            <div className="admin-upload-section">
-              <label className="admin-upload-label">
-                {uploading ? 'Uploading...' : '📤 Upload Lifestyle Image 2'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], setLifestyle2)} />
-              </label>
-              {lifestyle2 && <img src={lifestyle2} alt="Lifestyle 2" className="admin-preview-img" />}
-            </div>
+            {lifestyleDetails.map((detail, i) => (
+              <div key={i} className="admin-lifestyle-item">
+                <img src={detail.image} alt={`Lifestyle ${i + 1}`} className="admin-preview-img" />
+                <div className="admin-form-grid" style={{ marginTop: '10px' }}>
+                  <input type="text" placeholder="Eyebrow" value={detail.eyebrow} onChange={(e) => handleUpdateLifestyleDetail(i, 'eyebrow', e.target.value)} className="admin-input admin-input-full" />
+                  <input type="text" placeholder="Title" value={detail.title} onChange={(e) => handleUpdateLifestyleDetail(i, 'title', e.target.value)} className="admin-input" />
+                  <input type="text" placeholder="Title Accent" value={detail.titleAccent} onChange={(e) => handleUpdateLifestyleDetail(i, 'titleAccent', e.target.value)} className="admin-input" />
+                  <textarea placeholder="Description" value={detail.description} onChange={(e) => handleUpdateLifestyleDetail(i, 'description', e.target.value)} className="admin-input admin-input-full" style={{ minHeight: '60px' }}></textarea>
+                </div>
+                <button onClick={() => handleDeleteLifestyleImage(i)} className="admin-btn-delete" style={{ marginTop: '8px' }}>Delete Image</button>
+              </div>
+            ))}
 
-            <button onClick={handleSaveSiteSettings} className="admin-btn-primary" style={{ marginTop: '20px' }}>Save Site Settings</button>
+            <button onClick={handleSaveLifestyleDetails} className="admin-btn-primary" style={{ marginTop: '20px' }}>Save Lifestyle Details</button>
           </div>
         )}
       </div>
@@ -319,9 +426,10 @@ function App() {
   const [renderCount, setRenderCount] = useState(0);
   const collectionRef = useRef(null);
 
-  const [heroImage, setHeroImage] = useState(DEFAULT_HERO);
-  const [lifestyle1, setLifestyle1] = useState(DEFAULT_LIFESTYLE_1);
-  const [lifestyle2, setLifestyle2] = useState(DEFAULT_LIFESTYLE_2);
+  const [heroImages, setHeroImages] = useState([DEFAULT_HERO]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [lifestyleImages, setLifestyleImages] = useState([DEFAULT_LIFESTYLE_1, DEFAULT_LIFESTYLE_2]);
+  const [lifestyleDetails, setLifestyleDetails] = useState(defaultLifestyleDetails);
 
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -360,9 +468,9 @@ function App() {
 
         const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
         if (siteData) {
-          if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImage(siteData.hero_images[0]);
-          if (siteData.lifestyle_image_1) setLifestyle1(siteData.lifestyle_image_1);
-          if (siteData.lifestyle_image_2) setLifestyle2(siteData.lifestyle_image_2);
+          if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImages(siteData.hero_images);
+          if (siteData.lifestyle_images && siteData.lifestyle_images.length > 0) setLifestyleImages(siteData.lifestyle_images);
+          if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) setLifestyleDetails(siteData.lifestyle_details);
         }
       } catch (e) {
         console.error(e);
@@ -371,6 +479,15 @@ function App() {
     }
     loadData();
   }, []);
+
+  // Hero Auto Slide
+  useEffect(() => {
+    if (heroImages.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentHeroIndex(prev => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages]);
 
   const addToCart = (product) => {
     setCartItems(prev => {
@@ -463,9 +580,9 @@ function App() {
       <AdminPanelModal 
         isAdminOpen={isAdminOpen} setIsAdminOpen={setIsAdminOpen}
         products={products} setProducts={setProducts}
-        heroImage={heroImage} setHeroImage={setHeroImage}
-        lifestyle1={lifestyle1} setLifestyle1={setLifestyle1}
-        lifestyle2={lifestyle2} setLifestyle2={setLifestyle2}
+        heroImages={heroImages} setHeroImages={setHeroImages}
+        lifestyleImages={lifestyleImages} setLifestyleImages={setLifestyleImages}
+        lifestyleDetails={lifestyleDetails} setLifestyleDetails={setLifestyleDetails}
       />
 
       {showAddedPopup && (
@@ -517,7 +634,7 @@ function App() {
       </header>
 
       <section className="hero-section">
-        <img src={heroImage} alt="Aroma Lab" className="hero-img" />
+        <img src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="hero-content-inner">
@@ -534,6 +651,13 @@ function App() {
             </div>
           </div>
         </div>
+        {heroImages.length > 1 && (
+          <div className="hero-dots">
+            {heroImages.map((_, i) => (
+              <button key={i} className={`hero-dot ${i === currentHeroIndex ? 'active' : ''}`} onClick={() => setCurrentHeroIndex(i)}></button>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="trust-badges">
@@ -597,39 +721,24 @@ function App() {
         </div>
       </section>
 
-      <section className="lifestyle-section">
-        <div className="lifestyle-grid">
-          <div className="lifestyle-img">
-            <img src={lifestyle1} alt="Black Temptation" />
-          </div>
-          <div className="lifestyle-content">
-            <div className="lifestyle-eyebrow">MUSE — BLACK TEMPTATION</div>
-            <h3 className="lifestyle-title">Dark, mysterious,<br /><span className="accent">& seductive.</span></h3>
-            <p className="lifestyle-desc">"Blackcurrant and pear open with a bright bite, jasmine and orange blossom bloom at the heart, and vanilla, praline, and musk leave a soft, unforgettable trail. Perfect for evenings."</p>
-            <div className="lifestyle-buttons">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
-              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Black Temptation - Rs. 1,500")}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
+      {lifestyleDetails.map((detail, index) => (
+        <section key={index} className="lifestyle-section">
+          <div className={`lifestyle-grid ${index % 2 === 1 ? 'reverse' : ''}`}>
+            <div className="lifestyle-img">
+              <img src={detail.image} alt={detail.title} />
+            </div>
+            <div className="lifestyle-content">
+              <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
+              <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
+              <p className="lifestyle-desc">"{detail.description}"</p>
+              <div className="lifestyle-buttons">
+                <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
+                <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title} - Rs. 1,500`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="lifestyle-section">
-        <div className="lifestyle-grid reverse">
-          <div className="lifestyle-content">
-            <div className="lifestyle-eyebrow">MUSE — HUNTERS DUSK</div>
-            <h3 className="lifestyle-title">Woody, smoky,<br /><span className="accent">& adventurous.</span></h3>
-            <p className="lifestyle-desc">"Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man."</p>
-            <div className="lifestyle-buttons">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
-              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Hunters Dusk - Rs. 1,500")}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
-            </div>
-          </div>
-          <div className="lifestyle-img">
-            <img src={lifestyle2} alt="Hunters Dusk" />
-          </div>
-        </div>
-      </section>
+        </section>
+      ))}
 
       <section className="koko-section">
         <div className="koko-box">
