@@ -407,7 +407,9 @@ const CartModal = () => {
 // === END CART POPUP ===
   return (
     <div className="min-h-screen bg-[#FFFBF5] text-[#0A2E1F] selection:bg-[#B8963E]/20">
-      <style>{`
+      {/* Cart Modal */}
+<CartModal />
+    <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
         .font-display { font-family: 'Playfair Display', serif; }
         .font-body { font-family: 'Inter', sans-serif; }
@@ -473,6 +475,46 @@ const CartModal = () => {
   <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none', padding: '8px 16px', background: '#db4437', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
     Logout
   </button>
+      {/* Cart Icon */}
+<button 
+  onClick={() => setIsCartOpen(true)}
+  style={{
+    position: 'relative',
+    background: '#0A2E1F',
+    color: '#FFFBF5',
+    border: 'none',
+    borderRadius: '50%',
+    width: '45px',
+    height: '45px',
+    fontSize: '20px',
+    cursor: 'pointer',
+    marginLeft: '10px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}
+>
+  🛒
+  {getCartCount() > 0 && (
+    <span style={{
+      position: 'absolute',
+      top: '-5px',
+      right: '-5px',
+      background: '#B8963E',
+      color: '#0A2E1F',
+      borderRadius: '50%',
+      width: '22px',
+      height: '22px',
+      fontSize: '12px',
+      fontWeight: 'bold',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      {getCartCount()}
+    </span>
+  )}
+</button>
 </div>
         
           <header className="sticky top-0 z-40 bg-[#FFFBF5]/90 backdrop-blur-[12px] border-b border-[#0A2E1F]/[0.06]">
