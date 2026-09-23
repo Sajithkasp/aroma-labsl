@@ -111,6 +111,16 @@ function App() {
             </div>
           </div>
 
+{/* Google Login/Logout Buttons */}
+<div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 20px 0 20px' }}>
+  <button id="google-login-btn" onClick={() => window.googleLogin()} style={{ padding: '8px 16px', background: '#4285F4', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+    Sign in with Google
+  </button>
+  <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none', padding: '8px 16px', background: '#db4437', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+    Logout
+  </button>
+</div>
+        
           <header className="sticky top-0 z-40 bg-[#FFFBF5]/90 backdrop-blur-[12px] border-b border-[#0A2E1F]/[0.06]">
             <div className="max-w-[1320px] mx-auto px-6 sm:px-8 py-5 sm:py-7 flex flex-col items-center">
               <div className="flex flex-col items-center">
