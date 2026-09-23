@@ -4,6 +4,7 @@ const { createRoot } = ReactDOM;
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
 const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
+const ADMIN_EMAIL = "sajith.kasp@gmail.com";
 
 const defaultProducts = [
   { id: "goodgirl", name: "Good Girl", for: "FOR LADIES", filter: "Ladies", tagline: "Sweet, Floral & Sensual", top: "Almond, Coffee", heart: "Jasmine, Tuberose", base: "Cocoa, Vanilla, Tonka Bean", image: "https://sajithkasp.github.io/aroma-labsl/goodgirl.jpg", accent: "#E8A8C0" },
@@ -13,11 +14,11 @@ const defaultProducts = [
   { id: "vanilla", name: "Vanilla", for: "FOR UNISEX", filter: "Unisex", tagline: "Warm, Sweet & Cozy", top: "Vanilla Orchid, Mandarin", heart: "Vanilla, Jasmine", base: "Sandalwood, Musk", image: "https://sajithkasp.github.io/aroma-labsl/vanilla.jpg", accent: "#D4B896" }
 ];
 
-const HERO_IMAGE = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
-const LIFESTYLE_IMAGE = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
-const LIFESTYLE_IMAGE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
+const DEFAULT_HERO = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
+const DEFAULT_LIFESTYLE_1 = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
+const DEFAULT_LIFESTYLE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
 
-// === CART MODAL COMPONENT (App එකෙන් එළියේ) ===
+// === CART MODAL COMPONENT ===
 function CartModal({ 
   isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
   getSubtotal, getDeliveryCharge, getTotal, getCartCount,
@@ -28,318 +29,222 @@ function CartModal({
   if (!isCartOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.7)',
-      zIndex: 99999,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      overflowY: 'auto'
-    }}>
-      <div style={{
-        background: '#FFFBF5',
-        borderRadius: '20px',
-        maxWidth: '600px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        position: 'relative',
-        padding: '30px'
-      }}>
-        <button 
-          onClick={() => setIsCartOpen(false)}
-          style={{
-            position: 'absolute',
-            top: '15px', right: '15px',
-            background: '#0A2E1F',
-            color: '#FFFBF5',
-            border: 'none',
-            borderRadius: '50%',
-            width: '35px', height: '35px',
-            fontSize: '18px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >×</button>
+    <div className="cart-modal-overlay">
+      <div className="cart-modal-box">
+        <button className="cart-modal-close" onClick={() => setIsCartOpen(false)}>×</button>
+        <h2 className="cart-modal-title">Your Cart</h2>
 
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '28px', marginBottom: '20px', color: '#0A2E1F' }}>
-          Your Cart
-        </h2>
-
-        <div style={{
-          background: '#0A2E1F',
-          color: '#FFFBF5',
-          padding: '15px',
-          borderRadius: '12px',
-          marginBottom: '20px',
-          textAlign: 'center'
-        }}>
-          <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>
-            🏆 Best Option: Order on Daraz
-          </p>
-          <p style={{ margin: '5px 0 0', fontSize: '12px', opacity: 0.8 }}>
-            Cash on Delivery & KOKO Pay Later available • Safe returns
-          </p>
+        <div className="cart-daraz-banner">
+          <p className="cart-daraz-title">🏆 Best Option: Order on Daraz</p>
+          <p className="cart-daraz-desc">Cash on Delivery & KOKO Pay Later available • Safe returns</p>
         </div>
 
         {cartItems.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#666', padding: '20px' }}>Your cart is empty.</p>
+          <p className="cart-empty">Your cart is empty.</p>
         ) : (
           <div>
             {cartItems.map(item => (
-              <div key={item.id} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px',
-                background: '#fff',
-                borderRadius: '10px',
-                marginBottom: '10px',
-                border: '1px solid #eee'
-              }}>
-                <img src={item.image} alt={item.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{item.name}</div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>Rs. 1,500 each</div>
+              <div key={item.id} className="cart-item">
+                <img src={item.image} alt={item.name} className="cart-item-img" />
+                <div className="cart-item-info">
+                  <div className="cart-item-name">{item.name}</div>
+                  <div className="cart-item-price">Rs. 1,500 each</div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>-</button>
-                  <span style={{ fontWeight: 'bold' }}>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>+</button>
+                <div className="cart-qty-controls">
+                  <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+                  <span className="cart-qty-num">{item.quantity}</span>
+                  <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
                 </div>
-                <div style={{ fontWeight: 'bold', minWidth: '70px', textAlign: 'right' }}>Rs. {(1500 * item.quantity).toLocaleString()}</div>
-                <button onClick={() => removeFromCart(item.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '16px' }}>✕</button>
+                <div className="cart-item-total">Rs. {(1500 * item.quantity).toLocaleString()}</div>
+                <button className="cart-item-remove" onClick={() => removeFromCart(item.id)}>✕</button>
               </div>
             ))}
           </div>
         )}
 
-        <div style={{ marginTop: '20px', padding: '15px', background: '#fff', borderRadius: '10px', border: '1px solid #eee' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span>Subtotal</span>
-            <span>Rs. {getSubtotal().toLocaleString()}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span>Delivery</span>
-            <span>{getDeliveryCharge() === 0 ? 'FREE 🎉' : `Rs. ${getDeliveryCharge()}`}</span>
-          </div>
+        <div className="cart-totals">
+          <div className="cart-total-row"><span>Subtotal</span><span>Rs. {getSubtotal().toLocaleString()}</span></div>
+          <div className="cart-total-row"><span>Delivery</span><span>{getDeliveryCharge() === 0 ? 'FREE 🎉' : `Rs. ${getDeliveryCharge()}`}</span></div>
           {getDeliveryCharge() > 0 && (
-            <p style={{ fontSize: '11px', color: '#B8963E', margin: '5px 0' }}>
-              Add {3 - getCartCount()} more item(s) for FREE delivery!
-            </p>
+            <p className="cart-delivery-hint">Add {3 - getCartCount()} more item(s) for FREE delivery!</p>
           )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '18px', borderTop: '1px solid #eee', paddingTop: '10px', marginTop: '10px' }}>
-            <span>Total</span>
-            <span>Rs. {getTotal().toLocaleString()}</span>
-          </div>
+          <div className="cart-total-row cart-total-final"><span>Total</span><span>Rs. {getTotal().toLocaleString()}</span></div>
         </div>
 
         {isLoggedIn ? (
-          <div style={{ marginTop: '20px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>Customer Details</h3>
-            <input 
-              type="text" 
-              placeholder="Your Name" 
-              value={customerName} 
-              onChange={(e) => setCustomerName(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
-            />
-            <input 
-              type="tel" 
-              placeholder="Phone Number" 
-              value={customerPhone} 
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
-            />
-            <textarea 
-              placeholder="Address" 
-              value={customerAddress} 
-              onChange={(e) => setCustomerAddress(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '8px', border: '1px solid #ccc', minHeight: '60px' }}
-            />
-            <select 
-              value={customerDistrict} 
-              onChange={(e) => setCustomerDistrict(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #ccc' }}
-            >
+          <div className="cart-customer-form">
+            <h3 className="cart-form-title">Customer Details</h3>
+            <input type="text" placeholder="Your Name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="cart-form-input" />
+            <input type="tel" placeholder="Phone Number" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="cart-form-input" />
+            <textarea placeholder="Address" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} className="cart-form-input cart-form-textarea"></textarea>
+            <select value={customerDistrict} onChange={(e) => setCustomerDistrict(e.target.value)} className="cart-form-input">
               <option value="">Select District</option>
               {districts.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
         ) : (
-          <div style={{ marginTop: '20px', padding: '15px', background: '#FFF3CD', borderRadius: '10px', textAlign: 'center' }}>
-            <p style={{ margin: 0, fontSize: '14px', color: '#856404' }}>
-              Please sign in with Google to place an order.
-            </p>
+          <div className="cart-login-warning">
+            <p>Please sign in with Google to place an order.</p>
           </div>
         )}
 
-        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <a 
-            href={DARAZ_LINK} 
-            target="_blank" 
-            rel="noopener"
-            style={{
-              display: 'block',
-              textAlign: 'center',
-              padding: '15px',
-              background: '#0A2E1F',
-              color: '#FFFBF5',
-              borderRadius: '12px',
-              textDecoration: 'none',
-              fontWeight: 'bold',
-              fontSize: '14px'
-            }}
-          >
-            🛒 Order on Daraz (COD / KOKO)
-          </a>
+        <div className="cart-payment-options">
+          <a href={DARAZ_LINK} target="_blank" rel="noopener" className="cart-btn cart-btn-daraz">🛒 Order on Daraz (COD / KOKO)</a>
 
           {isLoggedIn && (
-            <div style={{ padding: '15px', background: '#fff', borderRadius: '12px', border: '1px solid #eee' }}>
-              <p style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '14px' }}>🏦 Bank Deposit Details:</p>
-              <p style={{ margin: '3px 0', fontSize: '13px' }}>Account Holder: <strong>K.A.S.P. Wijerathne</strong></p>
-              <p style={{ margin: '3px 0', fontSize: '13px' }}>Bank: <strong>Sampath Bank</strong></p>
-              <p style={{ margin: '3px 0', fontSize: '13px' }}>Account No: <strong>100252479872</strong></p>
-              <p style={{ margin: '3px 0', fontSize: '13px' }}>Branch: <strong>Pettah</strong></p>
-              <button 
-                onClick={sendBankDepositOrder}
-                style={{
-                  width: '100%',
-                  marginTop: '10px',
-                  padding: '12px',
-                  background: '#B8963E',
-                  color: '#0A2E1F',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  fontSize: '13px'
-                }}
-              >
-                📤 Send Slip via WhatsApp
-              </button>
+            <div className="cart-bank-deposit">
+              <p className="cart-bank-title">🏦 Bank Deposit Details:</p>
+              <p className="cart-bank-line">Account Holder: <strong>K.A.S.P. Wijerathne</strong></p>
+              <p className="cart-bank-line">Bank: <strong>Sampath Bank</strong></p>
+              <p className="cart-bank-line">Account No: <strong>100252479872</strong></p>
+              <p className="cart-bank-line">Branch: <strong>Pettah</strong></p>
+              <button onClick={sendBankDepositOrder} className="cart-btn cart-btn-bank">📤 Send Slip via WhatsApp</button>
             </div>
           )}
 
           {isLoggedIn && (
-            <button 
-              onClick={sendWhatsAppOrder}
-              style={{
-                padding: '15px',
-                background: '#25D366',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              💬 Order via WhatsApp
-            </button>
+            <button onClick={sendWhatsAppOrder} className="cart-btn cart-btn-whatsapp">💬 Order via WhatsApp</button>
           )}
         </div>
       </div>
     </div>
   );
 }
-// === END CART MODAL COMPONENT ===
 
 // === ADMIN PANEL MODAL ===
-function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts }) {
-  const [jsonInput, setJsonInput] = useState(JSON.stringify(products, null, 2));
+function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, heroImage, setHeroImage, lifestyle1, setLifestyle1, lifestyle2, setLifestyle2 }) {
+  const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    setJsonInput(JSON.stringify(products, null, 2));
-  }, [products]);
+  const [newProduct, setNewProduct] = useState({
+    name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: ''
+  });
 
   if (!isAdminOpen) return null;
 
-  const handleSave = () => {
+  const handleAddProduct = async () => {
+    if (!newProduct.name || !newProduct.image) {
+      setMessage('❌ Product name and image URL are required.');
+      return;
+    }
     try {
-      const parsed = JSON.parse(jsonInput);
-      if (!Array.isArray(parsed)) throw new Error("Data must be an array");
-      setProducts(parsed);
-      localStorage.setItem('aromaLabProducts', JSON.stringify(parsed));
-      setMessage('✅ Products saved successfully!');
+      const { data, error } = await window.supabaseClient.from('products').insert([{
+        name: newProduct.name,
+        price: 'Rs. 1,500',
+        category: newProduct.category,
+        description: newProduct.tagline,
+        top_notes: newProduct.top,
+        heart_notes: newProduct.heart,
+        base_notes: newProduct.base,
+        image_url: newProduct.image
+      }]).select();
+
+      if (error) throw error;
+
+      const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
+      setProducts(fresh.data || []);
+      setNewProduct({ name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: '' });
+      setMessage('✅ Product added successfully!');
       setTimeout(() => setMessage(''), 3000);
-    } catch (e) {
-      setMessage('❌ Invalid JSON format.');
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm('Delete this product?')) return;
+    try {
+      const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
+      if (error) throw error;
+      const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
+      setProducts(fresh.data || []);
+      setMessage('✅ Product deleted.');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleSaveSiteSettings = async () => {
+    try {
+      const { error } = await window.supabaseClient.from('site_settings').update({
+        hero_images: [heroImage],
+        lifestyle_image_1: lifestyle1,
+        lifestyle_image_2: lifestyle2,
+        updated_at: new Date().toISOString()
+      }).eq('id', 1);
+      if (error) throw error;
+      setMessage('✅ Site settings saved!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
     }
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.8)',
-      zIndex: 99999,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      overflowY: 'auto'
-    }}>
-      <div style={{
-        background: '#fff',
-        borderRadius: '20px',
-        maxWidth: '900px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        position: 'relative',
-        padding: '30px'
-      }}>
-        <button 
-          onClick={() => setIsAdminOpen(false)}
-          style={{
-            position: 'absolute',
-            top: '15px', right: '15px',
-            background: '#0A2E1F',
-            color: '#FFFBF5',
-            border: 'none',
-            borderRadius: '50%',
-            width: '35px', height: '35px',
-            fontSize: '18px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >×</button>
+    <div className="admin-overlay">
+      <div className="admin-box">
+        <button className="admin-close" onClick={() => setIsAdminOpen(false)}>×</button>
+        <h2 className="admin-title">Admin Panel</h2>
 
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '28px', marginBottom: '20px', color: '#0A2E1F' }}>
-          Admin Panel
-        </h2>
-
-        <div style={{ background: '#FEF3C7', border: '1px solid #FCD34D', padding: '15px', borderRadius: '10px', marginBottom: '20px', fontSize: '13px', color: '#92400E' }}>
-          <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>📌 දැනට මේකෙන් Products විතරයි edit කරන්න පුළුවන්. අපි ඊළඟට Supabase එකට connect කරමු.</p>
+        <div className="admin-tabs">
+          <button className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>Products</button>
+          <button className={`admin-tab ${activeTab === 'images' ? 'active' : ''}`} onClick={() => setActiveTab('images')}>Site Images</button>
         </div>
 
-        <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>Products (JSON):</label>
-        <textarea 
-          style={{ width: '100%', height: '400px', padding: '15px', border: '1px solid #ccc', borderRadius: '10px', fontFamily: 'monospace', fontSize: '13px' }}
-          value={jsonInput}
-          onChange={(e) => setJsonInput(e.target.value)}
-          spellCheck="false"
-        />
+        {message && <div className="admin-message">{message}</div>}
 
-        <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
-          <button onClick={handleSave} style={{ padding: '12px 24px', background: '#16A34A', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}>Save & Apply</button>
-        </div>
+        {activeTab === 'products' && (
+          <div>
+            <h3 className="admin-subtitle">Add New Product</h3>
+            <div className="admin-form-grid">
+              <input type="text" placeholder="Product Name *" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} className="admin-input" />
+              <select value={newProduct.category} onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })} className="admin-input">
+                <option value="Ladies">Ladies</option>
+                <option value="Men">Men</option>
+                <option value="Unisex">Unisex</option>
+              </select>
+              <input type="text" placeholder="Tagline (e.g. Sweet, Floral & Sensual)" value={newProduct.tagline} onChange={(e) => setNewProduct({ ...newProduct, tagline: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Top Notes" value={newProduct.top} onChange={(e) => setNewProduct({ ...newProduct, top: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Heart Notes" value={newProduct.heart} onChange={(e) => setNewProduct({ ...newProduct, heart: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Base Notes" value={newProduct.base} onChange={(e) => setNewProduct({ ...newProduct, base: e.target.value })} className="admin-input" />
+              <input type="text" placeholder="Image URL *" value={newProduct.image} onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })} className="admin-input admin-input-full" />
+            </div>
+            <button onClick={handleAddProduct} className="admin-btn-primary">+ Add Product</button>
 
-        {message && (
-          <div style={{ marginTop: '15px', padding: '10px', borderRadius: '8px', background: message.includes('✅') ? '#DCFCE7' : '#FEE2E2', color: message.includes('✅') ? '#166534' : '#991B1B', fontSize: '13px' }}>
-            {message}
+            <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Products</h3>
+            <div className="admin-product-list">
+              {products.map(p => (
+                <div key={p.id} className="admin-product-row">
+                  <img src={p.image} alt={p.name} className="admin-product-img" />
+                  <div className="admin-product-info">
+                    <div className="admin-product-name">{p.name}</div>
+                    <div className="admin-product-cat">{p.for}</div>
+                  </div>
+                  <button onClick={() => handleDeleteProduct(p.id)} className="admin-btn-delete">Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'images' && (
+          <div>
+            <h3 className="admin-subtitle">Hero Image</h3>
+            <input type="text" value={heroImage} onChange={(e) => setHeroImage(e.target.value)} className="admin-input admin-input-full" placeholder="Hero image URL" />
+
+            <h3 className="admin-subtitle" style={{ marginTop: '20px' }}>Lifestyle Image 1</h3>
+            <input type="text" value={lifestyle1} onChange={(e) => setLifestyle1(e.target.value)} className="admin-input admin-input-full" placeholder="Lifestyle image 1 URL" />
+
+            <h3 className="admin-subtitle" style={{ marginTop: '20px' }}>Lifestyle Image 2</h3>
+            <input type="text" value={lifestyle2} onChange={(e) => setLifestyle2(e.target.value)} className="admin-input admin-input-full" placeholder="Lifestyle image 2 URL" />
+
+            <button onClick={handleSaveSiteSettings} className="admin-btn-primary" style={{ marginTop: '20px' }}>Save Site Settings</button>
           </div>
         )}
       </div>
     </div>
   );
 }
-// === END ADMIN PANEL MODAL ===
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -347,7 +252,12 @@ function App() {
   const [renderCount, setRenderCount] = useState(0);
   const collectionRef = useRef(null);
 
-  // === CART STATES ===
+  // Hero & Lifestyle Images
+  const [heroImage, setHeroImage] = useState(DEFAULT_HERO);
+  const [lifestyle1, setLifestyle1] = useState(DEFAULT_LIFESTYLE_1);
+  const [lifestyle2, setLifestyle2] = useState(DEFAULT_LIFESTYLE_2);
+
+  // Cart States
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
@@ -357,13 +267,10 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [showAddedPopup, setShowAddedPopup] = useState(false);
-  // === END CART STATES ===
 
-  // === ADMIN STATES ===
+  // Admin States
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const ADMIN_EMAIL = 'sajith.kasp@gmail.com';
-  // === END ADMIN STATES ===
 
   const districts = [
     "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
@@ -371,102 +278,94 @@ function App() {
     "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
   ];
 
+  // === LOAD FROM SUPABASE ===
+  useEffect(() => {
+    async function loadData() {
+      try {
+        // Load Products
+        const { data: prodData, error: prodErr } = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
+        if (!prodErr && prodData && prodData.length > 0) {
+          const mapped = prodData.map(p => ({
+            id: p.id,
+            name: p.name,
+            for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
+            filter: p.category,
+            tagline: p.description || '',
+            top: p.top_notes || '',
+            heart: p.heart_notes || '',
+            base: p.base_notes || '',
+            image: p.image_url || '',
+            accent: '#B8963E'
+          }));
+          setProducts(mapped);
+        } else {
+          setProducts(defaultProducts);
+        }
+
+        // Load Site Settings
+        const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
+        if (siteData) {
+          if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImage(siteData.hero_images[0]);
+          if (siteData.lifestyle_image_1) setLifestyle1(siteData.lifestyle_image_1);
+          if (siteData.lifestyle_image_2) setLifestyle2(siteData.lifestyle_image_2);
+        }
+      } catch (e) {
+        console.error(e);
+        setProducts(defaultProducts);
+      }
+    }
+    loadData();
+  }, []);
+
   // === CART FUNCTIONS ===
   const addToCart = (product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
-      if (existing) {
-        return prev.map(item => 
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
+      if (existing) return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
       return [...prev, { ...product, quantity: 1 }];
     });
     setShowAddedPopup(true);
     setTimeout(() => setShowAddedPopup(false), 2000);
   };
 
-  const removeFromCart = (id) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  };
-
+  const removeFromCart = (id) => setCartItems(prev => prev.filter(item => item.id !== id));
   const updateQuantity = (id, newQty) => {
     if (newQty < 1) return;
-    setCartItems(prev => prev.map(item => 
-      item.id === id ? { ...item, quantity: newQty } : item
-    ));
+    setCartItems(prev => prev.map(item => item.id === id ? { ...item, quantity: newQty } : item));
   };
 
-  const getSubtotal = () => {
-    return cartItems.reduce((sum, item) => sum + (1500 * item.quantity), 0);
-  };
-
+  const getSubtotal = () => cartItems.reduce((sum, item) => sum + (1500 * item.quantity), 0);
   const getDeliveryCharge = () => {
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     return totalItems >= 3 ? 0 : 350;
   };
-
-  const getTotal = () => {
-    return getSubtotal() + getDeliveryCharge();
-  };
-
-  const getCartCount = () => {
-    return cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  };
+  const getTotal = () => getSubtotal() + getDeliveryCharge();
+  const getCartCount = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const sendWhatsAppOrder = () => {
     if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
-      alert("Please fill all customer details (Name, Phone, Address, District).");
-      return;
+      alert("Please fill all customer details."); return;
     }
-    if (cartItems.length === 0) {
-      alert("Your cart is empty.");
-      return;
-    }
-    
+    if (cartItems.length === 0) { alert("Your cart is empty."); return; }
     let message = "Hi Aroma Lab! I want to order:\n\n";
-    cartItems.forEach(item => {
-      message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
-    });
-    message += `\nSubtotal: Rs. ${getSubtotal()}`;
-    message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
-    message += `\nTotal: Rs. ${getTotal()}`;
-    message += `\n\nName: ${customerName}`;
-    message += `\nPhone: ${customerPhone}`;
-    message += `\nAddress: ${customerAddress}`;
-    message += `\nDistrict: ${customerDistrict}`;
-    
-    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
+    message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
+    message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}`;
+    window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const sendBankDepositOrder = () => {
     if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
-      alert("Please fill all customer details (Name, Phone, Address, District).");
-      return;
+      alert("Please fill all customer details."); return;
     }
-    if (cartItems.length === 0) {
-      alert("Your cart is empty.");
-      return;
-    }
-    
+    if (cartItems.length === 0) { alert("Your cart is empty."); return; }
     let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
-    cartItems.forEach(item => {
-      message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
-    });
-    message += `\nSubtotal: Rs. ${getSubtotal()}`;
-    message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
-    message += `\nTotal: Rs. ${getTotal()}`;
-    message += `\n\nName: ${customerName}`;
-    message += `\nPhone: ${customerPhone}`;
-    message += `\nAddress: ${customerAddress}`;
-    message += `\nDistrict: ${customerDistrict}`;
+    cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
+    message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
+    message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}`;
     message += `\n\nI will send the bank deposit slip shortly.`;
-    
-    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
-  // === END CART FUNCTIONS ===
 
   // === FIREBASE USER CONNECTION ===
   window.setAppUser = function(user) {
@@ -479,24 +378,11 @@ function App() {
       setLoggedInUser(null);
     }
   };
-  // === END FIREBASE USER CONNECTION ===
 
-  // === ADMIN FUNCTION ===
   window.checkAdmin = function(email) {
-    if (email === ADMIN_EMAIL) {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
-    }
+    if (email === ADMIN_EMAIL) setIsAdmin(true);
+    else setIsAdmin(false);
   };
-  // === END ADMIN FUNCTION ===
-
-  useEffect(() => {
-    const saved = localStorage.getItem('aromaLabProducts');
-    if (saved) {
-      try { setProducts(JSON.parse(saved)); } catch (e) { setProducts(defaultProducts); }
-    } else { setProducts(defaultProducts); }
-  }, []);
 
   const handleFilter = (filter) => {
     setActiveFilter(filter);
@@ -507,172 +393,113 @@ function App() {
   const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.filter === activeFilter);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5] text-[#0A2E1F] selection:bg-[#B8963E]/20">
-      {/* Cart Modal */}
+    <div className="app-root">
       <CartModal 
-        isCartOpen={isCartOpen}
-        setIsCartOpen={setIsCartOpen}
-        cartItems={cartItems}
-        removeFromCart={removeFromCart}
-        updateQuantity={updateQuantity}
-        getSubtotal={getSubtotal}
-        getDeliveryCharge={getDeliveryCharge}
-        getTotal={getTotal}
-        getCartCount={getCartCount}
-        customerName={customerName}
-        setCustomerName={setCustomerName}
-        customerPhone={customerPhone}
-        setCustomerPhone={setCustomerPhone}
-        customerAddress={customerAddress}
-        setCustomerAddress={setCustomerAddress}
-        customerDistrict={customerDistrict}
-        setCustomerDistrict={setCustomerDistrict}
-        districts={districts}
-        isLoggedIn={isLoggedIn}
-        sendWhatsAppOrder={sendWhatsAppOrder}
-        sendBankDepositOrder={sendBankDepositOrder}
+        isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen}
+        cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity}
+        getSubtotal={getSubtotal} getDeliveryCharge={getDeliveryCharge} getTotal={getTotal} getCartCount={getCartCount}
+        customerName={customerName} setCustomerName={setCustomerName}
+        customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
+        customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
+        customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
+        districts={districts} isLoggedIn={isLoggedIn}
+        sendWhatsAppOrder={sendWhatsAppOrder} sendBankDepositOrder={sendBankDepositOrder}
         DARAZ_LINK={DARAZ_LINK}
       />
 
-      {/* Admin Panel Modal */}
       <AdminPanelModal 
-        isAdminOpen={isAdminOpen}
-        setIsAdminOpen={setIsAdminOpen}
-        products={products}
-        setProducts={setProducts}
+        isAdminOpen={isAdminOpen} setIsAdminOpen={setIsAdminOpen}
+        products={products} setProducts={setProducts}
+        heroImage={heroImage} setHeroImage={setHeroImage}
+        lifestyle1={lifestyle1} setLifestyle1={setLifestyle1}
+        lifestyle2={lifestyle2} setLifestyle2={setLifestyle2}
       />
 
-      {/* Added to Cart Popup */}
       {showAddedPopup && (
-        <div style={{
-          position: 'fixed',
-          top: '80px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#0A2E1F',
-          color: '#FFFBF5',
-          padding: '12px 24px',
-          borderRadius: '50px',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          zIndex: 99999,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
-        }}>
-          ✅ Added to Cart!
-        </div>
+        <div className="added-popup">✅ Added to Cart!</div>
       )}
 
-      <style>{`
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'Inter', sans-serif; }
-      `}</style>
-
       {/* Top Bar */}
-      <div className="bg-[#0A2E1F] text-[#FFFBF5] text-[11px] tracking-[0.15em] font-body uppercase py-3">
-        <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-center gap-8 flex-wrap">
+      <div className="top-bar">
+        <div className="top-bar-inner">
           <span>🚚 FREE DELIVERY ISLANDWIDE</span>
-          <span className="opacity-40">|</span>
+          <span className="divider">|</span>
           <span>🛡️ PREMIUM QUALITY</span>
-          <span className="opacity-40">|</span>
+          <span className="divider">|</span>
           <span>🌿 100% ORIGINAL PRODUCTS</span>
         </div>
       </div>
 
       {/* Header */}
-      <header className="bg-[#FFFBF5] border-b border-[#0A2E1F]/10 sticky top-0 z-40 backdrop-blur-[12px]">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 py-5 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <img src={LOGO_URL} alt="Aroma Lab" className="w-14 h-14 rounded-full object-cover" />
-            <div>
-              <div className="font-display text-[22px] tracking-[0.15em] font-semibold leading-none">AROMA LAB</div>
-              <div className="font-body text-[9px] tracking-[0.35em] mt-1 opacity-60">FINE FRAGRANCES</div>
+      <header className="site-header">
+        <div className="header-inner">
+          <div className="header-logo">
+            <img src={LOGO_URL} alt="Aroma Lab" />
+            <div className="header-logo-text">
+              <div className="title">AROMA LAB</div>
+              <div className="subtitle">FINE FRAGRANCES</div>
             </div>
           </div>
 
-          {/* Nav */}
-          <nav className="hidden lg:flex items-center gap-8 font-body text-[14px]">
-            <a href="#" className="border-b-2 border-[#B8963E] pb-1 font-medium">Home</a>
-            <a href="#collection" className="hover:text-[#B8963E] transition">Shop</a>
-            <a href="#about" className="hover:text-[#B8963E] transition">About Us</a>
-            <a href="#contact" className="hover:text-[#B8963E] transition">Contact</a>
+          <nav className="header-nav">
+            <a href="#" className="active">Home</a>
+            <a href="#collection">Shop</a>
+            <a href="#about">About Us</a>
+            <a href="#contact">Contact</a>
           </nav>
 
-          {/* Icons */}
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-full hover:bg-[#0A2E1F]/5 flex items-center justify-center text-[18px]">🔍</button>
-            <button id="google-login-btn" onClick={() => window.googleLogin()} className="w-10 h-10 rounded-full hover:bg-[#0A2E1F]/5 flex items-center justify-center text-[18px]" title="Sign in">👤</button>
-            <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="w-10 h-10 rounded-full hover:bg-[#0A2E1F]/5 flex items-center justify-center text-[18px]" title="Logout">🚪</button>
-            
+          <div className="header-icons">
+            <button className="icon-btn">🔍</button>
+            <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in">👤</button>
+            <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout">🚪</button>
+
             {isAdmin && (
-              <button 
-                onClick={() => setIsAdminOpen(true)}
-                className="w-10 h-10 rounded-full bg-[#B8963E] text-[#0A2E1F] flex items-center justify-center text-[18px] font-bold"
-                title="Admin Panel"
-              >⚙️</button>
+              <button onClick={() => setIsAdminOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel">⚙️</button>
             )}
 
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              className="relative w-10 h-10 rounded-full hover:bg-[#0A2E1F]/5 flex items-center justify-center text-[18px]"
-            >
+            <button onClick={() => setIsCartOpen(true)} className="icon-btn">
               🛒
-              {getCartCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#B8963E] text-[#0A2E1F] rounded-full w-5 h-5 text-[11px] font-bold flex items-center justify-center">
-                  {getCartCount()}
-                </span>
-              )}
+              {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
             </button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative">
-        <div className="relative h-[500px] sm:h-[600px] overflow-hidden">
-          <img src={HERO_IMAGE} alt="Aroma Lab" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A2E1F]/80 via-[#0A2E1F]/40 to-transparent"></div>
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-[1400px] mx-auto px-6 sm:px-12 w-full">
-              <div className="max-w-[600px]">
-                <div className="font-body text-[12px] tracking-[0.4em] uppercase text-[#B8963E] mb-4">
-                  PREMIUM EAU DE PARFUM
-                </div>
-                <h1 className="font-display text-[#FFFBF5] text-[42px] sm:text-[64px] leading-[1.05] mb-6">
-                  Crafted for Every<br />
-                  <span className="text-[#B8963E] italic">Mood & Moment</span>
-                </h1>
-                <p className="font-body text-[#FFFBF5]/70 text-[14px] sm:text-[15px] leading-[1.7] mb-8 max-w-[480px]">
-                  From bold and mysterious to fresh and elegant — find your perfect scent.
-                </p>
-                <button 
-                  onClick={() => handleFilter("All")}
-                  className="bg-[#B8963E] text-[#0A2E1F] px-8 py-3 font-body text-[13px] tracking-[0.15em] uppercase font-semibold hover:bg-[#c9a84a] transition rounded-sm"
-                >
-                  SHOP NOW →
-                </button>
-              </div>
+      <section className="hero-section">
+        <img src={heroImage} alt="Aroma Lab" className="hero-img" />
+        <div className="hero-overlay"></div>
+        <div className="hero-content">
+          <div className="hero-content-inner">
+            <div className="hero-text">
+              <div className="hero-eyebrow">PREMIUM EAU DE PARFUM</div>
+              <h1 className="hero-title">
+                Crafted for Every<br />
+                <span className="accent">Mood & Moment</span>
+              </h1>
+              <p className="hero-desc">
+                From bold and mysterious to fresh and elegant — find your perfect scent.
+              </p>
+              <button onClick={() => handleFilter("All")} className="hero-btn">SHOP NOW →</button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Trust Badges */}
-      <section className="bg-[#0A2E1F] text-[#FFFBF5] py-8">
-        <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="trust-badges">
+        <div className="trust-grid">
           {[
             { icon: "🌿", title: "PREMIUM QUALITY", desc: "Finest ingredients, long lasting scents" },
             { icon: "🛡️", title: "TRUSTED BRAND", desc: "Authentic & original products" },
             { icon: "🚚", title: "FAST DELIVERY", desc: "Islandwide delivery" },
             { icon: "⭐", title: "CUSTOMER SATISFACTION", desc: "Your happiness, our priority" }
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full border-2 border-[#B8963E] flex items-center justify-center text-[24px] shrink-0">
-                {item.icon}
-              </div>
+            <div key={i} className="trust-item">
+              <div className="trust-icon">{item.icon}</div>
               <div>
-                <div className="font-body text-[12px] tracking-[0.1em] font-semibold">{item.title}</div>
-                <div className="font-body text-[11px] opacity-60 mt-1">{item.desc}</div>
+                <div className="trust-title">{item.title}</div>
+                <div className="trust-desc">{item.desc}</div>
               </div>
             </div>
           ))}
@@ -680,79 +507,42 @@ function App() {
       </section>
 
       {/* Collection Section */}
-      <section ref={collectionRef} id="collection" className="max-w-[1400px] mx-auto px-6 sm:px-12 py-16 sm:py-24">
-        <div className="text-center mb-12">
-          <div className="font-body text-[11px] tracking-[0.4em] uppercase text-[#B8963E] mb-3">OUR COLLECTION</div>
-          <h2 className="font-display text-[36px] sm:text-[52px] leading-[1.1]">
-            Explore Our <span className="italic text-[#B8963E]">Signature Scents</span>
-          </h2>
+      <section ref={collectionRef} id="collection" className="collection-section">
+        <div className="collection-header">
+          <div className="collection-eyebrow">OUR COLLECTION</div>
+          <h2 className="collection-title">Explore Our <span className="accent">Signature Scents</span></h2>
         </div>
 
-        {/* Filter Buttons */}
-        <div className="flex items-center justify-center gap-2 mb-12 flex-wrap">
+        <div className="filter-buttons">
           {['All', 'Ladies', 'Men', 'Unisex'].map((label) => (
-            <button 
-              key={label} 
-              onClick={() => handleFilter(label)} 
-              className={`px-6 py-2 rounded-full font-body text-[12px] tracking-[0.15em] uppercase transition-all ${activeFilter === label ? 'bg-[#0A2E1F] text-[#FFFBF5]' : 'bg-[#0A2E1F]/5 text-[#0A2E1F]/60 hover:bg-[#0A2E1F]/10'}`}
-            >
+            <button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>
               {label === 'All' ? 'All' : `For ${label}`}
             </button>
           ))}
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="product-grid">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="group bg-white rounded-lg border border-[#0A2E1F]/[0.06] overflow-hidden shadow-[0_4px_20px_rgba(10,46,31,0.04)] hover:shadow-[0_12px_40px_rgba(10,46,31,0.10)] transition-all duration-500">
-              <div className="relative aspect-[4/5] overflow-hidden bg-[#FFFBF5]">
+            <div key={product.id} className="product-card">
+              <div className="product-img-wrap">
                 {product.image ? (
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" />
+                  <img src={product.image} alt={product.name} />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#0A2E1F]/20 font-display text-[18px]">{product.name}</div>
+                  <div className="product-img-placeholder">{product.name}</div>
                 )}
-                <div className="absolute top-4 left-4 bg-[#FFFBF5]/95 backdrop-blur px-3 py-1.5 rounded-full">
-                  <span className="font-body text-[10px] tracking-[0.15em] uppercase font-semibold text-[#0A2E1F]">{product.for}</span>
-                </div>
-                <div className="absolute bottom-4 right-4 bg-[#B8963E] text-[#0A2E1F] rounded-full px-4 py-1.5 font-body text-[12px] font-bold">
-                  Rs. 1,500
-                </div>
+                <div className="product-badge-for">{product.for}</div>
+                <div className="product-badge-price">Rs. 1,500</div>
               </div>
-              <div className="p-6">
-                <h3 className="font-display text-[24px] leading-[1.1] text-center mb-2">{product.name}</h3>
-                <div className="font-body text-[12px] text-[#0A2E1F]/60 text-center mb-4">{product.tagline}</div>
-                
-                <div className="bg-[#FFFBF5] rounded-md p-4 mb-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="text-center">
-                      <div className="font-body text-[9px] tracking-[0.15em] uppercase text-[#B8963E] font-semibold">Top</div>
-                      <div className="font-body text-[10px] leading-[1.4] mt-1 text-[#0A2E1F]/80">{product.top}</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-body text-[9px] tracking-[0.15em] uppercase text-[#B8963E] font-semibold">Heart</div>
-                      <div className="font-body text-[10px] leading-[1.4] mt-1 text-[#0A2E1F]/80">{product.heart}</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-body text-[9px] tracking-[0.15em] uppercase text-[#B8963E] font-semibold">Base</div>
-                      <div className="font-body text-[10px] leading-[1.4] mt-1 text-[#0A2E1F]/80">{product.base}</div>
-                    </div>
-                  </div>
+              <div className="product-info">
+                <h3 className="product-name">{product.name}</h3>
+                <div className="product-tagline">{product.tagline}</div>
+                <div className="product-notes">
+                  <div><div className="note-label">Top</div><div className="note-value">{product.top}</div></div>
+                  <div><div className="note-label">Heart</div><div className="note-value">{product.heart}</div></div>
+                  <div><div className="note-label">Base</div><div className="note-value">{product.base}</div></div>
                 </div>
-
-                <button 
-                  onClick={() => addToCart(product)}
-                  className="w-full py-3 bg-[#0A2E1F] text-[#FFFBF5] rounded-sm font-body text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[#123a28] transition mb-3"
-                >
-                  ADD TO CART
-                </button>
-                <a 
-                  href={DARAZ_LINK} 
-                  target="_blank" 
-                  rel="noopener" 
-                  className="w-full py-3 border border-[#0A2E1F]/20 text-[#0A2E1F] rounded-sm font-body text-[12px] tracking-[0.15em] uppercase font-medium hover:bg-[#0A2E1F]/5 transition text-center block"
-                >
-                  ORDER ON DARAZ
-                </a>
+                <button onClick={() => addToCart(product)} className="btn-add-cart">ADD TO CART</button>
+                <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-order-daraz">ORDER ON DARAZ</a>
               </div>
             </div>
           ))}
@@ -760,131 +550,96 @@ function App() {
       </section>
 
       {/* Lifestyle Section 1 */}
-      <section className="max-w-[1400px] mx-auto px-6 sm:px-12 py-12">
-        <div className="grid lg:grid-cols-2 gap-0 overflow-hidden rounded-lg bg-[#0A2E1F]">
-          <div className="relative min-h-[400px] lg:min-h-[500px]">
-            <img src={LIFESTYLE_IMAGE} alt="Black Temptation" className="w-full h-full object-cover object-top" />
+      <section className="lifestyle-section">
+        <div className="lifestyle-grid">
+          <div className="lifestyle-img">
+            <img src={lifestyle1} alt="Black Temptation" />
           </div>
-          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
-            <div className="font-body text-[11px] tracking-[0.3em] uppercase text-[#B8963E] mb-4">MUSE — BLACK TEMPTATION</div>
-            <h3 className="font-display text-[#FFFBF5] text-[36px] sm:text-[48px] leading-[1.1] mb-6">
-              Dark, mysterious,<br />
-              <span className="italic text-[#B8963E]">& seductive.</span>
-            </h3>
-            <p className="font-body text-[#FFFBF5]/60 text-[14px] leading-[1.8] mb-8">
-              "Blackcurrant and pear open with a bright bite, jasmine and orange blossom bloom at the heart, and vanilla, praline, and musk leave a soft, unforgettable trail. Perfect for evenings."
-            </p>
-            <div className="flex gap-3 flex-wrap">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="bg-[#B8963E] text-[#0A2E1F] px-6 py-3 font-body text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[#c9a84a] transition">
-                BUY ON DARAZ
-              </a>
-              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Black Temptation - Rs. 1,500")}`} target="_blank" rel="noopener" className="bg-white text-[#0A2E1F] px-6 py-3 font-body text-[12px] tracking-[0.15em] uppercase font-medium hover:bg-[#FFFBF5] transition">
-                WHATSAPP
-              </a>
+          <div className="lifestyle-content">
+            <div className="lifestyle-eyebrow">MUSE — BLACK TEMPTATION</div>
+            <h3 className="lifestyle-title">Dark, mysterious,<br /><span className="accent">& seductive.</span></h3>
+            <p className="lifestyle-desc">"Blackcurrant and pear open with a bright bite, jasmine and orange blossom bloom at the heart, and vanilla, praline, and musk leave a soft, unforgettable trail. Perfect for evenings."</p>
+            <div className="lifestyle-buttons">
+              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
+              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Black Temptation - Rs. 1,500")}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
             </div>
           </div>
         </div>
       </section>
 
       {/* Lifestyle Section 2 */}
-      <section className="max-w-[1400px] mx-auto px-6 sm:px-12 py-12">
-        <div className="grid lg:grid-cols-2 gap-0 overflow-hidden rounded-lg bg-[#0A2E1F]">
-          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2 lg:order-1">
-            <div className="font-body text-[11px] tracking-[0.3em] uppercase text-[#B8963E] mb-4">MUSE — HUNTERS DUSK</div>
-            <h3 className="font-display text-[#FFFBF5] text-[36px] sm:text-[48px] leading-[1.1] mb-6">
-              Woody, smoky,<br />
-              <span className="italic text-[#B8963E]">& adventurous.</span>
-            </h3>
-            <p className="font-body text-[#FFFBF5]/60 text-[14px] leading-[1.8] mb-8">
-              "Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man."
-            </p>
-            <div className="flex gap-3 flex-wrap">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="bg-[#B8963E] text-[#0A2E1F] px-6 py-3 font-body text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[#c9a84a] transition">
-                BUY ON DARAZ
-              </a>
-              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Hunters Dusk - Rs. 1,500")}`} target="_blank" rel="noopener" className="bg-white text-[#0A2E1F] px-6 py-3 font-body text-[12px] tracking-[0.15em] uppercase font-medium hover:bg-[#FFFBF5] transition">
-                WHATSAPP
-              </a>
+      <section className="lifestyle-section">
+        <div className="lifestyle-grid reverse">
+          <div className="lifestyle-content">
+            <div className="lifestyle-eyebrow">MUSE — HUNTERS DUSK</div>
+            <h3 className="lifestyle-title">Woody, smoky,<br /><span className="accent">& adventurous.</span></h3>
+            <p className="lifestyle-desc">"Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man."</p>
+            <div className="lifestyle-buttons">
+              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
+              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Hunters Dusk - Rs. 1,500")}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
             </div>
           </div>
-          <div className="relative min-h-[400px] lg:min-h-[500px] order-1 lg:order-2">
-            <img src={LIFESTYLE_IMAGE_2} alt="Hunters Dusk" className="w-full h-full object-cover object-top" />
+          <div className="lifestyle-img">
+            <img src={lifestyle2} alt="Hunters Dusk" />
           </div>
         </div>
       </section>
 
       {/* KOKO Section */}
-      <section className="max-w-[1400px] mx-auto px-6 sm:px-12 py-12">
-        <div className="rounded-lg bg-[#B8963E]/10 border border-[#B8963E]/20 px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-[#0A2E1F] text-[#FFFBF5] flex items-center justify-center font-display font-bold text-[16px]">KOKO</div>
+      <section className="koko-section">
+        <div className="koko-box">
+          <div className="koko-info">
+            <div className="koko-logo">KOKO</div>
             <div>
-              <div className="font-display text-[22px] leading-none">Buy Now, Pay Later</div>
-              <div className="font-body text-[13px] text-[#0A2E1F]/60 mt-2">Pay in 3 installments with any debit / credit card • 0% interest</div>
+              <div className="koko-title">Buy Now, Pay Later</div>
+              <div className="koko-desc">Pay in 3 installments with any debit / credit card • 0% interest</div>
             </div>
           </div>
-          <a href={DARAZ_LINK} target="_blank" rel="noopener" className="font-body text-[12px] tracking-[0.15em] uppercase bg-white border border-[#0A2E1F]/10 rounded-full px-6 py-3 hover:bg-[#FFFBF5] transition">
-            ORDER ON DARAZ
-          </a>
+          <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-koko-order">ORDER ON DARAZ</a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="mt-16 border-t border-[#0A2E1F]/10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-12 py-16 grid sm:grid-cols-3 gap-12">
+      <footer id="contact" className="site-footer">
+        <div className="footer-inner">
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <img src={LOGO_URL} alt="Aroma Lab" className="w-12 h-12 rounded-full object-cover" />
-              <div className="font-display text-[20px] tracking-[0.15em] font-semibold">AROMA LAB</div>
+            <div className="footer-logo">
+              <img src={LOGO_URL} alt="Aroma Lab" />
+              <div className="footer-logo-text">AROMA LAB</div>
             </div>
-            <p className="font-body text-[13px] text-[#0A2E1F]/60 leading-[1.8] max-w-[340px]">
-              Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.
-            </p>
+            <p className="footer-desc">Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.</p>
           </div>
           <div>
-            <div className="font-body text-[11px] tracking-[0.25em] uppercase font-semibold opacity-60 mb-4">CONTACT</div>
-            <div className="space-y-3 font-body text-[14px]">
-              <a href="tel:+94777804705" className="block hover:text-[#B8963E] transition">0777 804 705</a>
-              <a href="https://wa.me/94777804705" target="_blank" rel="noopener" className="block hover:text-[#B8963E] transition">WhatsApp</a>
-              <div className="text-[#0A2E1F]/60">Colombo, Sri Lanka</div>
+            <div className="footer-heading">CONTACT</div>
+            <div className="footer-links">
+              <a href="tel:+94777804705">0777 804 705</a>
+              <a href="https://wa.me/94777804705" target="_blank" rel="noopener">WhatsApp</a>
+              <span>Colombo, Sri Lanka</span>
             </div>
           </div>
           <div>
-            <div className="font-body text-[11px] tracking-[0.25em] uppercase font-semibold opacity-60 mb-4">SHOP</div>
-            <div className="space-y-3 font-body text-[14px]">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="block hover:text-[#B8963E] transition">Order on Daraz</a>
-              <div className="text-[#0A2E1F]/60">Buy Now Pay Later with KOKO</div>
-              <div className="text-[#0A2E1F]/60">Island Wide Delivery</div>
+            <div className="footer-heading">SHOP</div>
+            <div className="footer-links">
+              <a href={DARAZ_LINK} target="_blank" rel="noopener">Order on Daraz</a>
+              <span>Buy Now Pay Later with KOKO</span>
+              <span>Island Wide Delivery</span>
             </div>
           </div>
         </div>
-        <div className="border-t border-[#0A2E1F]/10 py-6 px-6 text-center">
-          <div className="font-body text-[11px] tracking-[0.15em] uppercase text-[#0A2E1F]/40">
-            © {new Date().getFullYear()} AROMA LAB FINE FRAGRANCES • ALL RIGHTS RESERVED
-          </div>
+        <div className="footer-bottom">
+          © {new Date().getFullYear()} AROMA LAB FINE FRAGRANCES • ALL RIGHTS RESERVED
         </div>
       </footer>
 
       {/* Fixed Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-[12px] border-t border-[#0A2E1F]/10 px-4 py-3 shadow-[0_-8px_32px_rgba(0,0,0,0.08)]">
-        <div className="max-w-[1400px] mx-auto flex items-center gap-3">
-          <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
-             className="flex-1 flex items-center justify-center gap-2 text-white rounded-sm py-3 font-body text-[11px] tracking-[0.15em] uppercase font-semibold transition"
-             style={{ backgroundColor: '#0866FF' }}>
-            Facebook
-          </a>
-          <a href={DARAZ_LINK} target="_blank" rel="noopener"
-             className="flex-1 flex items-center justify-center gap-2 bg-[#0A2E1F] text-[#FFFBF5] rounded-sm py-3 font-body text-[11px] tracking-[0.15em] uppercase font-semibold hover:bg-[#123a28] transition">
-            Daraz
-          </a>
-          <a href={`${WHATSAPP_LINK}?text=Hi%20Aroma%20Lab!%20I%20want%20to%20order%20perfumes.%20Rs.%201,500%20each`}
-             target="_blank" rel="noopener"
-             className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white rounded-sm py-3 font-body text-[11px] tracking-[0.15em] uppercase font-semibold hover:bg-[#1da851] transition">
-            WhatsApp
-          </a>
+      <div className="bottom-bar">
+        <div className="bottom-bar-inner">
+          <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="bottom-btn facebook">Facebook</a>
+          <a href={DARAZ_LINK} target="_blank" rel="noopener" className="bottom-btn daraz">Daraz</a>
+          <a href={`${WHATSAPP_LINK}?text=Hi%20Aroma%20Lab!%20I%20want%20to%20order%20perfumes.%20Rs.%201,500%20each`} target="_blank" rel="noopener" className="bottom-btn whatsapp">WhatsApp</a>
         </div>
       </div>
-      <div className="h-[80px]"></div>
+      <div style={{ height: '80px' }}></div>
     </div>
   );
 }
