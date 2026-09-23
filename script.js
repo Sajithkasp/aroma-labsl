@@ -18,175 +18,14 @@ const HERO_IMAGE = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
 const LIFESTYLE_IMAGE = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
 const LIFESTYLE_IMAGE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
 
-function App() {
-  const [products, setProducts] = useState([]);
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [renderCount, setRenderCount] = useState(0);
-  const collectionRef = useRef(null);
-  const [adminState, setAdminState] = useState('locked');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [authError, setAuthError] = useState(false);
-  // === CART STATES ===
-const [cartItems, setCartItems] = useState([]);
-const [isCartOpen, setIsCartOpen] = useState(false);
-const [customerName, setCustomerName] = useState('');
-const [customerPhone, setCustomerPhone] = useState('');
-const [customerAddress, setCustomerAddress] = useState('');
-const [customerDistrict, setCustomerDistrict] = useState('');
-const [isLoggedIn, setIsLoggedIn] = useState(false);
-const [loggedInUser, setLoggedInUser] = useState(null);
-
-// ශ්‍රී ලංකාවේ දිස්ත්‍රික්ක 25
-const districts = [
-  "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
-  "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
-  "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
-];
-  // === CART FUNCTIONS ===
-
-// Cart එකට Product එකක් එකතු කරන්න
-const addToCart = (product) => {
-  setCartItems(prev => {
-    const existing = prev.find(item => item.id === product.id);
-    if (existing) {
-      return prev.map(item => 
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    }
-    return [...prev, { ...product, quantity: 1 }];
-  });
-};
-
-// Cart එකෙන් Product එකක් අයින් කරන්න
-const removeFromCart = (id) => {
-  setCartItems(prev => prev.filter(item => item.id !== id));
-};
-
-// Quantity එක වෙනස් කරන්න
-const updateQuantity = (id, newQty) => {
-  if (newQty < 1) return;
-  setCartItems(prev => prev.map(item => 
-    item.id === id ? { ...item, quantity: newQty } : item
-  ));
-};
-
-// Subtotal එක ගණනය කරන්න
-const getSubtotal = () => {
-  return cartItems.reduce((sum, item) => sum + (1500 * item.quantity), 0);
-};
-
-// Delivery Charge එක ගණනය කරන්න
-const getDeliveryCharge = () => {
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  return totalItems >= 3 ? 0 : 350;
-};
-
-// Total එක ගණනය කරන්න
-const getTotal = () => {
-  return getSubtotal() + getDeliveryCharge();
-};
-
-// Cart එකේ අංකය
-const getCartCount = () => {
-  return cartItems.reduce((sum, item) => sum + item.quantity, 0);
-};
-
-// WhatsApp Order එක යවන්න
-const sendWhatsAppOrder = () => {
-  if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
-    alert("Please fill all customer details (Name, Phone, Address, District).");
-    return;
-  }
-  if (cartItems.length === 0) {
-    alert("Your cart is empty.");
-    return;
-  }
-  
-  let message = "Hi Aroma Lab! I want to order:\n\n";
-  cartItems.forEach(item => {
-    message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
-  });
-  message += `\nSubtotal: Rs. ${getSubtotal()}`;
-  message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
-  message += `\nTotal: Rs. ${getTotal()}`;
-  message += `\n\nName: ${customerName}`;
-  message += `\nPhone: ${customerPhone}`;
-  message += `\nAddress: ${customerAddress}`;
-  message += `\nDistrict: ${customerDistrict}`;
-  
-  const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
-};
-
-// Bank Deposit Order එක යවන්න
-const sendBankDepositOrder = () => {
-  if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
-    alert("Please fill all customer details (Name, Phone, Address, District).");
-    return;
-  }
-  if (cartItems.length === 0) {
-    alert("Your cart is empty.");
-    return;
-  }
-  
-  let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
-  cartItems.forEach(item => {
-    message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
-  });
-  message += `\nSubtotal: Rs. ${getSubtotal()}`;
-  message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
-  message += `\nTotal: Rs. ${getTotal()}`;
-  message += `\n\nName: ${customerName}`;
-  message += `\nPhone: ${customerPhone}`;
-  message += `\nAddress: ${customerAddress}`;
-  message += `\nDistrict: ${customerDistrict}`;
-  message += `\n\nI will send the bank deposit slip shortly.`;
-  
-  const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
-};
-// === END CART FUNCTIONS ===
-// === END CART STATES ===
-// === FIREBASE USER CONNECTION ===
-// Firebase එකෙන් එන User ව අල්ලගන්න
-window.setAppUser = function(user) {
-  if (user) {
-    setIsLoggedIn(true);
-    setLoggedInUser(user);
-    if (!customerName) setCustomerName(user.displayName || '');
-  } else {
-    setIsLoggedIn(false);
-    setLoggedInUser(null);
-  }
-};
-// === END FIREBASE USER CONNECTION ===
-  
-  useEffect(() => {
-    const saved = localStorage.getItem('aromaLabProducts');
-    if (saved) {
-      try { setProducts(JSON.parse(saved)); } catch (e) { setProducts(defaultProducts); }
-    } else { setProducts(defaultProducts); }
-  }, []);
-
-  const handleFilter = (filter) => {
-    setActiveFilter(filter);
-    setRenderCount(c => c + 1);
-    setTimeout(() => { collectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-  };
-
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    if (passwordInput === ADMIN_PASSWORD) {
-      setAdminState('unlocked'); setAuthError(false); setPasswordInput('');
-    } else {
-      setAuthError(true); setPasswordInput('');
-    }
-  };
-
-  const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.filter === activeFilter);
-
-  // === CART POPUP (MODAL) ===
-const CartModal = () => {
+// === CART MODAL COMPONENT (App එකෙන් එළියේ) ===
+function CartModal({ 
+  isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
+  getSubtotal, getDeliveryCharge, getTotal, getCartCount,
+  customerName, setCustomerName, customerPhone, setCustomerPhone,
+  customerAddress, setCustomerAddress, customerDistrict, setCustomerDistrict,
+  districts, isLoggedIn, sendWhatsAppOrder, sendBankDepositOrder, DARAZ_LINK
+}) {
   if (!isCartOpen) return null;
 
   return (
@@ -346,7 +185,6 @@ const CartModal = () => {
 
         {/* Payment Options */}
         <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {/* Daraz Button */}
           <a 
             href={DARAZ_LINK} 
             target="_blank" 
@@ -366,7 +204,6 @@ const CartModal = () => {
             🛒 Order on Daraz (COD / KOKO)
           </a>
 
-          {/* Bank Deposit */}
           {isLoggedIn && (
             <div style={{ padding: '15px', background: '#fff', borderRadius: '12px', border: '1px solid #eee' }}>
               <p style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '14px' }}>🏦 Bank Deposit Details:</p>
@@ -394,7 +231,6 @@ const CartModal = () => {
             </div>
           )}
 
-          {/* WhatsApp Order */}
           {isLoggedIn && (
             <button 
               onClick={sendWhatsAppOrder}
@@ -416,13 +252,231 @@ const CartModal = () => {
       </div>
     </div>
   );
-};
-// === END CART POPUP ===
+}
+// === END CART MODAL COMPONENT ===
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [renderCount, setRenderCount] = useState(0);
+  const collectionRef = useRef(null);
+  const [adminState, setAdminState] = useState('locked');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState(false);
+
+  // === CART STATES ===
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [customerDistrict, setCustomerDistrict] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [showAddedPopup, setShowAddedPopup] = useState(false);
+
+  // ශ්‍රී ලංකාවේ දිස්ත්‍රික්ක 25
+  const districts = [
+    "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
+    "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
+    "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
+  ];
+  // === END CART STATES ===
+
+  // === CART FUNCTIONS ===
+
+  // Cart එකට Product එකක් එකතු කරන්න
+  const addToCart = (product) => {
+    setCartItems(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item => 
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    setShowAddedPopup(true);
+    setTimeout(() => setShowAddedPopup(false), 2000);
+  };
+
+  // Cart එකෙන් Product එකක් අයින් කරන්න
+  const removeFromCart = (id) => {
+    setCartItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  // Quantity එක වෙනස් කරන්න
+  const updateQuantity = (id, newQty) => {
+    if (newQty < 1) return;
+    setCartItems(prev => prev.map(item => 
+      item.id === id ? { ...item, quantity: newQty } : item
+    ));
+  };
+
+  // Subtotal එක ගණනය කරන්න
+  const getSubtotal = () => {
+    return cartItems.reduce((sum, item) => sum + (1500 * item.quantity), 0);
+  };
+
+  // Delivery Charge එක ගණනය කරන්න
+  const getDeliveryCharge = () => {
+    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    return totalItems >= 3 ? 0 : 350;
+  };
+
+  // Total එක ගණනය කරන්න
+  const getTotal = () => {
+    return getSubtotal() + getDeliveryCharge();
+  };
+
+  // Cart එකේ අංකය
+  const getCartCount = () => {
+    return cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  // WhatsApp Order එක යවන්න
+  const sendWhatsAppOrder = () => {
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
+      alert("Please fill all customer details (Name, Phone, Address, District).");
+      return;
+    }
+    if (cartItems.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+    
+    let message = "Hi Aroma Lab! I want to order:\n\n";
+    cartItems.forEach(item => {
+      message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
+    });
+    message += `\nSubtotal: Rs. ${getSubtotal()}`;
+    message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
+    message += `\nTotal: Rs. ${getTotal()}`;
+    message += `\n\nName: ${customerName}`;
+    message += `\nPhone: ${customerPhone}`;
+    message += `\nAddress: ${customerAddress}`;
+    message += `\nDistrict: ${customerDistrict}`;
+    
+    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
+  // Bank Deposit Order එක යවන්න
+  const sendBankDepositOrder = () => {
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
+      alert("Please fill all customer details (Name, Phone, Address, District).");
+      return;
+    }
+    if (cartItems.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+    
+    let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
+    cartItems.forEach(item => {
+      message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`;
+    });
+    message += `\nSubtotal: Rs. ${getSubtotal()}`;
+    message += `\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}`;
+    message += `\nTotal: Rs. ${getTotal()}`;
+    message += `\n\nName: ${customerName}`;
+    message += `\nPhone: ${customerPhone}`;
+    message += `\nAddress: ${customerAddress}`;
+    message += `\nDistrict: ${customerDistrict}`;
+    message += `\n\nI will send the bank deposit slip shortly.`;
+    
+    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+  // === END CART FUNCTIONS ===
+
+  // === FIREBASE USER CONNECTION ===
+  window.setAppUser = function(user) {
+    if (user) {
+      setIsLoggedIn(true);
+      setLoggedInUser(user);
+      if (!customerName) setCustomerName(user.displayName || '');
+    } else {
+      setIsLoggedIn(false);
+      setLoggedInUser(null);
+    }
+  };
+  // === END FIREBASE USER CONNECTION ===
+
+  useEffect(() => {
+    const saved = localStorage.getItem('aromaLabProducts');
+    if (saved) {
+      try { setProducts(JSON.parse(saved)); } catch (e) { setProducts(defaultProducts); }
+    } else { setProducts(defaultProducts); }
+  }, []);
+
+  const handleFilter = (filter) => {
+    setActiveFilter(filter);
+    setRenderCount(c => c + 1);
+    setTimeout(() => { collectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  };
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (passwordInput === ADMIN_PASSWORD) {
+      setAdminState('unlocked'); setAuthError(false); setPasswordInput('');
+    } else {
+      setAuthError(true); setPasswordInput('');
+    }
+  };
+
+  const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.filter === activeFilter);
+
   return (
     <div className="min-h-screen bg-[#FFFBF5] text-[#0A2E1F] selection:bg-[#B8963E]/20">
       {/* Cart Modal */}
-<CartModal />
-    <style>{`
+      <CartModal 
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
+        cartItems={cartItems}
+        removeFromCart={removeFromCart}
+        updateQuantity={updateQuantity}
+        getSubtotal={getSubtotal}
+        getDeliveryCharge={getDeliveryCharge}
+        getTotal={getTotal}
+        getCartCount={getCartCount}
+        customerName={customerName}
+        setCustomerName={setCustomerName}
+        customerPhone={customerPhone}
+        setCustomerPhone={setCustomerPhone}
+        customerAddress={customerAddress}
+        setCustomerAddress={setCustomerAddress}
+        customerDistrict={customerDistrict}
+        setCustomerDistrict={setCustomerDistrict}
+        districts={districts}
+        isLoggedIn={isLoggedIn}
+        sendWhatsAppOrder={sendWhatsAppOrder}
+        sendBankDepositOrder={sendBankDepositOrder}
+        DARAZ_LINK={DARAZ_LINK}
+      />
+
+      {/* Added to Cart Popup */}
+      {showAddedPopup && (
+        <div style={{
+          position: 'fixed',
+          top: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#0A2E1F',
+          color: '#FFFBF5',
+          padding: '12px 24px',
+          borderRadius: '50px',
+          fontWeight: 'bold',
+          fontSize: '14px',
+          zIndex: 99999,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+          animation: 'fadeInOut 2s ease-in-out'
+        }}>
+          ✅ Added to Cart!
+        </div>
+      )}
+
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
         .font-display { font-family: 'Playfair Display', serif; }
         .font-body { font-family: 'Inter', sans-serif; }
@@ -446,6 +500,12 @@ const CartModal = () => {
           transition: all 0.3s;
         }
         .admin-btn:hover { transform: scale(1.1); }
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+          15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
       `}</style>
       
       <div className="admin-btn" onClick={() => { if(adminState === 'locked') setAdminState('authenticating'); }} title="Admin Panel">⚙️</div>
@@ -480,55 +540,54 @@ const CartModal = () => {
             </div>
           </div>
 
-{/* Google Login/Logout Buttons */}
-<div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 20px 0 20px' }}>
-  <button id="google-login-btn" onClick={() => window.googleLogin()} style={{ padding: '8px 16px', background: '#4285F4', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
-    Sign in with Google
-  </button>
-  <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none', padding: '8px 16px', background: '#db4437', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
-    Logout
-  </button>
-      {/* Cart Icon */}
-<button 
-  onClick={() => setIsCartOpen(true)}
-  style={{
-    position: 'relative',
-    background: '#0A2E1F',
-    color: '#FFFBF5',
-    border: 'none',
-    borderRadius: '50%',
-    width: '45px',
-    height: '45px',
-    fontSize: '20px',
-    cursor: 'pointer',
-    marginLeft: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }}
->
-  🛒
-  {getCartCount() > 0 && (
-    <span style={{
-      position: 'absolute',
-      top: '-5px',
-      right: '-5px',
-      background: '#B8963E',
-      color: '#0A2E1F',
-      borderRadius: '50%',
-      width: '22px',
-      height: '22px',
-      fontSize: '12px',
-      fontWeight: 'bold',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      {getCartCount()}
-    </span>
-  )}
-</button>
-</div>
+          {/* Google Login/Logout Buttons + Cart Icon */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '10px 20px 0 20px', gap: '10px' }}>
+            <button id="google-login-btn" onClick={() => window.googleLogin()} style={{ padding: '8px 16px', background: '#4285F4', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+              Sign in with Google
+            </button>
+            <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none', padding: '8px 16px', background: '#db4437', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>
+              Logout
+            </button>
+            {/* Cart Icon */}
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              style={{
+                position: 'relative',
+                background: '#0A2E1F',
+                color: '#FFFBF5',
+                border: 'none',
+                borderRadius: '50%',
+                width: '45px',
+                height: '45px',
+                fontSize: '20px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              🛒
+              {getCartCount() > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-5px',
+                  right: '-5px',
+                  background: '#B8963E',
+                  color: '#0A2E1F',
+                  borderRadius: '50%',
+                  width: '22px',
+                  height: '22px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {getCartCount()}
+                </span>
+              )}
+            </button>
+          </div>
         
           <header className="sticky top-0 z-40 bg-[#FFFBF5]/90 backdrop-blur-[12px] border-b border-[#0A2E1F]/[0.06]">
             <div className="max-w-[1320px] mx-auto px-6 sm:px-8 py-5 sm:py-7 flex flex-col items-center">
@@ -636,24 +695,24 @@ const CartModal = () => {
                         <div><div className="font-body text-[9px] tracking-[0.18em] uppercase text-[#B8963E] font-semibold">Base</div><div className="font-body text-[11px] leading-[1.4] mt-1 text-[#0A2E1F]/80">{product.base}</div></div>
                       </div>
                     </div>
-                      <button 
-  onClick={() => addToCart(product)}
-  style={{
-    width: '100%',
-    marginTop: '15px',
-    padding: '12px',
-    background: '#B8963E',
-    color: '#0A2E1F',
-    border: 'none',
-    borderRadius: '25px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    fontSize: '13px',
-    letterSpacing: '0.05em'
-  }}
->
-  🛒 Add to Cart
-</button>
+                    <button 
+                      onClick={() => addToCart(product)}
+                      style={{
+                        width: '100%',
+                        marginTop: '15px',
+                        padding: '12px',
+                        background: '#B8963E',
+                        color: '#0A2E1F',
+                        border: 'none',
+                        borderRadius: '25px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        letterSpacing: '0.05em'
+                      }}
+                    >
+                      🛒 Add to Cart
+                    </button>
                     <div className="mt-5 flex gap-2">
                       <a href={DARAZ_LINK} target="_blank" rel="noopener" className="flex-1 bg-[#0A2E1F] text-[#FFFBF5] rounded-full py-[13px] font-body text-[12px] tracking-[0.14em] uppercase font-medium text-center hover:bg-[#123a28] transition">Order on Daraz - Rs. 1,500</a>
                       <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${product.name} (${product.for}) - Rs. 1,500. Please confirm availability.`)}`} target="_blank" rel="noopener" className="w-[46px] h-[44px] rounded-full border border-[#0A2E1F]/15 flex items-center justify-center font-body text-[10px] tracking-[0.05em] uppercase font-semibold hover:bg-[#0A2E1F]/5 transition shrink-0">WA</a>
@@ -684,23 +743,23 @@ const CartModal = () => {
               </div>
             </div>
           </section>
-                <section className="max-w-[1320px] mx-auto px-4 sm:px-8 mt-16 sm:mt-28">
-  <div className="rounded-[24px] sm:rounded-[32px] overflow-hidden bg-[#0A2E1F] grid sm:grid-cols-[0.9fr_1.1fr] items-stretch">
-    <div className="p-8 sm:p-12 lg:p-14 flex flex-col justify-center order-1 sm:order-1">
-      <div className="inline-flex self-start bg-[#FFFBF5]/10 border border-[#FFFBF5]/10 rounded-full px-4 py-2 font-body text-[10px] tracking-[0.2em] uppercase text-[#FFFBF5]/70">Muse — Hunters Dusk</div>
-      <h3 className="font-display text-[#FFFBF5] text-[32px] sm:text-[44px] leading-[0.95] tracking-[-0.02em] mt-6">Woody, smoky,<br /><span className="italic font-[300] text-[#B8963E]">& adventurous.</span></h3>
-      <p className="font-body text-[#FFFBF5]/60 text-[14px] leading-[1.7] mt-6 max-w-[380px]">"Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man."</p>
-      <div className="mt-6 flex gap-2">
-        <a href={DARAZ_LINK} target="_blank" rel="noopener" className="flex-1 bg-[#B8963E] text-[#0A2E1F] rounded-full py-3 font-body text-[12px] tracking-[0.12em] uppercase font-semibold text-center hover:bg-[#c9a84a] transition">Buy on Daraz</a>
-        <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Hunters Dusk - Rs. 1,500")}`} target="_blank" rel="noopener" className="flex-1 bg-white text-[#0A2E1F] rounded-full py-3 font-body text-[12px] tracking-[0.12em] uppercase font-medium text-center hover:bg-[#FFFBF5] transition">WhatsApp</a>
-      </div>
-    </div>
-    <div className="relative aspect-[4/5] sm:aspect-auto sm:min-h-[560px] order-2 sm:order-2">
-      <img src={LIFESTYLE_IMAGE_2} alt="Hunters Dusk lifestyle" className="w-full h-full object-cover object-top" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0A2E1F]/60 to-transparent sm:hidden"></div>
-    </div>
-  </div>
-</section>
+          <section className="max-w-[1320px] mx-auto px-4 sm:px-8 mt-16 sm:mt-28">
+            <div className="rounded-[24px] sm:rounded-[32px] overflow-hidden bg-[#0A2E1F] grid sm:grid-cols-[0.9fr_1.1fr] items-stretch">
+              <div className="p-8 sm:p-12 lg:p-14 flex flex-col justify-center order-1 sm:order-1">
+                <div className="inline-flex self-start bg-[#FFFBF5]/10 border border-[#FFFBF5]/10 rounded-full px-4 py-2 font-body text-[10px] tracking-[0.2em] uppercase text-[#FFFBF5]/70">Muse — Hunters Dusk</div>
+                <h3 className="font-display text-[#FFFBF5] text-[32px] sm:text-[44px] leading-[0.95] tracking-[-0.02em] mt-6">Woody, smoky,<br /><span className="italic font-[300] text-[#B8963E]">& adventurous.</span></h3>
+                <p className="font-body text-[#FFFBF5]/60 text-[14px] leading-[1.7] mt-6 max-w-[380px]">"Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man."</p>
+                <div className="mt-6 flex gap-2">
+                  <a href={DARAZ_LINK} target="_blank" rel="noopener" className="flex-1 bg-[#B8963E] text-[#0A2E1F] rounded-full py-3 font-body text-[12px] tracking-[0.12em] uppercase font-semibold text-center hover:bg-[#c9a84a] transition">Buy on Daraz</a>
+                  <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent("Hi Aroma Lab! I want to order Hunters Dusk - Rs. 1,500")}`} target="_blank" rel="noopener" className="flex-1 bg-white text-[#0A2E1F] rounded-full py-3 font-body text-[12px] tracking-[0.12em] uppercase font-medium text-center hover:bg-[#FFFBF5] transition">WhatsApp</a>
+                </div>
+              </div>
+              <div className="relative aspect-[4/5] sm:aspect-auto sm:min-h-[560px] order-2 sm:order-2">
+                <img src={LIFESTYLE_IMAGE_2} alt="Hunters Dusk lifestyle" className="w-full h-full object-cover object-top" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A2E1F]/60 to-transparent sm:hidden"></div>
+              </div>
+            </div>
+          </section>
 
           <section className="max-w-[1320px] mx-auto px-4 sm:px-8 mt-8 sm:mt-10">
             <div className="rounded-[20px] bg-[#B8963E]/10 border border-[#B8963E]/20 px-6 sm:px-10 py-6 sm:py-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -748,35 +807,28 @@ const CartModal = () => {
             </div>
           </footer>
 
-{/* Fixed Bottom Bar - Facebook + Daraz + WhatsApp */}
-<div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-[12px] border-t border-[#0A2E1F]/10 px-3 py-3 sm:px-6 shadow-[0_-8px_32px_rgba(0,0,0,0.08)]">
-  <div className="max-w-[1320px] mx-auto flex items-center gap-2 sm:gap-3">
-
-{/* Facebook */}
-<a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
-   style={{ backgroundColor: '#0866FF' }}
-   className="flex-1 flex items-center justify-center gap-1.5 text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold transition hover:opacity-90">
-  <span className="truncate">Facebook</span>
-</a>
-
-    {/* Daraz */}
-    <a href={DARAZ_LINK} target="_blank" rel="noopener"
-       className="flex-1 flex items-center justify-center gap-1.5 bg-[#0A2E1F] text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#123a28] transition">
-      <span className="truncate">Daraz</span>
-      <span className="hidden sm:inline">→</span>
-    </a>
-
-    {/* WhatsApp */}
-    <a href={`${WHATSAPP_LINK}?text=Hi%20Aroma%20Lab!%20I%20want%20to%20order%20perfumes.%20Rs.%201,500%20each`}
-       target="_blank" rel="noopener"
-       className="flex-1 flex items-center justify-center gap-1.5 bg-[#25D366] text-white rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#1da851] transition">
-      <span className="w-4 h-4 rounded-full bg-white flex items-center justify-center text-[9px] text-[#25D366] shrink-0">✆</span>
-      <span className="truncate">WhatsApp</span>
-    </a>
-
-  </div>
-</div>
-<div className="h-[72px]"></div>
+          {/* Fixed Bottom Bar - Facebook + Daraz + WhatsApp */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-[12px] border-t border-[#0A2E1F]/10 px-3 py-3 sm:px-6 shadow-[0_-8px_32px_rgba(0,0,0,0.08)]">
+            <div className="max-w-[1320px] mx-auto flex items-center gap-2 sm:gap-3">
+              <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer"
+                 style={{ backgroundColor: '#0866FF' }}
+                 className="flex-1 flex items-center justify-center gap-1.5 text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold transition hover:opacity-90">
+                <span className="truncate">Facebook</span>
+              </a>
+              <a href={DARAZ_LINK} target="_blank" rel="noopener"
+                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#0A2E1F] text-[#FFFBF5] rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#123a28] transition">
+                <span className="truncate">Daraz</span>
+                <span className="hidden sm:inline">→</span>
+              </a>
+              <a href={`${WHATSAPP_LINK}?text=Hi%20Aroma%20Lab!%20I%20want%20to%20order%20perfumes.%20Rs.%201,500%20each`}
+                 target="_blank" rel="noopener"
+                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#25D366] text-white rounded-full py-3 px-2 font-body text-[10px] sm:text-[11px] tracking-[0.08em] uppercase font-semibold hover:bg-[#1da851] transition">
+                <span className="w-4 h-4 rounded-full bg-white flex items-center justify-center text-[9px] text-[#25D366] shrink-0">✆</span>
+                <span className="truncate">WhatsApp</span>
+              </a>
+            </div>
+          </div>
+          <div className="h-[72px]"></div>
         </>
       )}
     </div>
