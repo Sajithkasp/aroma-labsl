@@ -19,20 +19,8 @@ const DEFAULT_LIFESTYLE_1 = "https://sajithkasp.github.io/aroma-labsl/lifestyle.
 const DEFAULT_LIFESTYLE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
 
 const defaultLifestyleDetails = [
-  {
-    eyebrow: "MUSE — BLACK TEMPTATION",
-    title: "Dark, mysterious,",
-    titleAccent: "& seductive.",
-    description: "Blackcurrant and pear open with a bright bite, jasmine and orange blossom bloom at the heart, and vanilla, praline, and musk leave a soft, unforgettable trail. Perfect for evenings.",
-    image: DEFAULT_LIFESTYLE_1
-  },
-  {
-    eyebrow: "MUSE — HUNTERS DUSK",
-    title: "Woody, smoky,",
-    titleAccent: "& adventurous.",
-    description: "Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man.",
-    image: DEFAULT_LIFESTYLE_2
-  }
+  { eyebrow: "MUSE — BLACK TEMPTATION", title: "Dark, mysterious,", titleAccent: "& seductive.", description: "Blackcurrant and pear open with a bright bite, jasmine and orange blossom bloom at the heart, and vanilla, praline, and musk leave a soft, unforgettable trail. Perfect for evenings.", image: DEFAULT_LIFESTYLE_1 },
+  { eyebrow: "MUSE — HUNTERS DUSK", title: "Woody, smoky,", titleAccent: "& adventurous.", description: "Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man.", image: DEFAULT_LIFESTYLE_2 }
 ];
 
 // === CART MODAL ===
@@ -128,20 +116,80 @@ function CartModal({
   );
 }
 
+// === REVIEW SECTION ===
+function ReviewSection({ 
+  isLoggedIn, reviewUser, setReviewUser, 
+  reviewName, setReviewName, reviewEmail, setReviewEmail, 
+  reviewRating, setReviewRating, reviewComment, setReviewComment,
+  handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex
+}) {
+  return (
+    <section className="review-section">
+      <div className="review-header">
+        <div className="review-eyebrow">WHAT OUR CUSTOMERS SAY</div>
+        <h2 className="review-title">Loved by Fragrance Enthusiasts</h2>
+      </div>
+
+      {isLoggedIn ? (
+        <form className="review-form" onSubmit={handleReviewSubmit}>
+          <input type="text" placeholder="Your Name" value={reviewName} onChange={(e) => setReviewName(e.target.value)} required className="review-input" />
+          <input type="email" placeholder="Your Email" value={reviewEmail} onChange={(e) => setReviewEmail(e.target.value)} required className="review-input" />
+          <select value={reviewRating} onChange={(e) => setReviewRating(e.target.value)} required className="review-input">
+            <option value="">Select Rating</option>
+            <option value="5">★★★★★ (5)</option>
+            <option value="4">★★★★☆ (4)</option>
+            <option value="3">★★★☆☆ (3)</option>
+            <option value="2">★★☆☆☆ (2)</option>
+            <option value="1">★☆☆☆☆ (1)</option>
+          </select>
+          <textarea placeholder="Write your review..." value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} required className="review-input review-textarea"></textarea>
+          <button type="submit" className="review-submit">Submit Review</button>
+        </form>
+      ) : (
+        <div className="review-login-message">
+          <p>Please sign in with Google to write a review.</p>
+        </div>
+      )}
+
+      {reviews.length > 0 && (
+        <div className="reviews-slider">
+          <button className="reviews-nav reviews-nav-prev" onClick={() => setCurrentReviewIndex(prev => (prev - 1 + reviews.length) % reviews.length)}>‹</button>
+          <div className="reviews-slider-inner">
+            {reviews.map((rev, i) => (
+              <div key={rev.id} className={`review-card ${i === currentReviewIndex ? 'active' : ''}`}>
+                <div className="review-card-header">
+                  {rev.user_image && <img src={rev.user_image} alt={rev.name} className="review-avatar" />}
+                  <div>
+                    <h4 className="review-name">{rev.name}</h4>
+                    <p className="review-stars">{'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}</p>
+                  </div>
+                </div>
+                <p className="review-comment">"{rev.comment}"</p>
+                <small className="review-date">{new Date(rev.created_at).toLocaleDateString()}</small>
+              </div>
+            ))}
+          </div>
+          <button className="reviews-nav reviews-nav-next" onClick={() => setCurrentReviewIndex(prev => (prev + 1) % reviews.length)}>›</button>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // === ADMIN PANEL MODAL ===
 function AdminPanelModal({ 
   isAdminOpen, setIsAdminOpen, products, setProducts, 
   heroImages, setHeroImages, lifestyleImages, setLifestyleImages, 
-  lifestyleDetails, setLifestyleDetails 
+  lifestyleDetails, setLifestyleDetails, pages, setPages 
 }) {
   const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [newProduct, setNewProduct] = useState({
-    name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: ''
-  });
+  const [newProduct, setNewProduct] = useState({ name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: '' });
   const [newHeroUploading, setNewHeroUploading] = useState(false);
   const [newLifestyleUploading, setNewLifestyleUploading] = useState(false);
+  const [newPage, setNewPage] = useState({ title: '', content: '' });
+  const [editingPageId, setEditingPageId] = useState(null);
 
   if (!isAdminOpen) return null;
 
@@ -150,16 +198,9 @@ function AdminPanelModal({
     setUploading(true);
     try {
       const fileName = `${Date.now()}-${file.name.replace(/\s/g, '-')}`;
-      const { error } = await window.supabaseClient.storage
-        .from('product-images')
-        .upload(fileName, file);
-
+      const { error } = await window.supabaseClient.storage.from('product-images').upload(fileName, file);
       if (error) throw error;
-
-      const { data: urlData } = window.supabaseClient.storage
-        .from('product-images')
-        .getPublicUrl(fileName);
-
+      const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
       callback(urlData.publicUrl);
       setMessage('✅ Image uploaded!');
       setTimeout(() => setMessage(''), 3000);
@@ -218,13 +259,7 @@ function AdminPanelModal({
       if (error) throw error;
       const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
       const updated = [...lifestyleImages, urlData.publicUrl];
-      const newDetail = {
-        eyebrow: "NEW COLLECTION",
-        title: "New Fragrance,",
-        titleAccent: "& elegant.",
-        description: "Discover our latest addition.",
-        image: urlData.publicUrl
-      };
+      const newDetail = { eyebrow: "NEW COLLECTION", title: "New Fragrance,", titleAccent: "& elegant.", description: "Discover our latest addition.", image: urlData.publicUrl };
       const updatedDetails = [...lifestyleDetails, newDetail];
       setLifestyleImages(updated);
       setLifestyleDetails(updatedDetails);
@@ -260,25 +295,17 @@ function AdminPanelModal({
     }
     try {
       const { error } = await window.supabaseClient.from('products').insert([{
-        name: newProduct.name,
-        price: 'Rs. 1,500',
-        category: newProduct.category,
-        description: newProduct.tagline,
-        top_notes: newProduct.top,
-        heart_notes: newProduct.heart,
-        base_notes: newProduct.base,
-        image_url: newProduct.image
+        name: newProduct.name, price: 'Rs. 1,500', category: newProduct.category,
+        description: newProduct.tagline, top_notes: newProduct.top, heart_notes: newProduct.heart,
+        base_notes: newProduct.base, image_url: newProduct.image
       }]);
-
       if (error) throw error;
-
       const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
       if (fresh.data) {
         setProducts(fresh.data.map(p => ({
           id: p.id, name: p.name,
           for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-          filter: p.category, tagline: p.description || '',
-          top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+          filter: p.category, tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
           image: p.image_url || '', accent: '#B8963E'
         })));
       }
@@ -300,12 +327,47 @@ function AdminPanelModal({
         setProducts(fresh.data.map(p => ({
           id: p.id, name: p.name,
           for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-          filter: p.category, tagline: p.description || '',
-          top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+          filter: p.category, tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
           image: p.image_url || '', accent: '#B8963E'
         })));
       }
       setMessage('✅ Product deleted.');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleAddPage = async () => {
+    if (!newPage.title) { setMessage('❌ Title is required.'); return; }
+    try {
+      if (editingPageId) {
+        const { error } = await window.supabaseClient.from('pages').update({ title: newPage.title, content: newPage.content }).eq('id', editingPageId);
+        if (error) throw error;
+        setMessage('✅ Page updated!');
+      } else {
+        const { error } = await window.supabaseClient.from('pages').insert([{ title: newPage.title, content: newPage.content }]);
+        if (error) throw error;
+        setMessage('✅ Page added!');
+      }
+      const fresh = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
+      setPages(fresh.data || []);
+      setNewPage({ title: '', content: '' });
+      setEditingPageId(null);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleDeletePage = async (id) => {
+    if (!window.confirm('Delete this page?')) return;
+    try {
+      const { error } = await window.supabaseClient.from('pages').delete().eq('id', id);
+      if (error) throw error;
+      const fresh = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
+      setPages(fresh.data || []);
+      setMessage('✅ Page deleted.');
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setMessage('❌ Error: ' + err.message);
@@ -320,8 +382,9 @@ function AdminPanelModal({
 
         <div className="admin-tabs">
           <button className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>Products</button>
-          <button className={`admin-tab ${activeTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveTab('hero')}>Hero Images</button>
+          <button className={`admin-tab ${activeTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveTab('hero')}>Hero</button>
           <button className={`admin-tab ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>Lifestyle</button>
+          <button className={`admin-tab ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => setActiveTab('pages')}>Pages</button>
         </div>
 
         {message && <div className="admin-message">{message}</div>}
@@ -341,7 +404,6 @@ function AdminPanelModal({
               <input type="text" placeholder="Heart Notes" value={newProduct.heart} onChange={(e) => setNewProduct({ ...newProduct, heart: e.target.value })} className="admin-input" />
               <input type="text" placeholder="Base Notes" value={newProduct.base} onChange={(e) => setNewProduct({ ...newProduct, base: e.target.value })} className="admin-input" />
             </div>
-
             <div className="admin-upload-section">
               <label className="admin-upload-label">
                 {uploading ? 'Uploading...' : '📤 Upload Product Image *'}
@@ -349,7 +411,6 @@ function AdminPanelModal({
               </label>
               {newProduct.image && <img src={newProduct.image} alt="Preview" className="admin-preview-img" />}
             </div>
-
             <button onClick={handleAddProduct} className="admin-btn-primary">+ Add Product</button>
 
             <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Products</h3>
@@ -377,7 +438,6 @@ function AdminPanelModal({
                 <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAddHeroImage(e.target.files[0])} />
               </label>
             </div>
-
             <div className="admin-image-grid">
               {heroImages.map((img, i) => (
                 <div key={i} className="admin-image-item">
@@ -398,7 +458,6 @@ function AdminPanelModal({
                 <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleAddLifestyleImage(e.target.files[0])} />
               </label>
             </div>
-
             {lifestyleDetails.map((detail, i) => (
               <div key={i} className="admin-lifestyle-item">
                 <img src={detail.image} alt={`Lifestyle ${i + 1}`} className="admin-preview-img" />
@@ -411,10 +470,48 @@ function AdminPanelModal({
                 <button onClick={() => handleDeleteLifestyleImage(i)} className="admin-btn-delete" style={{ marginTop: '8px' }}>Delete Image</button>
               </div>
             ))}
-
             <button onClick={handleSaveLifestyleDetails} className="admin-btn-primary" style={{ marginTop: '20px' }}>Save Lifestyle Details</button>
           </div>
         )}
+
+        {activeTab === 'pages' && (
+          <div>
+            <h3 className="admin-subtitle">{editingPageId ? 'Edit Page' : 'Add New Page'}</h3>
+            <div className="admin-form-grid">
+              <input type="text" placeholder="Page Title *" value={newPage.title} onChange={(e) => setNewPage({ ...newPage, title: e.target.value })} className="admin-input admin-input-full" />
+              <textarea placeholder="Page Content" value={newPage.content} onChange={(e) => setNewPage({ ...newPage, content: e.target.value })} className="admin-input admin-input-full" style={{ minHeight: '120px' }}></textarea>
+            </div>
+            <button onClick={handleAddPage} className="admin-btn-primary">{editingPageId ? 'Update Page' : '+ Add Page'}</button>
+            {editingPageId && <button onClick={() => { setEditingPageId(null); setNewPage({ title: '', content: '' }); }} className="admin-btn-delete" style={{ marginLeft: '10px' }}>Cancel Edit</button>}
+
+            <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Pages</h3>
+            <div className="admin-product-list">
+              {pages.map(p => (
+                <div key={p.id} className="admin-product-row">
+                  <div className="admin-product-info">
+                    <div className="admin-product-name">{p.title}</div>
+                  </div>
+                  <button onClick={() => { setEditingPageId(p.id); setNewPage({ title: p.title, content: p.content || '' }); }} className="admin-btn-primary" style={{ padding: '8px 14px', fontSize: '12px' }}>Edit</button>
+                  <button onClick={() => handleDeletePage(p.id)} className="admin-btn-delete">Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// === PAGE POPUP ===
+function PagePopup({ page, onClose }) {
+  if (!page) return null;
+  return (
+    <div className="page-popup-overlay" onClick={onClose}>
+      <div className="page-popup-box" onClick={(e) => e.stopPropagation()}>
+        <button className="page-popup-close" onClick={onClose}>×</button>
+        <h2 className="page-popup-title">{page.title}</h2>
+        <p className="page-popup-content">{page.content}</p>
       </div>
     </div>
   );
@@ -430,6 +527,8 @@ function App() {
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [lifestyleImages, setLifestyleImages] = useState([DEFAULT_LIFESTYLE_1, DEFAULT_LIFESTYLE_2]);
   const [lifestyleDetails, setLifestyleDetails] = useState(defaultLifestyleDetails);
+  const [pages, setPages] = useState([]);
+  const [activePage, setActivePage] = useState(null);
 
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -443,6 +542,14 @@ function App() {
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  // Review States
+  const [reviews, setReviews] = useState([]);
+  const [reviewName, setReviewName] = useState('');
+  const [reviewEmail, setReviewEmail] = useState('');
+  const [reviewRating, setReviewRating] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
   const districts = [
     "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
@@ -458,8 +565,7 @@ function App() {
           setProducts(prodData.map(p => ({
             id: p.id, name: p.name,
             for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-            filter: p.category, tagline: p.description || '',
-            top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+            filter: p.category, tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
             image: p.image_url || '', accent: '#B8963E'
           })));
         } else {
@@ -472,6 +578,12 @@ function App() {
           if (siteData.lifestyle_images && siteData.lifestyle_images.length > 0) setLifestyleImages(siteData.lifestyle_images);
           if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) setLifestyleDetails(siteData.lifestyle_details);
         }
+
+        const { data: pagesData } = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
+        if (pagesData) setPages(pagesData);
+
+        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+        if (reviewsData) setReviews(reviewsData);
       } catch (e) {
         console.error(e);
         setProducts(defaultProducts);
@@ -488,6 +600,15 @@ function App() {
     }, 5000);
     return () => clearInterval(interval);
   }, [heroImages]);
+
+  // Review Auto Slide
+  useEffect(() => {
+    if (reviews.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentReviewIndex(prev => (prev + 1) % reviews.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [reviews]);
 
   const addToCart = (product) => {
     setCartItems(prev => {
@@ -514,9 +635,7 @@ function App() {
   const getCartCount = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const sendWhatsAppOrder = () => {
-    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
-      alert("Please fill all customer details."); return;
-    }
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
     if (cartItems.length === 0) { alert("Your cart is empty."); return; }
     let message = "Hi Aroma Lab! I want to order:\n\n";
     cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
@@ -526,9 +645,7 @@ function App() {
   };
 
   const sendBankDepositOrder = () => {
-    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) {
-      alert("Please fill all customer details."); return;
-    }
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
     if (cartItems.length === 0) { alert("Your cart is empty."); return; }
     let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
     cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
@@ -538,11 +655,31 @@ function App() {
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!reviewName || !reviewEmail || !reviewRating || !reviewComment) return;
+    try {
+      const userImage = loggedInUser?.photoURL || '';
+      const { error } = await window.supabaseClient.from('reviews').insert([{
+        name: reviewName, email: reviewEmail, rating: reviewRating, comment: reviewComment, user_image: userImage
+      }]);
+      if (error) throw error;
+      setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
+      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+      if (reviewsData) setReviews(reviewsData);
+      alert('✅ Review submitted successfully!');
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+    }
+  };
+
   window.setAppUser = function(user) {
     if (user) {
       setIsLoggedIn(true);
       setLoggedInUser(user);
       if (!customerName) setCustomerName(user.displayName || '');
+      setReviewName(user.displayName || '');
+      setReviewEmail(user.email || '');
     } else {
       setIsLoggedIn(false);
       setLoggedInUser(null);
@@ -583,15 +720,16 @@ function App() {
         heroImages={heroImages} setHeroImages={setHeroImages}
         lifestyleImages={lifestyleImages} setLifestyleImages={setLifestyleImages}
         lifestyleDetails={lifestyleDetails} setLifestyleDetails={setLifestyleDetails}
+        pages={pages} setPages={setPages}
       />
 
-      {showAddedPopup && (
-        <div className="added-popup">✅ Added to Cart!</div>
-      )}
+      <PagePopup page={activePage} onClose={() => setActivePage(null)} />
+
+      {showAddedPopup && <div className="added-popup">✅ Added to Cart!</div>}
 
       <div className="top-bar">
         <div className="top-bar-inner">
-          <span>🚚 FREE DELIVERY ON 3+ ITEMS</span>
+          <span>🚚 FREE DELIVERY ISLANDWIDE</span>
           <span className="divider">|</span>
           <span>🛡️ PREMIUM QUALITY</span>
           <span className="divider">|</span>
@@ -612,7 +750,7 @@ function App() {
           <nav className="header-nav">
             <a href="#" className="active">Home</a>
             <a href="#collection">Shop</a>
-            <a href="#about">About Us</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setActivePage(pages.find(p => p.title.toLowerCase().includes('about')) || null); }}>About Us</a>
             <a href="#contact">Contact</a>
           </nav>
 
@@ -620,11 +758,9 @@ function App() {
             <button className="icon-btn">🔍</button>
             <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in">👤</button>
             <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout">🚪</button>
-
             {isAdmin && (
               <button onClick={() => setIsAdminOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel">⚙️</button>
             )}
-
             <button onClick={() => setIsCartOpen(true)} className="icon-btn">
               🛒
               {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
@@ -640,13 +776,8 @@ function App() {
           <div className="hero-content-inner">
             <div className="hero-text">
               <div className="hero-eyebrow">PREMIUM EAU DE PARFUM</div>
-              <h1 className="hero-title">
-                Crafted for Every<br />
-                <span className="accent">Mood & Moment</span>
-              </h1>
-              <p className="hero-desc">
-                From bold and mysterious to fresh and elegant — find your perfect scent.
-              </p>
+              <h1 className="hero-title">Crafted for Every<br /><span className="accent">Mood & Moment</span></h1>
+              <p className="hero-desc">From bold and mysterious to fresh and elegant — find your perfect scent.</p>
               <button onClick={() => handleFilter("All")} className="hero-btn">SHOP NOW →</button>
             </div>
           </div>
@@ -684,7 +815,6 @@ function App() {
           <div className="collection-eyebrow">OUR COLLECTION</div>
           <h2 className="collection-title">Explore Our <span className="accent">Signature Scents</span></h2>
         </div>
-
         <div className="filter-buttons">
           {['All', 'Ladies', 'Men', 'Unisex'].map((label) => (
             <button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>
@@ -692,16 +822,11 @@ function App() {
             </button>
           ))}
         </div>
-
         <div className="product-grid">
           {filteredProducts.map((product) => (
             <div key={product.id} className="product-card">
               <div className="product-img-wrap">
-                {product.image ? (
-                  <img src={product.image} alt={product.name} />
-                ) : (
-                  <div className="product-img-placeholder">{product.name}</div>
-                )}
+                {product.image ? <img src={product.image} alt={product.name} /> : <div className="product-img-placeholder">{product.name}</div>}
                 <div className="product-badge-for">{product.for}</div>
                 <div className="product-badge-price">Rs. 1,500</div>
               </div>
@@ -724,9 +849,7 @@ function App() {
       {lifestyleDetails.map((detail, index) => (
         <section key={index} className="lifestyle-section">
           <div className={`lifestyle-grid ${index % 2 === 1 ? 'reverse' : ''}`}>
-            <div className="lifestyle-img">
-              <img src={detail.image} alt={detail.title} />
-            </div>
+            <div className="lifestyle-img"><img src={detail.image} alt={detail.title} /></div>
             <div className="lifestyle-content">
               <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
               <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
@@ -753,6 +876,18 @@ function App() {
         </div>
       </section>
 
+      <ReviewSection 
+        isLoggedIn={isLoggedIn}
+        reviewName={reviewName} setReviewName={setReviewName}
+        reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
+        reviewRating={reviewRating} setReviewRating={setReviewRating}
+        reviewComment={reviewComment} setReviewComment={setReviewComment}
+        handleReviewSubmit={handleReviewSubmit}
+        reviews={reviews}
+        currentReviewIndex={currentReviewIndex}
+        setCurrentReviewIndex={setCurrentReviewIndex}
+      />
+
       <footer id="contact" className="site-footer">
         <div className="footer-inner">
           <div>
@@ -763,19 +898,21 @@ function App() {
             <p className="footer-desc">Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.</p>
           </div>
           <div>
+            <div className="footer-heading">QUICK LINKS</div>
+            <div className="footer-links">
+              <a href="#">Home</a>
+              <a href="#collection">Shop</a>
+              {pages.map(p => (
+                <a key={p.id} href="#" onClick={(e) => { e.preventDefault(); setActivePage(p); }}>{p.title}</a>
+              ))}
+            </div>
+          </div>
+          <div>
             <div className="footer-heading">CONTACT</div>
             <div className="footer-links">
               <a href="tel:+94777804705">0777 804 705</a>
               <a href="https://wa.me/94777804705" target="_blank" rel="noopener">WhatsApp</a>
               <span>Colombo, Sri Lanka</span>
-            </div>
-          </div>
-          <div>
-            <div className="footer-heading">SHOP</div>
-            <div className="footer-links">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener">Order on Daraz</a>
-              <span>Buy Now Pay Later with KOKO</span>
-              <span>Island Wide Delivery</span>
             </div>
           </div>
         </div>
