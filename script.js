@@ -623,6 +623,24 @@ const CartModal = () => {
                         <div><div className="font-body text-[9px] tracking-[0.18em] uppercase text-[#B8963E] font-semibold">Base</div><div className="font-body text-[11px] leading-[1.4] mt-1 text-[#0A2E1F]/80">{product.base}</div></div>
                       </div>
                     </div>
+                      <button 
+  onClick={() => addToCart(product)}
+  style={{
+    width: '100%',
+    marginTop: '15px',
+    padding: '12px',
+    background: '#B8963E',
+    color: '#0A2E1F',
+    border: 'none',
+    borderRadius: '25px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '13px',
+    letterSpacing: '0.05em'
+  }}
+>
+  🛒 Add to Cart
+</button>
                     <div className="mt-5 flex gap-2">
                       <a href={DARAZ_LINK} target="_blank" rel="noopener" className="flex-1 bg-[#0A2E1F] text-[#FFFBF5] rounded-full py-[13px] font-body text-[12px] tracking-[0.14em] uppercase font-medium text-center hover:bg-[#123a28] transition">Order on Daraz - Rs. 1,500</a>
                       <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${product.name} (${product.for}) - Rs. 1,500. Please confirm availability.`)}`} target="_blank" rel="noopener" className="w-[46px] h-[44px] rounded-full border border-[#0A2E1F]/15 flex items-center justify-center font-body text-[10px] tracking-[0.05em] uppercase font-semibold hover:bg-[#0A2E1F]/5 transition shrink-0">WA</a>
