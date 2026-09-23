@@ -147,7 +147,20 @@ const sendBankDepositOrder = () => {
 };
 // === END CART FUNCTIONS ===
 // === END CART STATES ===
-
+// === FIREBASE USER CONNECTION ===
+// Firebase එකෙන් එන User ව අල්ලගන්න
+window.setAppUser = function(user) {
+  if (user) {
+    setIsLoggedIn(true);
+    setLoggedInUser(user);
+    if (!customerName) setCustomerName(user.displayName || '');
+  } else {
+    setIsLoggedIn(false);
+    setLoggedInUser(null);
+  }
+};
+// === END FIREBASE USER CONNECTION ===
+  
   useEffect(() => {
     const saved = localStorage.getItem('aromaLabProducts');
     if (saved) {
