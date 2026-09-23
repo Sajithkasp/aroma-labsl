@@ -777,6 +777,25 @@ button { cursor: pointer; background: none; border: none; }
   width: 100%;
 }
 .admin-input-full { grid-column: span 2; }
+.admin-upload-section { margin-bottom: 15px; }
+.admin-upload-label {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #0A2E1F;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.admin-preview-img {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #eee;
+}
 .admin-btn-primary {
   padding: 12px 24px;
   background: #0A2E1F;
@@ -937,4 +956,4 @@ button { cursor: pointer; background: none; border: none; }
   .review-title { font-size: 2rem; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-input-full { grid-column: span 1; }
-  }
+    }
