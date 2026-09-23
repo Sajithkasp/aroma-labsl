@@ -27,11 +27,72 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Firebase SDK (අලුතින් එකතු කළා) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfu9sokfuPZmdZcdWhAuuSEZu65qQjEuU",
+      authDomain: "aroma-lab-sl.firebaseapp.com",
+      projectId: "aroma-lab-sl",
+      storageBucket: "aroma-lab-sl.firebasestorage.app",
+      messagingSenderId: "898558822586",
+      appId: "1:898558822586:web:26262b43dde14ec1381a83",
+      measurementId: "G-FNQVL4ZGKY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.googleLogin = function() {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          alert("Welcome " + user.displayName + "!");
+        }).catch((error) => {
+          console.error(error);
+          alert("Login failed: " + error.message);
+        });
+    };
+
+    window.googleLogout = function() {
+      signOut(auth).then(() => {
+        alert("Logged out successfully!");
+      }).catch((error) => {
+        console.error(error);
+      });
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      const loginBtn = document.getElementById('google-login-btn');
+      const logoutBtn = document.getElementById('google-logout-btn');
+      if (user) {
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(logoutBtn) logoutBtn.style.display = 'block';
+      } else {
+        if(loginBtn) loginBtn.style.display = 'block';
+        if(logoutBtn) logoutBtn.style.display = 'none';
+      }
+    });
+  </script>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel" src="script.js"></script>
+
+  <!-- Google Login/Logout Buttons (අලුතින් එකතු කළා) -->
+  <div style="text-align: center; margin: 20px 0;">
+    <button id="google-login-btn" onclick="googleLogin()" style="padding: 12px 24px; background: #4285F4; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+      Sign in with Google
+    </button>
+    <button id="google-logout-btn" onclick="googleLogout()" style="display: none; padding: 12px 24px; background: #db4437; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+      Logout
+    </button>
+  </div>
 
   <!-- Review Section -->
 <section id="review-section" style="padding: 40px 20px; background: #111; color: #fff; text-align: center; font-family: 'Poppins', sans-serif;">
