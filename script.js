@@ -118,8 +118,7 @@ function CartModal({
 
 // === REVIEW SECTION ===
 function ReviewSection({ 
-  isLoggedIn, reviewUser, setReviewUser, 
-  reviewName, setReviewName, reviewEmail, setReviewEmail, 
+  isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, 
   reviewRating, setReviewRating, reviewComment, setReviewComment,
   handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex
 }) {
@@ -543,7 +542,6 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // Review States
   const [reviews, setReviews] = useState([]);
   const [reviewName, setReviewName] = useState('');
   const [reviewEmail, setReviewEmail] = useState('');
@@ -592,7 +590,6 @@ function App() {
     loadData();
   }, []);
 
-  // Hero Auto Slide
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => {
@@ -601,7 +598,6 @@ function App() {
     return () => clearInterval(interval);
   }, [heroImages]);
 
-  // Review Auto Slide
   useEffect(() => {
     if (reviews.length <= 1) return;
     const interval = setInterval(() => {
@@ -729,7 +725,7 @@ function App() {
 
       <div className="top-bar">
         <div className="top-bar-inner">
-          <span>🚚 FREE DELIVERY ISLANDWIDE</span>
+          <span>🚚 FREE DELIVERY ON 3+ ITEMS</span>
           <span className="divider">|</span>
           <span>🛡️ PREMIUM QUALITY</span>
           <span className="divider">|</span>
@@ -750,8 +746,8 @@ function App() {
           <nav className="header-nav">
             <a href="#" className="active">Home</a>
             <a href="#collection">Shop</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); setActivePage(pages.find(p => p.title.toLowerCase().includes('about')) || null); }}>About Us</a>
-            <a href="#contact">Contact</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); const aboutPage = pages.find(p => p.title.toLowerCase().includes('about')); if (aboutPage) setActivePage(aboutPage); }}>About Us</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); const contactPage = pages.find(p => p.title.toLowerCase().includes('contact')); if (contactPage) setActivePage(contactPage); }}>Contact</a>
           </nav>
 
           <div className="header-icons">
@@ -888,47 +884,64 @@ function App() {
         setCurrentReviewIndex={setCurrentReviewIndex}
       />
 
-      <footer id="contact" className="site-footer">
-        <div className="footer-inner">
-          <div>
+      <footer className="site-footer">
+        <div className="footer-grid">
+          <div className="footer-col-1">
             <div className="footer-logo">
               <img src={LOGO_URL} alt="Aroma Lab" />
-              <div className="footer-logo-text">AROMA LAB</div>
+              <div className="footer-logo-text">
+                <div className="title">AROMA LAB</div>
+                <div className="subtitle">FINE FRAGRANCES</div>
+              </div>
             </div>
             <p className="footer-desc">Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.</p>
+            <div className="footer-socials">
+              <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="footer-social-btn facebook" title="Facebook">f</a>
+              <a href="https://wa.me/94777804705" target="_blank" rel="noopener" className="footer-social-btn whatsapp" title="WhatsApp">✆</a>
+              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="footer-social-btn daraz" title="Daraz">🛒</a>
+            </div>
           </div>
-          <div>
+
+          <div className="footer-col-2">
             <div className="footer-heading">QUICK LINKS</div>
             <div className="footer-links">
-              <a href="#">Home</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
               <a href="#collection">Shop</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('about')); if (p) setActivePage(p); }}>About Us</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('contact')); if (p) setActivePage(p); }}>Contact</a>
+            </div>
+          </div>
+
+          <div className="footer-col-3">
+            <div className="footer-heading">CUSTOMER CARE</div>
+            <div className="footer-links">
               {pages.map(p => (
                 <a key={p.id} href="#" onClick={(e) => { e.preventDefault(); setActivePage(p); }}>{p.title}</a>
               ))}
             </div>
           </div>
-          <div>
-            <div className="footer-heading">CONTACT</div>
+
+          <div className="footer-col-4">
+            <div className="footer-heading">CONTACT US</div>
             <div className="footer-links">
-              <a href="tel:+94777804705">0777 804 705</a>
-              <a href="https://wa.me/94777804705" target="_blank" rel="noopener">WhatsApp</a>
+              <span>0777 804 705</span>
+              <span>info@aromalab.lk</span>
               <span>Colombo, Sri Lanka</span>
             </div>
           </div>
         </div>
+
         <div className="footer-bottom">
-          © {new Date().getFullYear()} AROMA LAB FINE FRAGRANCES • ALL RIGHTS RESERVED
+          <span>© {new Date().getFullYear()} AROMA LAB FINE FRAGRANCES • ALL RIGHTS RESERVED</span>
+          <div className="footer-bottom-links">
+            {pages.map(p => (
+              <a key={p.id} href="#" onClick={(e) => { e.preventDefault(); setActivePage(p); }}>{p.title}</a>
+            ))}
+          </div>
         </div>
       </footer>
 
-      <div className="bottom-bar">
-        <div className="bottom-bar-inner">
-          <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="bottom-btn facebook">Facebook</a>
-          <a href={DARAZ_LINK} target="_blank" rel="noopener" className="bottom-btn daraz">Daraz</a>
-          <a href={`${WHATSAPP_LINK}?text=Hi%20Aroma%20Lab!%20I%20want%20to%20order%20perfumes.%20Rs.%201,500%20each`} target="_blank" rel="noopener" className="bottom-btn whatsapp">WhatsApp</a>
-        </div>
-      </div>
-      <div style={{ height: '80px' }}></div>
+      <div style={{ height: '40px' }}></div>
     </div>
   );
 }
