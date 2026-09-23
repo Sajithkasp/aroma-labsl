@@ -26,6 +26,23 @@ function App() {
   const [adminState, setAdminState] = useState('locked');
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState(false);
+  // === CART STATES ===
+const [cartItems, setCartItems] = useState([]);
+const [isCartOpen, setIsCartOpen] = useState(false);
+const [customerName, setCustomerName] = useState('');
+const [customerPhone, setCustomerPhone] = useState('');
+const [customerAddress, setCustomerAddress] = useState('');
+const [customerDistrict, setCustomerDistrict] = useState('');
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [loggedInUser, setLoggedInUser] = useState(null);
+
+// ශ්‍රී ලංකාවේ දිස්ත්‍රික්ක 25
+const districts = [
+  "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
+  "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
+  "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
+];
+// === END CART STATES ===
 
   useEffect(() => {
     const saved = localStorage.getItem('aromaLabProducts');
