@@ -957,3 +957,53 @@ button { cursor: pointer; background: none; border: none; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-input-full { grid-column: span 1; }
     }
+
+/* === HERO DOTS === */
+.hero-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.hero-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 251, 245, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.hero-dot.active {
+  background: #B8963E;
+  width: 28px;
+  border-radius: 5px;
+}
+
+/* === ADMIN IMAGE GRID === */
+.admin-image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+}
+.admin-image-item {
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.admin-lifestyle-item {
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
+  margin-bottom: 15px;
+}
+
+@media (min-width: 640px) {
+  .admin-image-grid { grid-template-columns: repeat(3, 1fr); }
+}
