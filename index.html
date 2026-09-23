@@ -75,13 +75,11 @@
       if (user) {
         if(loginBtn) loginBtn.style.display = 'none';
         if(logoutBtn) logoutBtn.style.display = 'flex';
-        if (window.showReviewForm) window.showReviewForm(user);
         if (window.setAppUser) window.setAppUser(user);
         if (window.checkAdmin) window.checkAdmin(user.email);
       } else {
         if(loginBtn) loginBtn.style.display = 'flex';
         if(logoutBtn) logoutBtn.style.display = 'none';
-        if (window.hideReviewForm) window.hideReviewForm();
         if (window.setAppUser) window.setAppUser(null);
         if (window.checkAdmin) window.checkAdmin(null);
       }
@@ -92,132 +90,5 @@
   <div id="root"></div>
 
   <script type="text/babel" src="script.js"></script>
-
-  <!-- Review Section -->
-  <section id="review-section" class="review-section">
-    <h2 class="review-title">Customer Reviews</h2>
-    
-    <div id="loginMessage" class="login-message">
-      <p class="login-message-title">Please sign in with Google to write a review.</p>
-      <p class="login-message-subtitle">Your review will be posted under your Google account name.</p>
-    </div>
-
-    <form id="reviewForm" class="review-form" style="display: none;">
-      <input type="text" id="name" placeholder="Your Name" required class="review-input">
-      <input type="email" id="email" placeholder="Your Email" required class="review-input">
-      <select id="rating" required class="review-input">
-        <option value="">Select Rating</option>
-        <option value="5">★★★★★ (5)</option>
-        <option value="4">★★★★☆ (4)</option>
-        <option value="3">★★★☆☆ (3)</option>
-        <option value="2">★★☆☆☆ (2)</option>
-        <option value="1">★☆☆☆☆ (1)</option>
-      </select>
-      <textarea id="comment" placeholder="Write your review..." required class="review-input review-textarea"></textarea>
-      <button type="submit" id="submitBtn" class="review-submit">Submit Review</button>
-    </form>
-
-    <div id="reviewsList" class="reviews-list"></div>
-  </section>
-
-  <!-- Supabase Script -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM';
-    
-    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    window.showReviewForm = function(user) {
-      const form = document.getElementById('reviewForm');
-      const loginMsg = document.getElementById('loginMessage');
-      if (form) form.style.display = 'flex';
-      if (loginMsg) loginMsg.style.display = 'none';
-      
-      const nameInput = document.getElementById('name');
-      const emailInput = document.getElementById('email');
-      if (nameInput) nameInput.value = user.displayName || '';
-      if (emailInput) emailInput.value = user.email || '';
-    };
-
-    window.hideReviewForm = function() {
-      const form = document.getElementById('reviewForm');
-      const loginMsg = document.getElementById('loginMessage');
-      if (form) form.style.display = 'none';
-      if (loginMsg) loginMsg.style.display = 'block';
-    };
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('reviewForm');
-      if (form) form.style.display = 'none';
-    });
-
-    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.textContent = 'Submitting...';
-      btn.disabled = true;
-
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const rating = document.getElementById('rating').value;
-      const comment = document.getElementById('comment').value;
-
-      const { error } = await window.supabaseClient.from('reviews').insert([{ name, email, rating, comment }]);
-
-      if (error) {
-        alert('Error: ' + error.message);
-      } else {
-        document.getElementById('reviewForm').reset();
-        loadReviews();
-      }
-      btn.textContent = 'Submit Review';
-      btn.disabled = false;
-    });
-
-    async function loadReviews() {
-      const { data, error } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-      if (error) { console.error(error); return; }
-
-      const container = document.getElementById('reviewsList');
-      container.innerHTML = '';
-      data.forEach(rev => {
-        const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
-        const date = new Date(rev.created_at).toLocaleDateString();
-        const div = document.createElement('div');
-        div.className = 'review-card';
-        div.innerHTML = `
-          <h4 class="review-name">${rev.name}</h4>
-          <p class="review-stars">${stars}</p>
-          <p class="review-comment">${rev.comment}</p>
-          <small class="review-date">${date}</small>
-        `;
-        container.appendChild(div);
-      });
-    }
-    loadReviews();
-  </script>
-  
-  <script>
-    (function(){
-      function m(a){
-        var h=a.getAttribute("href");
-        if(!h)return;
-        try{
-          var u=new URL(h,document.baseURI);
-          if((u.protocol==="http:"||u.protocol==="https:")&&u.host!==location.host){
-            a.target="_blank";
-            a.rel="noopener noreferrer";
-          }
-        }catch(e){}
-      }
-      function s(){ document.querySelectorAll("a[href]").forEach(m); }
-      if(document.readyState!=="loading"){ s(); }else{ document.addEventListener("DOMContentLoaded",s); }
-      document.addEventListener("click",function(e){
-        var a=e.target&&e.target.closest&&e.target.closest("a[href]");
-        if(a){m(a);}
-      },true);
-    })();
-  </script>
 </body>
 </html>
