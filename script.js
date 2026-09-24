@@ -632,6 +632,8 @@ function App() {
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [adminAuthOpen, setAdminAuthOpen] = useState(false);
+const [adminAuthenticated, setAdminAuthenticated] = useState(false);
 
   const [reviews, setReviews] = useState([]);
   const [reviewName, setReviewName] = useState('');
