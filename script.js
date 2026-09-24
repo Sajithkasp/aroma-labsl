@@ -1002,14 +1002,20 @@ const [adminAuthenticated, setAdminAuthenticated] = useState(false);
           </div>
 
           <div className="footer-col-2">
-            <div className="footer-heading">QUICK LINKS</div>
-            <div className="footer-links">
-              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
-              <a href="#collection">Shop</a>
-              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('about')); if (p) setActivePage(p); }}>About Us</a>
-              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('contact')); if (p) setActivePage(p); }}>Contact</a>
-            </div>
-          </div>
+  <div className="footer-heading">QUICK LINKS</div>
+  <div className="footer-links">
+    <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
+    <a href="#collection">Shop</a>
+    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('about')); if (p) setActivePage(p); }}>About Us</a>
+    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('contact')); if (p) setActivePage(p); }}>Contact</a>
+  </div>
+  <div className="footer-heading" style={{ marginTop: '24px' }}>LEGAL</div>
+  <div className="footer-links">
+    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('privacy')); if (p) setActivePage(p); }}>Privacy Policy</a>
+    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('terms')); if (p) setActivePage(p); }}>Terms & Conditions</a>
+    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('return')); if (p) setActivePage(p); }}>Return Policy</a>
+  </div>
+</div>
 
           <div className="footer-col-3">
             <div className="footer-heading">CONNECT WITH US</div>
