@@ -217,6 +217,55 @@ function ReviewSection({
   );
 }
 
+// === ADMIN AUTH ===
+function AdminAuth({ onSuccess, onClose }) {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const { data, error: authError } = await window.supabaseClient.auth.signInWithPassword({
+        email: 'sajith.kasp@gmail.com',
+        password: password
+      });
+      if (authError) throw authError;
+      onSuccess();
+    } catch (err) {
+      setError('❌ Wrong Password. Try again.');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="admin-overlay">
+      <div className="admin-auth-box">
+        <button className="admin-close" onClick={onClose}>×</button>
+        <h2 className="admin-title">Admin Access</h2>
+        <p className="admin-auth-desc">Enter your admin password to access the panel.</p>
+        <form onSubmit={handleLogin}>
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="admin-input admin-input-full"
+            autoFocus
+            required
+          />
+          {error && <p className="admin-auth-error">{error}</p>}
+          <button type="submit" className="admin-btn-primary" style={{ width: '100%', marginTop: '10px' }} disabled={loading}>
+            {loading ? 'Checking...' : 'Unlock Admin Panel'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // === ADMIN PANEL MODAL ===
 function AdminPanelModal({ 
   isAdminOpen, setIsAdminOpen, products, setProducts, 
