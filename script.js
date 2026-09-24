@@ -803,6 +803,17 @@ const [adminAuthenticated, setAdminAuthenticated] = useState(false);
         DARAZ_LINK={DARAZ_LINK}
       />
 
+          {adminAuthOpen && (
+  <AdminAuth 
+    onSuccess={() => { 
+      setAdminAuthenticated(true); 
+      setAdminAuthOpen(false); 
+      setIsAdminOpen(true); 
+    }}
+    onClose={() => setAdminAuthOpen(false)}
+  />
+)}
+
       <AdminPanelModal 
         isAdminOpen={isAdminOpen} setIsAdminOpen={setIsAdminOpen}
         products={products} setProducts={setProducts}
