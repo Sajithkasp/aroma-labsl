@@ -284,3 +284,42 @@ button { cursor: pointer; background: none; border: none; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-input-full { grid-column: span 1; }
                      }
+/* === ADMIN AUTH FORM === */
+.admin-auth-box {
+  background: #fff;
+  border-radius: 20px;
+  max-width: 450px;
+  width: 100%;
+  position: relative;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+.admin-auth-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.admin-auth-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 10px 0;
+  font-weight: 600;
+}
+.admin-auth-box .admin-title {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.admin-auth-box .admin-input {
+  padding: 14px 16px;
+  font-size: 15px;
+  text-align: center;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.admin-auth-box .admin-btn-primary {
+  padding: 14px 24px;
+  font-size: 13px;
+  margin-top: 10px;
+}
