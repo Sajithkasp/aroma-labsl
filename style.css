@@ -312,3 +312,11 @@ button { cursor: pointer; background: none; border: none; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-input-full { grid-column: span 1; }
                 }
+/* === SIMPLE LUXURY GOLD CIRCLES === */
+body, .app-root {
+  background-color: #FFFBF5;
+  background-image: radial-gradient(circle at 15% 20%, rgba(184, 150, 62, 0.07) 0%, transparent 35%),
+                    radial-gradient(circle at 85% 80%, rgba(184, 150, 62, 0.07) 0%, transparent 35%),
+                    radial-gradient(circle at 50% 50%, rgba(184, 150, 62, 0.04) 0%, transparent 50%);
+  background-attachment: fixed;
+}
