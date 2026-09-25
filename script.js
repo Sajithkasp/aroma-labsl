@@ -946,22 +946,42 @@ const [adminAuthenticated, setAdminAuthenticated] = useState(false);
         </div>
       </section>
 
+      {/* Lifestyle Slider */}
+<section className="lifestyle-section">
+  <div className="lifestyle-slider">
+    <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}>
+      <ChevronLeft />
+    </button>
+    <div className="lifestyle-slider-inner">
       {lifestyleDetails.map((detail, index) => (
-        <section key={index} className="lifestyle-section">
-          <div className={`lifestyle-grid ${index % 2 === 1 ? 'reverse' : ''}`}>
-            <div className="lifestyle-img"><img src={detail.image} alt={detail.title} /></div>
-            <div className="lifestyle-content">
-              <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
-              <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
-              <p className="lifestyle-desc">"{detail.description}"</p>
-              <div className="lifestyle-buttons">
-                <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
-                <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title} - Rs. 1,500`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
-              </div>
+        <div key={index} className={`lifestyle-slide ${index === currentLifestyleIndex ? 'active' : ''}`}>
+          <div className="lifestyle-slide-img">
+            <img src={detail.image} alt={detail.title} />
+          </div>
+          <div className="lifestyle-slide-content">
+            <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
+            <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
+            <p className="lifestyle-desc">"{detail.description}"</p>
+            <div className="lifestyle-buttons">
+              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
+              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title} - Rs. 1,500`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
             </div>
           </div>
-        </section>
+        </div>
       ))}
+    </div>
+    <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)}>
+      <ChevronRight />
+    </button>
+  </div>
+  {lifestyleDetails.length > 1 && (
+    <div className="lifestyle-dots">
+      {lifestyleDetails.map((_, i) => (
+        <button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)}></button>
+      ))}
+    </div>
+  )}
+</section>
 
       <section className="koko-section">
         <div className="koko-box">
