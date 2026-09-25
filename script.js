@@ -631,6 +631,7 @@ function App() {
   const [showAddedPopup, setShowAddedPopup] = useState(false);
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentLifestyleIndex, setCurrentLifestyleIndex] = useState(0);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [adminAuthOpen, setAdminAuthOpen] = useState(false);
 const [adminAuthenticated, setAdminAuthenticated] = useState(false);
@@ -698,6 +699,15 @@ const [adminAuthenticated, setAdminAuthenticated] = useState(false);
     }, 5000);
     return () => clearInterval(interval);
   }, [reviews]);
+
+  // Lifestyle Auto Slide
+useEffect(() => {
+  if (lifestyleDetails.length <= 1) return;
+  const interval = setInterval(() => {
+    setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length);
+  }, 5000);
+  return () => clearInterval(interval);
+}, [lifestyleDetails]);
 
   const addToCart = (product) => {
     setCartItems(prev => {
