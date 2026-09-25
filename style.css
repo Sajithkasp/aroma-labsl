@@ -312,14 +312,18 @@ button { cursor: pointer; background: none; border: none; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-input-full { grid-column: span 1; }
                 }
-/* === SIMPLE LUXURY GOLD CIRCLES (DARKER) === */
-.app-root {
+/* === SIMPLE LUXURY GOLD CIRCLES === */
+body {
   background-color: #FFFBF5;
   background-image: 
-    radial-gradient(circle at 10% 10%, rgba(184, 150, 62, 0.25) 0%, transparent 30%),
-    radial-gradient(circle at 90% 20%, rgba(184, 150, 62, 0.20) 0%, transparent 30%),
-    radial-gradient(circle at 20% 80%, rgba(184, 150, 62, 0.20) 0%, transparent 30%),
-    radial-gradient(circle at 80% 90%, rgba(184, 150, 62, 0.25) 0%, transparent 30%),
-    radial-gradient(circle at 50% 50%, rgba(184, 150, 62, 0.12) 0%, transparent 45%);
+    radial-gradient(circle at 10% 10%, rgba(184, 150, 62, 0.18) 0%, transparent 25%),
+    radial-gradient(circle at 90% 20%, rgba(184, 150, 62, 0.15) 0%, transparent 25%),
+    radial-gradient(circle at 20% 80%, rgba(184, 150, 62, 0.15) 0%, transparent 25%),
+    radial-gradient(circle at 80% 90%, rgba(184, 150, 62, 0.18) 0%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(184, 150, 62, 0.10) 0%, transparent 40%);
   background-attachment: fixed;
+}
+
+.app-root {
+  background-color: transparent;
 }
