@@ -634,7 +634,6 @@ function App() {
   const [currentLifestyleIndex, setCurrentLifestyleIndex] = useState(0);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [adminAuthOpen, setAdminAuthOpen] = useState(false);
-  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
 
   const [reviews, setReviews] = useState([]);
   const [reviewName, setReviewName] = useState('');
@@ -649,6 +648,7 @@ function App() {
     "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
   ];
 
+  // Load Products, Site Settings, Pages
   useEffect(() => {
     async function loadData() {
       try {
@@ -673,9 +673,6 @@ function App() {
 
         const { data: pagesData } = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
         if (pagesData) setPages(pagesData);
-
-        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-        if (reviewsData) setReviews(reviewsData);
       } catch (e) {
         console.error(e);
         setProducts(defaultProducts);
@@ -684,6 +681,20 @@ function App() {
     loadData();
   }, []);
 
+  // Load Reviews
+  useEffect(() => {
+    async function loadReviews() {
+      try {
+        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+        if (reviewsData) setReviews(reviewsData);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    loadReviews();
+  }, []);
+
+  // Hero Auto Slide
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => {
@@ -692,6 +703,7 @@ function App() {
     return () => clearInterval(interval);
   }, [heroImages]);
 
+  // Review Auto Slide
   useEffect(() => {
     if (reviews.length <= 1) return;
     const interval = setInterval(() => {
@@ -700,6 +712,7 @@ function App() {
     return () => clearInterval(interval);
   }, [reviews]);
 
+  // Lifestyle Auto Slide
   useEffect(() => {
     if (lifestyleDetails.length <= 1) return;
     const interval = setInterval(() => {
@@ -815,7 +828,6 @@ function App() {
       {adminAuthOpen && (
         <AdminAuth 
           onSuccess={() => { 
-            setAdminAuthenticated(true); 
             setAdminAuthOpen(false); 
             setIsAdminOpen(true); 
           }}
