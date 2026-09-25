@@ -270,7 +270,8 @@ function AdminAuth({ onSuccess, onClose }) {
 function AdminPanelModal({ 
   isAdminOpen, setIsAdminOpen, products, setProducts, 
   heroImages, setHeroImages, lifestyleImages, setLifestyleImages, 
-  lifestyleDetails, setLifestyleDetails, pages, setPages 
+  lifestyleDetails, setLifestyleDetails, pages, setPages,
+  onCloseAndSignOut
 }) {
   const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
@@ -467,7 +468,7 @@ function AdminPanelModal({
   return (
     <div className="admin-overlay">
       <div className="admin-box">
-        <button className="admin-close" onClick={() => setIsAdminOpen(false)}>×</button>
+        <button className="admin-close" onClick={onCloseAndSignOut}>×</button>
         <h2 className="admin-title">Admin Panel</h2>
 
         <div className="admin-tabs">
@@ -784,6 +785,23 @@ function App() {
     }
   };
 
+  // === CLOSE ADMIN + SIGN OUT ===
+  const handleCloseAdminAndSignOut = async () => {
+    try {
+      await window.supabaseClient.auth.signOut();
+    } catch (err) {
+      console.error(err);
+    }
+    setIsAdminOpen(false);
+    // Reviews ආයේ Load කරන්න
+    try {
+      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+      if (reviewsData) setReviews(reviewsData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   window.setAppUser = function(user) {
     if (user) {
       setIsLoggedIn(true);
@@ -836,12 +854,14 @@ function App() {
       )}
 
       <AdminPanelModal 
-        isAdminOpen={isAdminOpen} setIsAdminOpen={setIsAdminOpen}
+        isAdminOpen={isAdminOpen} 
+        setIsAdminOpen={setIsAdminOpen}
         products={products} setProducts={setProducts}
         heroImages={heroImages} setHeroImages={setHeroImages}
         lifestyleImages={lifestyleImages} setLifestyleImages={setLifestyleImages}
         lifestyleDetails={lifestyleDetails} setLifestyleDetails={setLifestyleDetails}
         pages={pages} setPages={setPages}
+        onCloseAndSignOut={handleCloseAdminAndSignOut}
       />
 
       <PagePopup page={activePage} onClose={() => setActivePage(null)} />
