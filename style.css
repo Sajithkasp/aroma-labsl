@@ -392,3 +392,44 @@ button { cursor: pointer; background: none; border: none; }
   .lifestyle-nav { width: 36px; height: 36px; }
   .lifestyle-nav svg { width: 20px; height: 20px; }
 }
+/* === ANIMATIONS === */
+
+/* Fade + Slide (Reviews සඳහා) */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Zoom + Fade (Lifestyle + Hero සඳහා) */
+@keyframes zoomFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Hero Image Animation */
+.hero-img {
+  animation: zoomFadeIn 1.5s ease-in-out;
+  transition: opacity 0.8s ease-in-out;
+}
+
+/* Lifestyle Slide Animation */
+.lifestyle-slide.active {
+  animation: zoomFadeIn 1.2s ease-in-out;
+}
+
+/* Review Card Animation */
+.review-card.active {
+  animation: fadeSlideIn 0.8s ease-in-out;
+}
