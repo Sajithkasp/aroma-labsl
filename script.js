@@ -634,7 +634,7 @@ function App() {
   const [currentLifestyleIndex, setCurrentLifestyleIndex] = useState(0);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [adminAuthOpen, setAdminAuthOpen] = useState(false);
-const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
 
   const [reviews, setReviews] = useState([]);
   const [reviewName, setReviewName] = useState('');
@@ -700,14 +700,13 @@ const [adminAuthenticated, setAdminAuthenticated] = useState(false);
     return () => clearInterval(interval);
   }, [reviews]);
 
-  // Lifestyle Auto Slide
-useEffect(() => {
-  if (lifestyleDetails.length <= 1) return;
-  const interval = setInterval(() => {
-    setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length);
-  }, 5000);
-  return () => clearInterval(interval);
-}, [lifestyleDetails]);
+  useEffect(() => {
+    if (lifestyleDetails.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [lifestyleDetails]);
 
   const addToCart = (product) => {
     setCartItems(prev => {
@@ -813,16 +812,16 @@ useEffect(() => {
         DARAZ_LINK={DARAZ_LINK}
       />
 
-          {adminAuthOpen && (
-  <AdminAuth 
-    onSuccess={() => { 
-      setAdminAuthenticated(true); 
-      setAdminAuthOpen(false); 
-      setIsAdminOpen(true); 
-    }}
-    onClose={() => setAdminAuthOpen(false)}
-  />
-)}
+      {adminAuthOpen && (
+        <AdminAuth 
+          onSuccess={() => { 
+            setAdminAuthenticated(true); 
+            setAdminAuthOpen(false); 
+            setIsAdminOpen(true); 
+          }}
+          onClose={() => setAdminAuthOpen(false)}
+        />
+      )}
 
       <AdminPanelModal 
         isAdminOpen={isAdminOpen} setIsAdminOpen={setIsAdminOpen}
@@ -869,8 +868,8 @@ useEffect(() => {
             <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in"><UserIcon /></button>
             <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout"><LogoutIcon /></button>
             {isAdmin && (
-  <button onClick={() => setAdminAuthOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel"><AdminIcon /></button>
-)}
+              <button onClick={() => setAdminAuthOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel"><AdminIcon /></button>
+            )}
             <button onClick={() => setIsCartOpen(true)} className="icon-btn" title="Cart">
               <CartIcon />
               {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
@@ -879,14 +878,13 @@ useEffect(() => {
         </div>
       </header>
 
- 
-        <section className="hero-section">
-  <img 
-    key={currentHeroIndex} 
-    src={heroImages[currentHeroIndex]} 
-    alt="Aroma Lab" 
-    className="hero-img" 
-  />
+      <section className="hero-section">
+        <img 
+          key={currentHeroIndex} 
+          src={heroImages[currentHeroIndex]} 
+          alt="Aroma Lab" 
+          className="hero-img" 
+        />
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="hero-content-inner">
@@ -963,41 +961,41 @@ useEffect(() => {
       </section>
 
       {/* Lifestyle Slider */}
-<section className="lifestyle-section">
-  <div className="lifestyle-slider">
-    <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}>
-      <ChevronLeft />
-    </button>
-    <div className="lifestyle-slider-inner">
-      {lifestyleDetails.map((detail, index) => (
-        <div key={index} className={`lifestyle-slide ${index === currentLifestyleIndex ? 'active' : ''}`}>
-          <div className="lifestyle-slide-img">
-            <img src={detail.image} alt={detail.title} />
+      <section className="lifestyle-section">
+        <div className="lifestyle-slider">
+          <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}>
+            <ChevronLeft />
+          </button>
+          <div className="lifestyle-slider-inner">
+            {lifestyleDetails.map((detail, index) => (
+              <div key={index} className={`lifestyle-slide ${index === currentLifestyleIndex ? 'active' : ''}`}>
+                <div className="lifestyle-slide-img">
+                  <img src={detail.image} alt={detail.title} />
+                </div>
+                <div className="lifestyle-slide-content">
+                  <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
+                  <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
+                  <p className="lifestyle-desc">"{detail.description}"</p>
+                  <div className="lifestyle-buttons">
+                    <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
+                    <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title} - Rs. 1,500`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="lifestyle-slide-content">
-            <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
-            <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
-            <p className="lifestyle-desc">"{detail.description}"</p>
-            <div className="lifestyle-buttons">
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
-              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title} - Rs. 1,500`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
-            </div>
-          </div>
+          <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)}>
+            <ChevronRight />
+          </button>
         </div>
-      ))}
-    </div>
-    <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)}>
-      <ChevronRight />
-    </button>
-  </div>
-  {lifestyleDetails.length > 1 && (
-    <div className="lifestyle-dots">
-      {lifestyleDetails.map((_, i) => (
-        <button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)}></button>
-      ))}
-    </div>
-  )}
-</section>
+        {lifestyleDetails.length > 1 && (
+          <div className="lifestyle-dots">
+            {lifestyleDetails.map((_, i) => (
+              <button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)}></button>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="koko-section">
         <div className="koko-box">
@@ -1038,20 +1036,20 @@ useEffect(() => {
           </div>
 
           <div className="footer-col-2">
-  <div className="footer-heading">QUICK LINKS</div>
-  <div className="footer-links">
-    <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
-    <a href="#collection">Shop</a>
-    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('about')); if (p) setActivePage(p); }}>About Us</a>
-    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('contact')); if (p) setActivePage(p); }}>Contact</a>
-  </div>
-  <div className="footer-heading" style={{ marginTop: '24px' }}>LEGAL</div>
-  <div className="footer-links">
-    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('privacy')); if (p) setActivePage(p); }}>Privacy Policy</a>
-    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('terms')); if (p) setActivePage(p); }}>Terms & Conditions</a>
-    <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('return')); if (p) setActivePage(p); }}>Return Policy</a>
-  </div>
-</div>
+            <div className="footer-heading">QUICK LINKS</div>
+            <div className="footer-links">
+              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
+              <a href="#collection">Shop</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('about')); if (p) setActivePage(p); }}>About Us</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('contact')); if (p) setActivePage(p); }}>Contact</a>
+            </div>
+            <div className="footer-heading" style={{ marginTop: '24px' }}>LEGAL</div>
+            <div className="footer-links">
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('privacy')); if (p) setActivePage(p); }}>Privacy Policy</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('terms')); if (p) setActivePage(p); }}>Terms & Conditions</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('return')); if (p) setActivePage(p); }}>Return Policy</a>
+            </div>
+          </div>
 
           <div className="footer-col-3">
             <div className="footer-heading">CONNECT WITH US</div>
