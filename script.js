@@ -879,7 +879,7 @@ useEffect(() => {
         </div>
       </header>
 
-      <section className="hero-section">
+ 
         <section className="hero-section">
   <img 
     key={currentHeroIndex} 
