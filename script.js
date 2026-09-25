@@ -880,7 +880,13 @@ useEffect(() => {
       </header>
 
       <section className="hero-section">
-        <img src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
+        <section className="hero-section">
+  <img 
+    key={currentHeroIndex} 
+    src={heroImages[currentHeroIndex]} 
+    alt="Aroma Lab" 
+    className="hero-img" 
+  />
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="hero-content-inner">
