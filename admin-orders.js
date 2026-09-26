@@ -13,6 +13,7 @@ const { useState: aoUseState, useEffect: aoUseEffect, useRef: aoUseRef } = React
 // ============================================================
 
 const ADMIN_EMAIL_ORDERS = "sajith.kasp@gmail.com";
+const ADMIN_PASSWORD_KEY = "aroma_admin_pwd"; // Not used for storage, only for reference
 const sb = window.supabaseClient;
 
 // ============================================================
@@ -47,6 +48,28 @@ function todayStr() {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   return yyyy + '-' + mm + '-' + dd;
+}
+
+// ============================================================
+// SUPABASE AUTH — Check + Login
+// ============================================================
+
+async function getSupabaseSession() {
+  try {
+    const { data } = await sb.auth.getSession();
+    return data.session;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function signInAdmin(password) {
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: ADMIN_EMAIL_ORDERS,
+    password: password
+  });
+  if (error) throw error;
+  return data;
 }
 
 // ============================================================
@@ -328,10 +351,59 @@ window.saveOrderToSupabase = async function(orderData, cartItems) {
 };
 
 // ============================================================
+// UI — ADMIN LOGIN MODAL (Supabase Auth)
+// ============================================================
+
+function AdminOrdersLogin({ onSuccess, onClose }) {
+  const [password, setPassword] = aoUseState('');
+  const [error, setError] = aoUseState('');
+  const [loading, setLoading] = aoUseState(false);
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await signInAdmin(password);
+      onSuccess();
+    } catch (err) {
+      setError('❌ Wrong password. Try again.');
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div className="ao-modal-overlay" onClick={onClose}>
+      <div className="ao-auth-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="ao-modal-close" onClick={onClose} style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}>×</button>
+        <div className="ao-auth-icon">🔐</div>
+        <h2 className="ao-auth-title">Admin Access</h2>
+        <p className="ao-auth-desc">Enter your admin password to view orders</p>
+        <form onSubmit={handleLogin}>
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="ao-auth-input"
+            autoFocus
+            required
+          />
+          {error && <p className="ao-auth-error">{error}</p>}
+          <button type="submit" className="ao-auth-btn" disabled={loading}>
+            {loading ? 'Checking...' : '🔓 Unlock Orders Panel'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // UI — ADMIN ORDERS PANEL
 // ============================================================
 
-function AdminOrdersPanel({ onClose }) {
+function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
   const [activeTab, setActiveTab] = aoUseState('pending');
   const [pendingOrders, setPendingOrders] = aoUseState([]);
   const [completedOrders, setCompletedOrders] = aoUseState([]);
@@ -358,20 +430,36 @@ function AdminOrdersPanel({ onClose }) {
   }
   
   aoUseEffect(() => {
-    loadOrders();
-    
-    const channel = sb.channel('orders-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        loadOrders();
-      })
-      .subscribe();
-    
-    return () => { sb.removeChannel(channel); };
-  }, []);
+    if (isAuthenticated) {
+      loadOrders();
+      
+      const channel = sb.channel('orders-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          loadOrders();
+        })
+        .subscribe();
+      
+      return () => { sb.removeChannel(channel); };
+    }
+  }, [isAuthenticated]);
   
   function showMsg(text) {
     setMessage(text);
     setTimeout(() => setMessage(''), 3000);
+  }
+  
+  // Not authenticated — show login prompt
+  if (!isAuthenticated) {
+    return (
+      <div className="ao-overlay">
+        <div className="ao-auth-wrapper">
+          <AdminOrdersLogin 
+            onSuccess={onNeedAuth} 
+            onClose={onClose}
+          />
+        </div>
+      </div>
+    );
   }
   
   return (
@@ -702,28 +790,23 @@ function SettingsTab({ showMsg }) {
   const [refreshing, setRefreshing] = aoUseState(false);
   const [lastRefresh, setLastRefresh] = aoUseState(null);
   
-  // Initial load
   aoUseEffect(() => {
     loadProducts();
   }, []);
   
-  // Auto-refresh every 10 seconds
   aoUseEffect(() => {
     const interval = setInterval(() => {
-      loadProducts(true); // silent refresh
+      loadProducts(true);
     }, 10000);
-    
     return () => clearInterval(interval);
   }, []);
   
-  // Real-time subscription — product add/update/delete වුණාම auto refresh
   aoUseEffect(() => {
     const channel = sb.channel('products-settings-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
         loadProducts(true);
       })
       .subscribe();
-    
     return () => { sb.removeChannel(channel); };
   }, []);
   
@@ -736,7 +819,6 @@ function SettingsTab({ showMsg }) {
       setProducts(prods);
       setLastRefresh(new Date());
       
-      // If selected product exists, update its data too
       if (selectedProduct) {
         const updated = prods.find(p => p.id === selectedProduct.id);
         if (updated) setSelectedProduct(updated);
@@ -1155,7 +1237,10 @@ function PnLReportTab({ showMsg }) {
 function OrdersButton() {
   const [isAdmin, setIsAdmin] = aoUseState(false);
   const [open, setOpen] = aoUseState(false);
+  const [authChecked, setAuthChecked] = aoUseState(false);
+  const [isAuthenticated, setIsAuthenticated] = aoUseState(false);
   
+  // Check Firebase admin (button visibility)
   aoUseEffect(() => {
     const check = () => {
       let admin = false;
@@ -1183,6 +1268,23 @@ function OrdersButton() {
     return () => clearInterval(interval);
   }, []);
   
+  // Check Supabase auth (data access)
+  aoUseEffect(() => {
+    async function checkAuth() {
+      const session = await getSupabaseSession();
+      if (session && session.user && session.user.email === ADMIN_EMAIL_ORDERS) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setAuthChecked(true);
+    }
+    checkAuth();
+    
+    const interval = setInterval(checkAuth, 5000);
+    return () => clearInterval(interval);
+  }, [open]); // Re-check when panel opens
+  
   if (!isAdmin) return null;
   
   return (
@@ -1194,7 +1296,19 @@ function OrdersButton() {
       >
         📊 Orders & PnL
       </button>
-      {open && <AdminOrdersPanel onClose={() => setOpen(false)} />}
+      {open && (
+        <AdminOrdersPanel 
+          onClose={() => setOpen(false)} 
+          isAuthenticated={isAuthenticated}
+          onNeedAuth={async () => {
+            // After login, re-check
+            const session = await getSupabaseSession();
+            if (session && session.user && session.user.email === ADMIN_EMAIL_ORDERS) {
+              setIsAuthenticated(true);
+            }
+          }}
+        />
+      )}
     </>
   );
 }
