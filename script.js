@@ -67,12 +67,10 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     const sb = window.supabaseClient;
     if (!sb) throw new Error('Supabase client not loaded');
 
-    // 1. Generate Order ID
     const { data: idData, error: idErr } = await sb.rpc('generate_order_id');
     if (idErr) throw new Error('generate_order_id failed: ' + idErr.message);
     const orderId = idData;
 
-    // 2. Calculate totals
     let totalAmount = 0;
     let totalCost = 0;
     const itemsSummaryParts = [];
@@ -108,7 +106,6 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
       };
     });
 
-    // 3. Insert order
     const { error: orderErr } = await sb.from('orders').insert([{
       order_id: orderId,
       customer_name: orderData.customer_name,
@@ -118,6 +115,7 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
       order_items: itemsSummaryParts.join(', '),
       total_amount: totalAmount,
       delivery_charge: deliveryCharge,
+      discount: 0,
       order_type: '',
       payment_method: '',
       total_cost: totalCost,
@@ -128,17 +126,14 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
       status: 'Pending',
       platform: orderData.platform || 'WhatsApp'
     }]);
-    if (orderErr) throw new Error('orders insert failed: ' + orderErr.message + ' | Code: ' + orderErr.code);
+    if (orderErr) throw new Error('orders insert failed: ' + orderErr.message);
 
-    // 4. Insert order items
     const { error: itemsErr } = await sb.from('order_items').insert(itemsToInsert);
     if (itemsErr) throw new Error('order_items insert failed: ' + itemsErr.message);
 
     console.log('✅ Order saved to Supabase:', orderId);
     return { success: true, orderId: orderId };
   } catch (err) {
-    // ⚠️ මේ error එක customer ට පෙන්නන්නේ නැහැ
-    // Developer ට console එකෙන් බලන්න පුළුවන්
     console.error('❌ Order save failed:', err.message);
     return { success: false, error: err.message };
   }
@@ -839,7 +834,6 @@ function App() {
       return; 
     }
 
-    // ✅ DIRECT SUPABASE SAVE — customer ට alert නොපෙනෙන්න silent save
     try {
       await saveOrderToSupabaseDirect({
         customer_name: customerName,
@@ -849,11 +843,9 @@ function App() {
         platform: 'WhatsApp'
       }, cartItems, getDeliveryCharge());
     } catch (err) {
-      // Error එක console එකට විතරයි — customer ට නොපෙනෙන්න
       console.error('Order save error:', err);
     }
 
-    // WhatsApp එකට order එක යවන්න
     let message = "Hi Aroma Lab! I want to order:\n\n";
     cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
@@ -871,7 +863,6 @@ function App() {
       return; 
     }
 
-    // ✅ DIRECT SUPABASE SAVE — customer ට alert නොපෙනෙන්න silent save
     try {
       await saveOrderToSupabaseDirect({
         customer_name: customerName,
@@ -910,18 +901,30 @@ function App() {
     }
   };
 
+  // ✅ Admin Panel close කරාම — Supabase logout + reviews reload
   const handleCloseAdminAndSignOut = async () => {
+    console.log('🔄 Closing Admin Panel — signing out Supabase + reloading reviews...');
+    
+    // 1. Supabase Logout — admin session එක clear කරන්න
     try {
       await window.supabaseClient.auth.signOut();
+      console.log('✅ Supabase signed out');
     } catch (err) {
-      console.error(err);
+      console.error('Supabase signout error:', err);
     }
+    
+    // 2. Admin Panel close
     setIsAdminOpen(false);
+    
+    // 3. Reviews reload — anon user විදිහට
     try {
       const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-      if (reviewsData) setReviews(reviewsData);
+      if (reviewsData) {
+        setReviews(reviewsData);
+        console.log('✅ Reviews reloaded:', reviewsData.length);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Reviews reload error:', err);
     }
   };
 
