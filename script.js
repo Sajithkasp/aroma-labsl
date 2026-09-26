@@ -61,6 +61,86 @@ const MapPinIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
 );
 
+// === SUPABASE DIRECT SAVE (script.js එකෙන්ම) ===
+async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
+  try {
+    const sb = window.supabaseClient;
+    if (!sb) throw new Error('Supabase client not loaded');
+
+    // 1. Generate Order ID
+    const { data: idData, error: idErr } = await sb.rpc('generate_order_id');
+    if (idErr) throw idErr;
+    const orderId = idData;
+
+    // 2. Calculate totals
+    let totalAmount = 0;
+    let totalCost = 0;
+    const itemsSummaryParts = [];
+
+    const { data: products } = await sb.from('products').select('*');
+    const productMap = {};
+    (products || []).forEach(p => {
+      productMap[String(p.name || '').trim().toLowerCase()] = p;
+    });
+
+    const itemsToInsert = cartItems.map(item => {
+      const qty = Number(item.quantity) || 1;
+      const unitPrice = 1500;
+      const product = productMap[String(item.name || '').trim().toLowerCase()];
+      const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
+      const totalIncome = unitPrice * qty;
+      const totalItemCost = unitCost * qty;
+
+      totalAmount += totalIncome;
+      totalCost += totalItemCost;
+      itemsSummaryParts.push(item.name + ' x' + qty);
+
+      return {
+        order_id: orderId,
+        product_name: item.name,
+        quantity: qty,
+        unit_price: unitPrice,
+        unit_cost: unitCost,
+        total_income: totalIncome,
+        total_cost: totalItemCost,
+        profit: totalIncome - totalItemCost
+      };
+    });
+
+    // 3. Insert order
+    const { error: orderErr } = await sb.from('orders').insert([{
+      order_id: orderId,
+      customer_name: orderData.customer_name,
+      customer_phone: orderData.customer_phone,
+      customer_address: orderData.customer_address,
+      district: orderData.district,
+      order_items: itemsSummaryParts.join(', '),
+      total_amount: totalAmount,
+      delivery_charge: deliveryCharge,
+      order_type: '',
+      payment_method: '',
+      total_cost: totalCost,
+      commission: 0,
+      other_expenses: 0,
+      net_profit: 0,
+      profit_margin: 0,
+      status: 'Pending',
+      platform: orderData.platform || 'WhatsApp'
+    }]);
+    if (orderErr) throw orderErr;
+
+    // 4. Insert order items
+    const { error: itemsErr } = await sb.from('order_items').insert(itemsToInsert);
+    if (itemsErr) throw itemsErr;
+
+    console.log('✅ Order saved:', orderId);
+    return { success: true, orderId: orderId };
+  } catch (err) {
+    console.error('❌ Order save failed:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 // === CART MODAL ===
 function CartModal({ 
   isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
@@ -746,23 +826,27 @@ function App() {
   const getTotal = () => getSubtotal() + getDeliveryCharge();
   const getCartCount = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const sendWhatsAppOrder = () => {
-    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
-    if (cartItems.length === 0) { alert("Your cart is empty."); return; }
+  const sendWhatsAppOrder = async () => {
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { 
+      alert("Please fill all customer details."); 
+      return; 
+    }
+    if (cartItems.length === 0) { 
+      alert("Your cart is empty."); 
+      return; 
+    }
 
-    // ✅ අලුතෙන් — Supabase එකට order එක save කරන්න
-    if (window.saveOrderToSupabase) {
-      window.saveOrderToSupabase({
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        district: customerDistrict,
-        delivery_charge: getDeliveryCharge(),
-        platform: 'WhatsApp'
-      }, cartItems).then(result => {
-        if (result.success) console.log('✅ Order saved to Supabase:', result.orderId);
-        else console.error('❌ Failed:', result.error);
-      });
+    // ✅ DIRECT SUPABASE SAVE
+    const result = await saveOrderToSupabaseDirect({
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      customer_address: customerAddress,
+      district: customerDistrict,
+      platform: 'WhatsApp'
+    }, cartItems, getDeliveryCharge());
+
+    if (!result.success) {
+      alert('⚠️ Order WhatsApp එකට යනවා. ඒත් database එකට save කරන්න බැරි වුණා.\n\nError: ' + result.error);
     }
 
     let message = "Hi Aroma Lab! I want to order:\n\n";
@@ -772,23 +856,27 @@ function App() {
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  const sendBankDepositOrder = () => {
-    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
-    if (cartItems.length === 0) { alert("Your cart is empty."); return; }
+  const sendBankDepositOrder = async () => {
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { 
+      alert("Please fill all customer details."); 
+      return; 
+    }
+    if (cartItems.length === 0) { 
+      alert("Your cart is empty."); 
+      return; 
+    }
 
-    // ✅ අලුතෙන් — Supabase එකට order එක save කරන්න
-    if (window.saveOrderToSupabase) {
-      window.saveOrderToSupabase({
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        district: customerDistrict,
-        delivery_charge: getDeliveryCharge(),
-        platform: 'WhatsApp'  // Bank deposit එකත් WhatsApp හරහා order කරන නිසා
-      }, cartItems).then(result => {
-        if (result.success) console.log('✅ Order saved to Supabase:', result.orderId);
-        else console.error('❌ Failed:', result.error);
-      });
+    // ✅ DIRECT SUPABASE SAVE
+    const result = await saveOrderToSupabaseDirect({
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      customer_address: customerAddress,
+      district: customerDistrict,
+      platform: 'WhatsApp'
+    }, cartItems, getDeliveryCharge());
+
+    if (!result.success) {
+      alert('⚠️ Order WhatsApp එකට යනවා. ඒත් database එකට save කරන්න බැරි වුණා.\n\nError: ' + result.error);
     }
 
     let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
