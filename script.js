@@ -749,6 +749,22 @@ function App() {
   const sendWhatsAppOrder = () => {
     if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
     if (cartItems.length === 0) { alert("Your cart is empty."); return; }
+
+    // ✅ අලුතෙන් — Supabase එකට order එක save කරන්න
+    if (window.saveOrderToSupabase) {
+      window.saveOrderToSupabase({
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        district: customerDistrict,
+        delivery_charge: getDeliveryCharge(),
+        platform: 'WhatsApp'
+      }, cartItems).then(result => {
+        if (result.success) console.log('✅ Order saved to Supabase:', result.orderId);
+        else console.error('❌ Failed:', result.error);
+      });
+    }
+
     let message = "Hi Aroma Lab! I want to order:\n\n";
     cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
@@ -759,6 +775,22 @@ function App() {
   const sendBankDepositOrder = () => {
     if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
     if (cartItems.length === 0) { alert("Your cart is empty."); return; }
+
+    // ✅ අලුතෙන් — Supabase එකට order එක save කරන්න
+    if (window.saveOrderToSupabase) {
+      window.saveOrderToSupabase({
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        district: customerDistrict,
+        delivery_charge: getDeliveryCharge(),
+        platform: 'WhatsApp'  // Bank deposit එකත් WhatsApp හරහා order කරන නිසා
+      }, cartItems).then(result => {
+        if (result.success) console.log('✅ Order saved to Supabase:', result.orderId);
+        else console.error('❌ Failed:', result.error);
+      });
+    }
+
     let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
     cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
@@ -785,7 +817,6 @@ function App() {
     }
   };
 
-  // === CLOSE ADMIN + SIGN OUT ===
   const handleCloseAdminAndSignOut = async () => {
     try {
       await window.supabaseClient.auth.signOut();
@@ -793,7 +824,6 @@ function App() {
       console.error(err);
     }
     setIsAdminOpen(false);
-    // Reviews ආයේ Load කරන්න
     try {
       const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
       if (reviewsData) setReviews(reviewsData);
@@ -992,7 +1022,6 @@ function App() {
         </div>
       </section>
 
-      {/* Lifestyle Slider */}
       <section className="lifestyle-section">
         <div className="lifestyle-slider">
           <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}>
