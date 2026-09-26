@@ -35,20 +35,28 @@
 }
 
 /* ============================================================
-   MAIN OVERLAY + PANEL
+   MAIN OVERLAY + PANEL — FULL SCREEN, MAX Z-INDEX
    ============================================================ */
 
 .ao-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 46, 31, 0.75);
-  backdrop-filter: blur(6px);
-  z-index: 99998;
-  display: flex;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(10, 46, 31, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2147483647 !important;
+  display: flex !important;
   align-items: flex-start;
   justify-content: center;
   padding: 20px;
   overflow-y: auto;
+  margin: 0 !important;
+  isolation: isolate;
 }
 
 .ao-panel {
@@ -60,9 +68,12 @@
   max-height: 95vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   animation: aoSlideIn 0.35s ease;
+  position: relative;
+  z-index: 2147483647 !important;
+  margin: auto;
 }
 
 @keyframes aoSlideIn {
@@ -78,6 +89,7 @@
   background: linear-gradient(135deg, #0A2E1F 0%, #123a28 100%);
   color: #FFFBF5;
   border-bottom: 3px solid #B8963E;
+  flex-shrink: 0;
 }
 
 .ao-header-left {
@@ -115,6 +127,7 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .ao-close:hover {
@@ -135,6 +148,7 @@
   border-bottom: 1px solid rgba(10, 46, 31, 0.1);
   overflow-x: auto;
   scrollbar-width: thin;
+  flex-shrink: 0;
 }
 
 .ao-tabs::-webkit-scrollbar {
@@ -163,6 +177,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border-bottom: 3px solid transparent;
+  font-family: inherit;
 }
 
 .ao-tab:hover {
@@ -199,6 +214,7 @@
   font-size: 13px;
   color: #0A2E1F;
   animation: aoFadeIn 0.3s;
+  flex-shrink: 0;
 }
 
 @keyframes aoFadeIn {
@@ -285,6 +301,7 @@
   margin-bottom: 14px;
   padding-bottom: 12px;
   border-bottom: 1px dashed rgba(10, 46, 31, 0.1);
+  gap: 12px;
 }
 
 .ao-order-id {
@@ -293,6 +310,7 @@
   font-weight: 700;
   color: #0A2E1F;
   letter-spacing: 0.05em;
+  word-break: break-all;
 }
 
 .ao-order-date {
@@ -308,6 +326,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  flex-shrink: 0;
 }
 
 .ao-status-pending {
@@ -400,6 +419,7 @@
   justify-content: center;
   gap: 6px;
   flex: 1;
+  font-family: inherit;
 }
 
 .ao-btn:disabled {
@@ -455,20 +475,27 @@
 }
 
 /* ============================================================
-   MODAL (Order Complete)
+   MODAL (Order Complete) — MAX Z-INDEX
    ============================================================ */
 
 .ao-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 100000;
-  display: flex;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2147483647 !important;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   padding: 20px;
   overflow-y: auto;
+  margin: 0 !important;
 }
 
 .ao-modal {
@@ -479,9 +506,12 @@
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
   animation: aoModalIn 0.3s ease;
   overflow: hidden;
+  position: relative;
+  z-index: 2147483647 !important;
+  margin: auto;
 }
 
 @keyframes aoModalIn {
@@ -497,6 +527,7 @@
   background: #0A2E1F;
   color: #FFFBF5;
   border-bottom: 3px solid #B8963E;
+  flex-shrink: 0;
 }
 
 .ao-modal-header h3 {
@@ -519,6 +550,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .ao-modal-close:hover {
@@ -573,6 +605,7 @@
   color: #0A2E1F;
   transition: all 0.3s;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .ao-modal-input:focus {
@@ -619,6 +652,7 @@
   padding: 16px 24px;
   border-top: 1px solid rgba(10, 46, 31, 0.1);
   background: #FFFBF5;
+  flex-shrink: 0;
 }
 
 /* ============================================================
@@ -718,6 +752,8 @@
   color: #0A2E1F;
   transition: all 0.3s;
   font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .ao-form-field input:focus,
@@ -908,13 +944,15 @@
 
 @media (max-width: 768px) {
   .ao-overlay {
-    padding: 0;
+    padding: 0 !important;
+    align-items: stretch;
   }
   
   .ao-panel {
     min-height: 100vh;
     max-height: 100vh;
     border-radius: 0;
+    max-width: 100%;
   }
   
   .ao-header {
@@ -961,6 +999,7 @@
   
   .ao-modal {
     max-height: 95vh;
+    border-radius: 16px;
   }
   
   .ao-modal-footer {
@@ -976,4 +1015,15 @@
   .ao-order-actions {
     flex-direction: column;
   }
+  
+  .ao-pnl-filters {
+    flex-direction: column;
+    align-items: stretch;
   }
+  
+  .ao-pnl-filters .ao-form-field,
+  .ao-pnl-filters .ao-btn {
+    width: 100%;
+    min-width: auto;
+  }
+                   }
