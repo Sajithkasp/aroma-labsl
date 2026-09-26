@@ -4,12 +4,6 @@
  * 
  * ⚠️ මේ file එක ඔයාගේ දැනට තියෙන script.js එකට
  *    අත ගහන්නේ නැහැ. අලුතෙන් එකතු වෙන file එකක්.
- * 
- * Features:
- * - Order Handling & PnL button (admin only)
- * - 5 Tabs: Pending / Complete / Cancelled / Settings / Commissions / PnL
- * - Order place කරාම Supabase orders table එකට auto save
- * - Reports Download (CSV)
  *************************************************************/
 
 const { useState: aoUseState, useEffect: aoUseEffect, useRef: aoUseRef } = React;
@@ -82,7 +76,6 @@ async function dbGetOrderItems(orderId) {
 }
 
 async function dbCreateOrder(orderData, items) {
-  // Generate Order ID
   const { data: idData, error: idErr } = await sb.rpc('generate_order_id');
   if (idErr) throw idErr;
   const orderId = idData;
@@ -304,7 +297,7 @@ async function cancelOrder(orderId) {
 }
 
 // ============================================================
-// GLOBAL — Order Place කරද්දී Script.js එකෙන් Call කරන Function
+// GLOBAL — Order Place කරද්දී script.js එකෙන් Call කරන Function
 // ============================================================
 
 window.saveOrderToSupabase = async function(orderData, cartItems) {
@@ -1087,7 +1080,7 @@ function PnLReportTab({ showMsg }) {
 }
 
 // ============================================================
-// HEADER BUTTON — "Order Handling & PnL"
+// HEADER BUTTON — Multi-method Admin Detection
 // ============================================================
 
 function OrdersButton() {
@@ -1096,15 +1089,34 @@ function OrdersButton() {
   
   aoUseEffect(() => {
     const check = () => {
-      const user = window.__currentUser;
-      if (user && user.email === ADMIN_EMAIL_ORDERS) {
-        setIsAdmin(true);
-      } else {
-        setIsAdmin(false);
+      let admin = false;
+      
+      // Method 1: window.__currentUser (හැම විදිහකින්ම set කරන්න try කරනවා)
+      if (window.__currentUser && window.__currentUser.email === ADMIN_EMAIL_ORDERS) {
+        admin = true;
       }
+      
+      // Method 2: window.__adminState (script.js එකෙන් set වෙනවා නම්)
+      if (window.__adminState === true) {
+        admin = true;
+      }
+      
+      // Method 3: window.__adminEmail
+      if (window.__adminEmail === ADMIN_EMAIL_ORDERS) {
+        admin = true;
+      }
+      
+      // Method 4: DOM-based — "⚙️ Admin" icon එක පේනවා නම්, ඒ කියන්නේ admin
+      const adminIconBtn = document.querySelector('.admin-btn-highlight');
+      if (adminIconBtn) {
+        admin = true;
+      }
+      
+      setIsAdmin(admin);
     };
+    
     check();
-    const interval = setInterval(check, 1000);
+    const interval = setInterval(check, 700);
     return () => clearInterval(interval);
   }, []);
   
@@ -1129,16 +1141,40 @@ function OrdersButton() {
 // ============================================================
 
 function injectOrdersButton() {
-  // Firebase user track
-  if (window.checkAdmin && !window.__adminWrapped) {
+  // Hook into script.js's checkAdmin
+  if (!window.__adminHookInstalled) {
+    // Firebase user track (from onAuthStateChanged in index.html)
+    const origSetAppUser = window.setAppUser;
+    if (origSetAppUser && !window.__setAppUserWrapped) {
+      window.setAppUser = function(user) {
+        if (user) {
+          window.__currentUser = { email: user.email, displayName: user.displayName };
+        } else {
+          window.__currentUser = null;
+        }
+        return origSetAppUser.apply(this, arguments);
+      };
+      window.__setAppUserWrapped = true;
+    }
+    
+    // checkAdmin hook
     const origCheckAdmin = window.checkAdmin;
-    window.checkAdmin = function(email) {
-      window.__currentUser = email ? { email } : null;
-      return origCheckAdmin.apply(this, arguments);
-    };
-    window.__adminWrapped = true;
+    if (origCheckAdmin) {
+      window.checkAdmin = function(email) {
+        if (email === ADMIN_EMAIL_ORDERS) {
+          window.__currentUser = { email: email };
+          window.__adminEmail = email;
+          window.__adminState = true;
+        } else if (!email) {
+          window.__adminState = false;
+        }
+        return origCheckAdmin.apply(this, arguments);
+      };
+      window.__adminHookInstalled = true;
+    }
   }
   
+  // Mount button into header
   const checkAndMount = setInterval(() => {
     const header = document.querySelector('.header-icons');
     if (header && !document.getElementById('ao-header-btn-mount')) {
@@ -1146,6 +1182,7 @@ function injectOrdersButton() {
       mount.id = 'ao-header-btn-mount';
       mount.style.display = 'inline-flex';
       mount.style.alignItems = 'center';
+      mount.style.marginRight = '8px';
       header.insertBefore(mount, header.firstChild);
       
       const root = ReactDOM.createRoot(mount);
