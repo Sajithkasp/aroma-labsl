@@ -1,6 +1,6 @@
 /*************************************************************
  * AROMA LAB — Admin Orders & PnL System
- * File: admin-orders.js — v2
+ * File: admin-orders.js — v3
  * 
  * Features:
  * - Pending Orders with Complete modal (Items edit + Discount)
@@ -8,6 +8,7 @@
  * - Settings (Cost Entry)
  * - Commissions
  * - PnL Report + CSV Download
+ * - PnL Close = Supabase Logout + Reviews Reload
  *************************************************************/
 
 const { useState: aoUseState, useEffect: aoUseEffect, useRef: aoUseRef } = React;
@@ -108,37 +109,13 @@ async function dbUpdateOrder(orderId, updates) {
 }
 
 async function dbDeleteOrder(orderId) {
-  // 1. Delete order_items first
   const { error: itemsErr } = await sb.from('order_items').delete().eq('order_id', orderId);
   if (itemsErr) throw itemsErr;
   
-  // 2. Delete order
   const { error: orderErr } = await sb.from('orders').delete().eq('order_id', orderId);
   if (orderErr) throw orderErr;
   
   return true;
-}
-
-// ============================================================
-// DATABASE — ORDER ITEMS
-// ============================================================
-
-async function dbUpdateOrderItem(itemId, updates) {
-  const { data, error } = await sb.from('order_items').update(updates).eq('id', itemId).select().single();
-  if (error) throw error;
-  return data;
-}
-
-async function dbDeleteOrderItem(itemId) {
-  const { error } = await sb.from('order_items').delete().eq('id', itemId);
-  if (error) throw error;
-  return true;
-}
-
-async function dbInsertOrderItem(itemData) {
-  const { data, error } = await sb.from('order_items').insert([itemData]).select().single();
-  if (error) throw error;
-  return data;
 }
 
 // ============================================================
@@ -224,13 +201,11 @@ async function completeOrder(orderId, completionData) {
     delivery_charge, 
     discount,
     commission_override,
-    updated_items  // Items list (edited)
+    updated_items
   } = completionData;
   
-  const order = await dbGetOrderById(orderId);
   const existingItems = await dbGetOrderItems(orderId);
   
-  // Products for cost lookup
   const products = await dbGetProducts();
   const productMap = {};
   products.forEach(p => {
@@ -276,7 +251,6 @@ async function completeOrder(orderId, completionData) {
   const deliveryCharge = Number(delivery_charge) || 0;
   const discountAmount = Number(discount) || 0;
   
-  // Commission calculate
   let commission = Number(commission_override) || 0;
   if (!commission_override && payment_method) {
     const commissions = await dbGetCommissions();
@@ -287,7 +261,6 @@ async function completeOrder(orderId, completionData) {
     }
   }
   
-  // Net profit = (Items Total + Delivery − Discount) − Cost − Commission
   const netTotal = totalAmount + deliveryCharge - discountAmount;
   const netProfit = netTotal - totalCost - commission;
   const profitMargin = netTotal > 0 ? (netProfit / netTotal) * 100 : 0;
@@ -299,7 +272,7 @@ async function completeOrder(orderId, completionData) {
     delivery_charge: deliveryCharge,
     discount: discountAmount,
     order_items: itemsSummaryParts.join(', '),
-    total_amount: netTotal,  // ← Net total (discount අඩු කරලා)
+    total_amount: netTotal,
     total_cost: totalCost,
     commission: commission,
     net_profit: netProfit,
@@ -494,6 +467,33 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
     setTimeout(() => setMessage(''), 3000);
   }
   
+  // ✅ PnL × ඔබාම — Supabase Logout + Reviews Reload + Panel Close
+  async function handleCloseAndSignOut() {
+    console.log('🔄 Closing PnL Panel — signing out Supabase + reloading reviews...');
+    
+    // 1. Supabase Logout
+    try {
+      await window.supabaseClient.auth.signOut();
+      console.log('✅ Supabase signed out');
+    } catch (err) {
+      console.error('Supabase signout error:', err);
+    }
+    
+    // 2. Panel Close
+    if (onClose) onClose();
+    
+    // 3. Reviews Reload — anon user විදිහට
+    try {
+      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+      if (reviewsData && window.__setReviews) {
+        window.__setReviews(reviewsData);
+        console.log('✅ Reviews reloaded:', reviewsData.length);
+      }
+    } catch (err) {
+      console.error('Reviews reload error:', err);
+    }
+  }
+  
   if (!isAuthenticated) {
     return (
       <div className="ao-overlay">
@@ -515,7 +515,7 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
             <h2 className="ao-title">Order Handling & PnL</h2>
             <p className="ao-subtitle">AROMA LAB Business Management</p>
           </div>
-          <button className="ao-close" onClick={onClose}>×</button>
+          <button className="ao-close" onClick={handleCloseAndSignOut}>×</button>
         </div>
         
         <div className="ao-tabs">
@@ -709,7 +709,7 @@ function OrdersList({ orders, status, onRefresh, showMsg, onSelectOrder }) {
 }
 
 // ============================================================
-// UI — ORDER COMPLETE MODAL (with Items Edit + Discount)
+// UI — ORDER COMPLETE MODAL
 // ============================================================
 
 function OrderCompleteModal({ order, onClose, onComplete }) {
@@ -721,7 +721,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
   const [loading, setLoading] = aoUseState(false);
   const [error, setError] = aoUseState('');
   
-  // Items state
   const [items, setItems] = aoUseState([]);
   const [products, setProducts] = aoUseState([]);
   const [showAddItem, setShowAddItem] = aoUseState(false);
@@ -730,7 +729,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
   const orderTypes = ['Deliver', 'In-Store'];
   const paymentMethods = ['Cash', 'Card', 'Online', 'KOKO', 'Bank', 'Daraz COD'];
   
-  // Load items + products
   aoUseEffect(() => {
     async function load() {
       try {
@@ -750,14 +748,9 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     load();
   }, [order.order_id]);
   
-  // ---- Item actions ----
   function updateItemQty(idx, newQty) {
     if (newQty < 1) return;
     setItems(items.map((it, i) => i === idx ? { ...it, quantity: newQty } : it));
-  }
-  
-  function updateItemPrice(idx, newPrice) {
-    setItems(items.map((it, i) => i === idx ? { ...it, unit_price: Number(newPrice) || 0 } : it));
   }
   
   function removeItem(idx) {
@@ -774,7 +767,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
     
     setItems([...items, {
-      id: null,  // new item
+      id: null,
       product_name: newItem.product_name,
       quantity: Number(newItem.quantity) || 1,
       unit_price: 1500,
@@ -785,7 +778,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     setShowAddItem(false);
   }
   
-  // ---- Commission auto-calculate ----
   aoUseEffect(() => {
     async function calc() {
       try {
@@ -828,7 +820,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     setLoading(false);
   }
   
-  // ---- Live calculations ----
   const itemsTotal = items.reduce((s, it) => s + (it.unit_price * it.quantity), 0);
   const totalCost = items.reduce((s, it) => s + (it.unit_cost * it.quantity), 0);
   const deliveryNum = Number(deliveryCharge) || 0;
@@ -846,7 +837,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
         </div>
         
         <div className="ao-modal-body">
-          {/* Customer */}
           <div className="ao-modal-section">
             <div className="ao-modal-customer">
               <p><strong>{order.customer_name}</strong></p>
@@ -854,7 +844,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             </div>
           </div>
           
-          {/* ---- ITEMS SECTION ---- */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Order Items</label>
             <div className="ao-items-edit-list">
@@ -879,7 +868,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
               )}
             </div>
             
-            {/* Add Item */}
             {!showAddItem ? (
               <button 
                 className="ao-add-item-btn" 
@@ -912,7 +900,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             )}
           </div>
           
-          {/* Order Type */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Order Type</label>
             <select className="ao-modal-input" value={orderType} onChange={(e) => setOrderType(e.target.value)}>
@@ -920,7 +907,6 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             </select>
           </div>
           
-          {/* Payment Method */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Payment Method</label>
             <select className="ao-modal-input" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
@@ -928,14 +914,12 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             </select>
           </div>
           
-          {/* Delivery Charge */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Delivery Charge (Rs.)</label>
             <input type="number" className="ao-modal-input" value={deliveryCharge} 
               onChange={(e) => setDeliveryCharge(e.target.value)} />
           </div>
           
-          {/* ✅ Discount — Delivery Charge එකට පහළින් */}
           <div className="ao-modal-section">
             <label className="ao-modal-label" style={{color: '#d97706'}}>🎁 Discount (Rs.) — Customer ට අඩුවෙන් දුන්නා නම්</label>
             <input type="number" className="ao-modal-input" value={discount} 
@@ -943,14 +927,12 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
               placeholder="0" />
           </div>
           
-          {/* Commission */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Commission (Auto-calculated)</label>
             <input type="number" className="ao-modal-input" value={commission} 
               onChange={(e) => setCommission(e.target.value)} />
           </div>
           
-          {/* ---- SUMMARY ---- */}
           <div className="ao-modal-section ao-modal-summary">
             <div className="ao-modal-row"><span>Items Total:</span><span>{fmtRs(itemsTotal)}</span></div>
             <div className="ao-modal-row"><span>Delivery:</span><span>+ {fmtRs(deliveryNum)}</span></div>
@@ -1584,4 +1566,4 @@ if (document.readyState === 'loading') {
   injectOrdersButton();
 }
 
-console.log('✅ AROMA LAB Admin Orders System v2 loaded');
+console.log('✅ AROMA LAB Admin Orders System v3 loaded');
