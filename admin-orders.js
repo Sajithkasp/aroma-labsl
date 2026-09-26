@@ -684,7 +684,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
 }
 
 // ============================================================
-// UI — SETTINGS TAB
+// UI — SETTINGS TAB (with Auto-Refresh + Manual Refresh)
 // ============================================================
 
 function SettingsTab({ showMsg }) {
@@ -699,20 +699,59 @@ function SettingsTab({ showMsg }) {
     selling_price: 1500
   });
   const [loading, setLoading] = aoUseState(true);
+  const [refreshing, setRefreshing] = aoUseState(false);
+  const [lastRefresh, setLastRefresh] = aoUseState(null);
   
+  // Initial load
   aoUseEffect(() => {
     loadProducts();
   }, []);
   
-  async function loadProducts() {
-    setLoading(true);
+  // Auto-refresh every 10 seconds
+  aoUseEffect(() => {
+    const interval = setInterval(() => {
+      loadProducts(true); // silent refresh
+    }, 10000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Real-time subscription — product add/update/delete වුණාම auto refresh
+  aoUseEffect(() => {
+    const channel = sb.channel('products-settings-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+        loadProducts(true);
+      })
+      .subscribe();
+    
+    return () => { sb.removeChannel(channel); };
+  }, []);
+  
+  async function loadProducts(silent = false) {
+    if (!silent) setLoading(true);
+    else setRefreshing(true);
+    
     try {
       const prods = await dbGetProducts();
       setProducts(prods);
+      setLastRefresh(new Date());
+      
+      // If selected product exists, update its data too
+      if (selectedProduct) {
+        const updated = prods.find(p => p.id === selectedProduct.id);
+        if (updated) setSelectedProduct(updated);
+      }
     } catch (e) {
       showMsg('❌ Error: ' + e.message);
     }
-    setLoading(false);
+    
+    if (!silent) setLoading(false);
+    else setRefreshing(false);
+  }
+  
+  function handleManualRefresh() {
+    loadProducts(true);
+    showMsg('🔄 Refreshed!');
   }
   
   function selectProduct(p) {
@@ -732,7 +771,7 @@ function SettingsTab({ showMsg }) {
     try {
       await dbUpdateProductCost(selectedProduct.id, form);
       showMsg('✅ Product cost updated!');
-      await loadProducts();
+      await loadProducts(true);
     } catch (e) {
       showMsg('❌ Error: ' + e.message);
     }
@@ -742,13 +781,43 @@ function SettingsTab({ showMsg }) {
                    (Number(form.oil_cost) || 0) + (Number(form.packaging_cost) || 0);
   const profitPerUnit = (Number(form.selling_price) || 0) - totalCost;
   
+  const productsWithoutCost = products.filter(p => !p.total_cost || Number(p.total_cost) === 0).length;
+  
   return (
     <div className="ao-settings">
       <div className="ao-settings-layout">
         <div className="ao-settings-sidebar">
-          <h4 className="ao-section-title">Products</h4>
+          <div className="ao-settings-header">
+            <h4 className="ao-section-title">Products ({products.length})</h4>
+            <button 
+              className="ao-refresh-btn" 
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              title="Refresh products"
+            >
+              {refreshing ? '⏳' : '🔄'}
+            </button>
+          </div>
+          
+          {lastRefresh && (
+            <p className="ao-last-refresh">
+              Last: {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
+          )}
+          
+          {productsWithoutCost > 0 && (
+            <div className="ao-warning-box">
+              ⚠️ {productsWithoutCost} product{productsWithoutCost > 1 ? 's' : ''} without cost
+            </div>
+          )}
+          
           {loading ? (
-            <p>Loading...</p>
+            <p className="ao-loading-small">Loading...</p>
+          ) : products.length === 0 ? (
+            <div className="ao-empty-small">
+              <p>No products yet</p>
+              <p style={{fontSize: '11px', opacity: 0.6}}>Add products from Admin Panel → Products tab</p>
+            </div>
           ) : (
             products.map(p => (
               <button 
@@ -758,7 +827,7 @@ function SettingsTab({ showMsg }) {
               >
                 <span className="ao-product-name">{p.name}</span>
                 <span className="ao-product-cost">
-                  {p.total_cost > 0 ? 'Cost: ' + fmtRs(p.total_cost) : '⚠️ No cost'}
+                  {p.total_cost > 0 ? 'Cost: ' + fmtRs(p.total_cost) : '⚠️ No cost yet'}
                 </span>
               </button>
             ))
@@ -768,12 +837,12 @@ function SettingsTab({ showMsg }) {
         <div className="ao-settings-main">
           {!selectedProduct ? (
             <div className="ao-empty">
-              <p>Select a product to edit costs</p>
+              <p>👈 Select a product to edit costs</p>
             </div>
           ) : (
             <>
               <h3 className="ao-section-title">{selectedProduct.name}</h3>
-              <p className="ao-hint">Enter cost breakdown for this product</p>
+              <p className="ao-hint">Enter cost breakdown for this product. Auto-refresh every 10s.</p>
               
               <div className="ao-form-grid">
                 <div className="ao-form-field">
@@ -1091,22 +1160,16 @@ function OrdersButton() {
     const check = () => {
       let admin = false;
       
-      // Method 1: window.__currentUser (හැම විදිහකින්ම set කරන්න try කරනවා)
       if (window.__currentUser && window.__currentUser.email === ADMIN_EMAIL_ORDERS) {
         admin = true;
       }
-      
-      // Method 2: window.__adminState (script.js එකෙන් set වෙනවා නම්)
       if (window.__adminState === true) {
         admin = true;
       }
-      
-      // Method 3: window.__adminEmail
       if (window.__adminEmail === ADMIN_EMAIL_ORDERS) {
         admin = true;
       }
       
-      // Method 4: DOM-based — "⚙️ Admin" icon එක පේනවා නම්, ඒ කියන්නේ admin
       const adminIconBtn = document.querySelector('.admin-btn-highlight');
       if (adminIconBtn) {
         admin = true;
@@ -1141,9 +1204,7 @@ function OrdersButton() {
 // ============================================================
 
 function injectOrdersButton() {
-  // Hook into script.js's checkAdmin
   if (!window.__adminHookInstalled) {
-    // Firebase user track (from onAuthStateChanged in index.html)
     const origSetAppUser = window.setAppUser;
     if (origSetAppUser && !window.__setAppUserWrapped) {
       window.setAppUser = function(user) {
@@ -1157,7 +1218,6 @@ function injectOrdersButton() {
       window.__setAppUserWrapped = true;
     }
     
-    // checkAdmin hook
     const origCheckAdmin = window.checkAdmin;
     if (origCheckAdmin) {
       window.checkAdmin = function(email) {
@@ -1174,7 +1234,6 @@ function injectOrdersButton() {
     }
   }
   
-  // Mount button into header
   const checkAndMount = setInterval(() => {
     const header = document.querySelector('.header-icons');
     if (header && !document.getElementById('ao-header-btn-mount')) {
