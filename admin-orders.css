@@ -1049,3 +1049,260 @@
   .ao-pnl-filters .ao-form-field,
   .ao-pnl-filters .ao-btn { width: 100%; min-width: auto; }
    }
+
+/* ============================================================
+   V2 ADDITIONS — Items Edit + Discount
+   ============================================================ */
+
+/* ---- Items Edit List ---- */
+
+.ao-items-edit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ao-item-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid rgba(10, 46, 31, 0.1);
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.ao-item-edit-row:hover {
+  border-color: rgba(184, 150, 62, 0.4);
+  box-shadow: 0 2px 8px rgba(10, 46, 31, 0.06);
+}
+
+.ao-item-edit-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.ao-item-edit-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0A2E1F;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+
+.ao-item-edit-price {
+  font-size: 11px;
+  color: rgba(10, 46, 31, 0.5);
+}
+
+.ao-item-edit-qty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ao-item-edit-qty button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(10, 46, 31, 0.2);
+  background: #fff;
+  color: #0A2E1F;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.ao-item-edit-qty button:hover {
+  background: #0A2E1F;
+  color: #FFFBF5;
+  border-color: #0A2E1F;
+}
+
+.ao-item-edit-qty span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0A2E1F;
+}
+
+.ao-item-edit-total {
+  font-size: 13px;
+  font-weight: 700;
+  color: #B8963E;
+  min-width: 70px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ao-item-edit-remove {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ao-item-edit-remove:hover {
+  background: #dc2626;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.ao-items-empty {
+  text-align: center;
+  padding: 20px;
+  color: rgba(10, 46, 31, 0.4);
+  font-size: 12px;
+  font-style: italic;
+  background: rgba(10, 46, 31, 0.03);
+  border-radius: 8px;
+}
+
+/* ---- Add Item Button ---- */
+
+.ao-add-item-btn {
+  width: 100%;
+  padding: 12px;
+  background: rgba(184, 150, 62, 0.12);
+  color: #0A2E1F;
+  border: 2px dashed rgba(184, 150, 62, 0.4);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+}
+
+.ao-add-item-btn:hover:not(:disabled) {
+  background: rgba(184, 150, 62, 0.2);
+  border-color: #B8963E;
+}
+
+.ao-add-item-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Add Item Form ---- */
+
+.ao-add-item-form {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(10, 46, 31, 0.03);
+  border-radius: 10px;
+  align-items: center;
+}
+
+.ao-add-item-form select,
+.ao-add-item-form input {
+  padding: 10px 12px;
+  border: 1px solid rgba(10, 46, 31, 0.15);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  color: #0A2E1F;
+  font-family: inherit;
+}
+
+.ao-add-item-form select {
+  flex: 1;
+  min-width: 0;
+}
+
+.ao-add-item-form input {
+  width: 70px;
+}
+
+.ao-add-item-form select:focus,
+.ao-add-item-form input:focus {
+  outline: none;
+  border-color: #B8963E;
+  box-shadow: 0 0 0 3px rgba(184, 150, 62, 0.15);
+}
+
+.ao-add-item-form .ao-btn {
+  padding: 10px 14px;
+  font-size: 12px;
+  flex: 0 0 auto;
+  min-width: auto;
+}
+
+/* ---- Discount highlight ---- */
+
+.ao-modal-label[style*="d97706"] {
+  color: #d97706 !important;
+  font-weight: 700;
+}
+
+/* ---- PnL Report — Discount card ---- */
+
+.ao-pnl-card .ao-pnl-value[style*="d97706"] {
+  color: #d97706 !important;
+}
+
+/* ---- Mobile Responsive ---- */
+
+@media (max-width: 640px) {
+  .ao-item-edit-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+  
+  .ao-item-edit-name {
+    flex: 1 1 100%;
+    order: 1;
+  }
+  
+  .ao-item-edit-qty {
+    order: 2;
+  }
+  
+  .ao-item-edit-total {
+    order: 3;
+    margin-left: auto;
+  }
+  
+  .ao-item-edit-remove {
+    order: 4;
+  }
+  
+  .ao-add-item-form {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .ao-add-item-form input {
+    width: 100%;
+  }
+  
+  .ao-add-item-form .ao-btn {
+    width: 100%;
+  }
+}
