@@ -1,9 +1,6 @@
 /*************************************************************
  * AROMA LAB — Admin Orders & PnL Styles
  * File: admin-orders.css
- * 
- * ⚠️ මේ file එක ඔයාගේ දැනට තියෙන style.css එකට
- *    අත ගහන්නේ නැහැ. අලුතෙන් එකතු වෙන file එකක්.
  *************************************************************/
 
 /* ============================================================
@@ -35,7 +32,7 @@
 }
 
 /* ============================================================
-   MAIN OVERLAY + PANEL — FULL SCREEN, MAX Z-INDEX
+   MAIN OVERLAY + PANEL
    ============================================================ */
 
 .ao-overlay {
@@ -57,6 +54,14 @@
   overflow-y: auto;
   margin: 0 !important;
   isolation: isolate;
+}
+
+.ao-auth-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ao-panel {
@@ -92,9 +97,7 @@
   flex-shrink: 0;
 }
 
-.ao-header-left {
-  flex: 1;
-}
+.ao-header-left { flex: 1; }
 
 .ao-title {
   font-family: 'Cormorant Garamond', serif;
@@ -151,14 +154,8 @@
   flex-shrink: 0;
 }
 
-.ao-tabs::-webkit-scrollbar {
-  height: 4px;
-}
-
-.ao-tabs::-webkit-scrollbar-thumb {
-  background: #B8963E;
-  border-radius: 2px;
-}
+.ao-tabs::-webkit-scrollbar { height: 4px; }
+.ao-tabs::-webkit-scrollbar-thumb { background: #B8963E; border-radius: 2px; }
 
 .ao-tab {
   padding: 16px 20px;
@@ -180,14 +177,8 @@
   font-family: inherit;
 }
 
-.ao-tab:hover {
-  color: #0A2E1F;
-}
-
-.ao-tab.active {
-  color: #0A2E1F;
-  border-bottom-color: #B8963E;
-}
+.ao-tab:hover { color: #0A2E1F; }
+.ao-tab.active { color: #0A2E1F; border-bottom-color: #B8963E; }
 
 .ao-badge {
   background: #B8963E;
@@ -200,10 +191,7 @@
   text-align: center;
 }
 
-.ao-badge-green {
-  background: #0A2E1F;
-  color: #FFFBF5;
-}
+.ao-badge-green { background: #0A2E1F; color: #FFFBF5; }
 
 .ao-message {
   margin: 16px 32px 0;
@@ -235,12 +223,28 @@
   color: rgba(10, 46, 31, 0.5);
 }
 
+.ao-loading-small {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: rgba(10, 46, 31, 0.5);
+}
+
 .ao-empty {
   text-align: center;
   padding: 60px 20px;
   color: rgba(10, 46, 31, 0.4);
   font-size: 14px;
 }
+
+.ao-empty-small {
+  text-align: center;
+  padding: 20px;
+  color: rgba(10, 46, 31, 0.4);
+  font-size: 13px;
+}
+
+.ao-empty-small p { margin: 4px 0; }
 
 .ao-section-title {
   font-family: 'Cormorant Garamond', serif;
@@ -282,17 +286,9 @@
   border-color: rgba(184, 150, 62, 0.4);
 }
 
-.ao-order-card.pending {
-  border-left: 4px solid #f59e0b;
-}
-
-.ao-order-card.completed {
-  border-left: 4px solid #10b981;
-}
-
-.ao-order-card.cancelled {
-  border-left: 4px solid #dc2626;
-}
+.ao-order-card.pending { border-left: 4px solid #f59e0b; }
+.ao-order-card.completed { border-left: 4px solid #10b981; }
+.ao-order-card.cancelled { border-left: 4px solid #dc2626; }
 
 .ao-order-header {
   display: flex;
@@ -329,20 +325,9 @@
   flex-shrink: 0;
 }
 
-.ao-status-pending {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.ao-status-completed {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.ao-status-cancelled {
-  background: #fee2e2;
-  color: #991b1b;
-}
+.ao-status-pending { background: #fef3c7; color: #92400e; }
+.ao-status-completed { background: #d1fae5; color: #065f46; }
+.ao-status-cancelled { background: #fee2e2; color: #991b1b; }
 
 .ao-order-body {
   display: flex;
@@ -422,60 +407,118 @@
   font-family: inherit;
 }
 
-.ao-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.ao-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ao-btn-primary { background: #0A2E1F; color: #FFFBF5; }
+.ao-btn-primary:hover:not(:disabled) { background: #123a28; transform: translateY(-1px); }
+
+.ao-btn-secondary { background: rgba(10, 46, 31, 0.08); color: #0A2E1F; }
+.ao-btn-secondary:hover:not(:disabled) { background: rgba(10, 46, 31, 0.15); }
+
+.ao-btn-complete { background: #10b981; color: #fff; }
+.ao-btn-complete:hover { background: #059669; transform: translateY(-1px); }
+
+.ao-btn-cancel { background: #fee2e2; color: #991b1b; }
+.ao-btn-cancel:hover { background: #fecaca; }
+
+.ao-btn-delete { background: #dc2626; color: #fff; }
+.ao-btn-delete:hover { background: #b91c1c; }
+
+/* ============================================================
+   AUTH MODAL (Supabase Login)
+   ============================================================ */
+
+.ao-auth-modal {
+  background: #FFFBF5;
+  border-radius: 20px;
+  max-width: 420px;
+  width: 100%;
+  padding: 40px 32px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  position: relative;
+  animation: aoModalIn 0.3s ease;
+  z-index: 2147483647 !important;
+  margin: auto;
 }
 
-.ao-btn-primary {
+.ao-auth-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.ao-auth-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #0A2E1F;
+  margin: 0 0 8px 0;
+}
+
+.ao-auth-desc {
+  font-size: 13px;
+  color: rgba(10, 46, 31, 0.6);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.ao-auth-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(10, 46, 31, 0.15);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15px;
+  color: #0A2E1F;
+  text-align: center;
+  letter-spacing: 0.1em;
+  font-family: inherit;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.ao-auth-input:focus {
+  outline: none;
+  border-color: #B8963E;
+  box-shadow: 0 0 0 3px rgba(184, 150, 62, 0.15);
+}
+
+.ao-auth-btn {
+  width: 100%;
+  padding: 14px 20px;
   background: #0A2E1F;
   color: #FFFBF5;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
 }
 
-.ao-btn-primary:hover:not(:disabled) {
+.ao-auth-btn:hover:not(:disabled) {
   background: #123a28;
   transform: translateY(-1px);
 }
 
-.ao-btn-secondary {
-  background: rgba(10, 46, 31, 0.08);
-  color: #0A2E1F;
+.ao-auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.ao-btn-secondary:hover:not(:disabled) {
-  background: rgba(10, 46, 31, 0.15);
-}
-
-.ao-btn-complete {
-  background: #10b981;
-  color: #fff;
-}
-
-.ao-btn-complete:hover {
-  background: #059669;
-  transform: translateY(-1px);
-}
-
-.ao-btn-cancel {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.ao-btn-cancel:hover {
-  background: #fecaca;
-}
-
-.ao-btn-delete {
-  background: #dc2626;
-  color: #fff;
-}
-
-.ao-btn-delete:hover {
-  background: #b91c1c;
+.ao-auth-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 0 0 12px 0;
+  font-weight: 600;
 }
 
 /* ============================================================
-   MODAL (Order Complete) — MAX Z-INDEX
+   MODAL (Order Complete)
    ============================================================ */
 
 .ao-modal-overlay {
@@ -671,6 +714,61 @@
   gap: 8px;
 }
 
+.ao-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ao-settings-header .ao-section-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.ao-refresh-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(184, 150, 62, 0.15);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.ao-refresh-btn:hover:not(:disabled) {
+  background: #B8963E;
+  transform: rotate(180deg);
+}
+
+.ao-refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ao-last-refresh {
+  font-size: 10px;
+  color: rgba(10, 46, 31, 0.4);
+  margin: 0 0 8px 0;
+  text-align: right;
+}
+
+.ao-warning-box {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
 .ao-settings-main {
   background: #fff;
   padding: 24px;
@@ -702,13 +800,8 @@
   border-color: #0A2E1F;
 }
 
-.ao-product-btn.active .ao-product-name {
-  color: #FFFBF5;
-}
-
-.ao-product-btn.active .ao-product-cost {
-  color: rgba(255, 251, 245, 0.7);
-}
+.ao-product-btn.active .ao-product-name { color: #FFFBF5; }
+.ao-product-btn.active .ao-product-cost { color: rgba(255, 251, 245, 0.7); }
 
 .ao-product-name {
   font-size: 14px;
@@ -798,9 +891,7 @@
   gap: 12px;
 }
 
-.ao-comm-header {
-  margin-bottom: 4px;
-}
+.ao-comm-header { margin-bottom: 4px; }
 
 .ao-comm-badge {
   display: inline-block;
@@ -812,20 +903,9 @@
   text-transform: uppercase;
 }
 
-.ao-comm-bank {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.ao-comm-koko {
-  background: #fce7f3;
-  color: #9d174d;
-}
-
-.ao-comm-online {
-  background: #d1fae5;
-  color: #065f46;
-}
+.ao-comm-bank { background: #dbeafe; color: #1e40af; }
+.ao-comm-koko { background: #fce7f3; color: #9d174d; }
+.ao-comm-online { background: #d1fae5; color: #065f46; }
 
 /* ============================================================
    PNL REPORT TAB
@@ -843,14 +923,8 @@
   border: 1px solid rgba(10, 46, 31, 0.08);
 }
 
-.ao-pnl-filters .ao-form-field {
-  min-width: 140px;
-}
-
-.ao-pnl-filters .ao-btn {
-  flex: 0 0 auto;
-  min-width: 100px;
-}
+.ao-pnl-filters .ao-form-field { min-width: 140px; }
+.ao-pnl-filters .ao-btn { flex: 0 0 auto; min-width: 100px; }
 
 .ao-pnl-summary {
   display: grid;
@@ -934,9 +1008,7 @@
   color: #0A2E1F;
 }
 
-.ao-table tr:hover td {
-  background: rgba(184, 150, 62, 0.05);
-}
+.ao-table tr:hover td { background: rgba(184, 150, 62, 0.05); }
 
 /* ============================================================
    RESPONSIVE
@@ -955,75 +1027,25 @@
     max-width: 100%;
   }
   
-  .ao-header {
-    padding: 18px 20px;
-  }
-  
-  .ao-title {
-    font-size: 22px;
-  }
-  
-  .ao-tabs {
-    padding: 0 12px;
-  }
-  
-  .ao-tab {
-    padding: 12px 14px;
-    font-size: 11px;
-  }
-  
-  .ao-content {
-    padding: 16px 20px 30px;
-  }
-  
-  .ao-orders-list {
-    grid-template-columns: 1fr;
-  }
-  
-  .ao-settings-layout {
-    grid-template-columns: 1fr;
-  }
-  
-  .ao-form-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .ao-pnl-summary {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .ao-header-btn {
-    padding: 8px 12px;
-    font-size: 11px;
-  }
-  
-  .ao-modal {
-    max-height: 95vh;
-    border-radius: 16px;
-  }
-  
-  .ao-modal-footer {
-    flex-direction: column-reverse;
-  }
+  .ao-header { padding: 18px 20px; }
+  .ao-title { font-size: 22px; }
+  .ao-tabs { padding: 0 12px; }
+  .ao-tab { padding: 12px 14px; font-size: 11px; }
+  .ao-content { padding: 16px 20px 30px; }
+  .ao-orders-list { grid-template-columns: 1fr; }
+  .ao-settings-layout { grid-template-columns: 1fr; }
+  .ao-form-grid { grid-template-columns: 1fr; }
+  .ao-pnl-summary { grid-template-columns: repeat(2, 1fr); }
+  .ao-header-btn { padding: 8px 12px; font-size: 11px; }
+  .ao-modal { max-height: 95vh; border-radius: 16px; }
+  .ao-modal-footer { flex-direction: column-reverse; }
+  .ao-auth-modal { padding: 32px 24px; border-radius: 16px; }
 }
 
 @media (max-width: 480px) {
-  .ao-pnl-summary {
-    grid-template-columns: 1fr;
-  }
-  
-  .ao-order-actions {
-    flex-direction: column;
-  }
-  
-  .ao-pnl-filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
+  .ao-pnl-summary { grid-template-columns: 1fr; }
+  .ao-order-actions { flex-direction: column; }
+  .ao-pnl-filters { flex-direction: column; align-items: stretch; }
   .ao-pnl-filters .ao-form-field,
-  .ao-pnl-filters .ao-btn {
-    width: 100%;
-    min-width: auto;
-  }
-                   }
+  .ao-pnl-filters .ao-btn { width: 100%; min-width: auto; }
+   }
