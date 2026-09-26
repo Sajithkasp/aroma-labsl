@@ -1,9 +1,13 @@
 /*************************************************************
  * AROMA LAB — Admin Orders & PnL System
- * File: admin-orders.js
+ * File: admin-orders.js — v2
  * 
- * ⚠️ මේ file එක ඔයාගේ දැනට තියෙන script.js එකට
- *    අත ගහන්නේ නැහැ. අලුතෙන් එකතු වෙන file එකක්.
+ * Features:
+ * - Pending Orders with Complete modal (Items edit + Discount)
+ * - Completed Orders with Delete
+ * - Settings (Cost Entry)
+ * - Commissions
+ * - PnL Report + CSV Download
  *************************************************************/
 
 const { useState: aoUseState, useEffect: aoUseEffect, useRef: aoUseRef } = React;
@@ -13,7 +17,6 @@ const { useState: aoUseState, useEffect: aoUseEffect, useRef: aoUseRef } = React
 // ============================================================
 
 const ADMIN_EMAIL_ORDERS = "sajith.kasp@gmail.com";
-const ADMIN_PASSWORD_KEY = "aroma_admin_pwd"; // Not used for storage, only for reference
 const sb = window.supabaseClient;
 
 // ============================================================
@@ -51,7 +54,7 @@ function todayStr() {
 }
 
 // ============================================================
-// SUPABASE AUTH — Check + Login
+// SUPABASE AUTH
 // ============================================================
 
 async function getSupabaseSession() {
@@ -98,75 +101,6 @@ async function dbGetOrderItems(orderId) {
   return data || [];
 }
 
-async function dbCreateOrder(orderData, items) {
-  const { data: idData, error: idErr } = await sb.rpc('generate_order_id');
-  if (idErr) throw idErr;
-  const orderId = idData;
-  
-  let totalAmount = 0;
-  let totalCost = 0;
-  const itemsSummaryParts = [];
-  
-  const { data: products } = await sb.from('products').select('*');
-  const productMap = {};
-  (products || []).forEach(p => {
-    productMap[String(p.name || '').trim().toLowerCase()] = p;
-  });
-  
-  const itemsWithCalc = items.map(item => {
-    const qty = Number(item.quantity) || 1;
-    const unitPrice = Number(item.unit_price) || 0;
-    const product = productMap[String(item.name || '').trim().toLowerCase()];
-    const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
-    const totalIncome = unitPrice * qty;
-    const totalItemCost = unitCost * qty;
-    const profit = totalIncome - totalItemCost;
-    
-    totalAmount += totalIncome;
-    totalCost += totalItemCost;
-    itemsSummaryParts.push(item.name + ' x' + qty);
-    
-    return {
-      product_name: item.name,
-      quantity: qty,
-      unit_price: unitPrice,
-      unit_cost: unitCost,
-      total_income: totalIncome,
-      total_cost: totalItemCost,
-      profit: profit
-    };
-  });
-  
-  const orderRow = {
-    order_id: orderId,
-    customer_name: orderData.customer_name,
-    customer_phone: orderData.customer_phone || '',
-    customer_address: orderData.customer_address || '',
-    district: orderData.district || '',
-    order_items: itemsSummaryParts.join(', '),
-    total_amount: totalAmount,
-    delivery_charge: Number(orderData.delivery_charge) || 0,
-    order_type: orderData.order_type || '',
-    payment_method: orderData.payment_method || '',
-    total_cost: totalCost,
-    commission: 0,
-    other_expenses: 0,
-    net_profit: 0,
-    profit_margin: 0,
-    status: 'Pending',
-    platform: orderData.platform || 'Website'
-  };
-  
-  const { data: newOrder, error: orderErr } = await sb.from('orders').insert([orderRow]).select().single();
-  if (orderErr) throw orderErr;
-  
-  const itemsToInsert = itemsWithCalc.map(it => ({ ...it, order_id: orderId }));
-  const { error: itemsErr } = await sb.from('order_items').insert(itemsToInsert);
-  if (itemsErr) throw itemsErr;
-  
-  return newOrder;
-}
-
 async function dbUpdateOrder(orderId, updates) {
   const { data, error } = await sb.from('orders').update(updates).eq('order_id', orderId).select().single();
   if (error) throw error;
@@ -174,10 +108,37 @@ async function dbUpdateOrder(orderId, updates) {
 }
 
 async function dbDeleteOrder(orderId) {
-  await sb.from('order_items').delete().eq('order_id', orderId);
-  const { error } = await sb.from('orders').delete().eq('order_id', orderId);
+  // 1. Delete order_items first
+  const { error: itemsErr } = await sb.from('order_items').delete().eq('order_id', orderId);
+  if (itemsErr) throw itemsErr;
+  
+  // 2. Delete order
+  const { error: orderErr } = await sb.from('orders').delete().eq('order_id', orderId);
+  if (orderErr) throw orderErr;
+  
+  return true;
+}
+
+// ============================================================
+// DATABASE — ORDER ITEMS
+// ============================================================
+
+async function dbUpdateOrderItem(itemId, updates) {
+  const { data, error } = await sb.from('order_items').update(updates).eq('id', itemId).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbDeleteOrderItem(itemId) {
+  const { error } = await sb.from('order_items').delete().eq('id', itemId);
   if (error) throw error;
   return true;
+}
+
+async function dbInsertOrderItem(itemData) {
+  const { data, error } = await sb.from('order_items').insert([itemData]).select().single();
+  if (error) throw error;
+  return data;
 }
 
 // ============================================================
@@ -253,54 +214,92 @@ async function dbGetExpenses() {
 }
 
 // ============================================================
-// ORDER LOGIC
+// ORDER LOGIC — Complete with Items + Discount
 // ============================================================
 
 async function completeOrder(orderId, completionData) {
-  const { order_type, payment_method, delivery_charge, commission_override } = completionData;
+  const { 
+    order_type, 
+    payment_method, 
+    delivery_charge, 
+    discount,
+    commission_override,
+    updated_items  // Items list (edited)
+  } = completionData;
   
   const order = await dbGetOrderById(orderId);
-  const items = await dbGetOrderItems(orderId);
+  const existingItems = await dbGetOrderItems(orderId);
   
+  // Products for cost lookup
   const products = await dbGetProducts();
   const productMap = {};
   products.forEach(p => {
     productMap[String(p.name || '').trim().toLowerCase()] = p;
   });
   
-  let totalCost = 0;
-  for (const item of items) {
-    const product = productMap[String(item.product_name || '').trim().toLowerCase()];
-    const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
-    const itemTotalCost = unitCost * (Number(item.quantity) || 0);
-    totalCost += itemTotalCost;
-    
-    await sb.from('order_items').update({
-      unit_cost: unitCost,
-      total_cost: itemTotalCost,
-      profit: (Number(item.total_income) || 0) - itemTotalCost
-    }).eq('id', item.id);
+  // ---- Step 1: Delete existing items ----
+  for (const item of existingItems) {
+    await sb.from('order_items').delete().eq('id', item.id);
   }
   
+  // ---- Step 2: Insert updated items ----
+  let totalAmount = 0;
+  let totalCost = 0;
+  const itemsSummaryParts = [];
+  
+  for (const item of (updated_items || [])) {
+    const itemName = String(item.product_name || '').trim();
+    const qty = Number(item.quantity) || 1;
+    const unitPrice = Number(item.unit_price) || 1500;
+    const product = productMap[itemName.toLowerCase()];
+    const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
+    const totalIncome = unitPrice * qty;
+    const totalItemCost = unitCost * qty;
+    
+    totalAmount += totalIncome;
+    totalCost += totalItemCost;
+    itemsSummaryParts.push(itemName + ' x' + qty);
+    
+    await sb.from('order_items').insert([{
+      order_id: orderId,
+      product_name: itemName,
+      quantity: qty,
+      unit_price: unitPrice,
+      unit_cost: unitCost,
+      total_income: totalIncome,
+      total_cost: totalItemCost,
+      profit: totalIncome - totalItemCost
+    }]);
+  }
+  
+  // ---- Step 3: Calculate final numbers ----
+  const deliveryCharge = Number(delivery_charge) || 0;
+  const discountAmount = Number(discount) || 0;
+  
+  // Commission calculate
   let commission = Number(commission_override) || 0;
   if (!commission_override && payment_method) {
     const commissions = await dbGetCommissions();
     const comm = commissions.find(c => String(c.method).toLowerCase() === String(payment_method).toLowerCase());
     if (comm) {
-      commission = (Number(order.total_amount) * Number(comm.rate) / 100) + Number(comm.fixed_fee || 0);
+      const netForCommission = totalAmount + deliveryCharge - discountAmount;
+      commission = (netForCommission * Number(comm.rate) / 100) + Number(comm.fixed_fee || 0);
     }
   }
   
-  const deliveryCharge = Number(delivery_charge) || 0;
-  const netProfit = Number(order.total_amount) - totalCost - commission + deliveryCharge;
-  const profitMargin = Number(order.total_amount) > 0 
-    ? (netProfit / Number(order.total_amount)) * 100 
-    : 0;
+  // Net profit = (Items Total + Delivery − Discount) − Cost − Commission
+  const netTotal = totalAmount + deliveryCharge - discountAmount;
+  const netProfit = netTotal - totalCost - commission;
+  const profitMargin = netTotal > 0 ? (netProfit / netTotal) * 100 : 0;
   
+  // ---- Step 4: Update order ----
   const updatedOrder = await dbUpdateOrder(orderId, {
     order_type: order_type || '',
     payment_method: payment_method || '',
     delivery_charge: deliveryCharge,
+    discount: discountAmount,
+    order_items: itemsSummaryParts.join(', '),
+    total_amount: netTotal,  // ← Net total (discount අඩු කරලා)
     total_cost: totalCost,
     commission: commission,
     net_profit: netProfit,
@@ -325,33 +324,80 @@ async function cancelOrder(orderId) {
 
 window.saveOrderToSupabase = async function(orderData, cartItems) {
   try {
-    const items = cartItems.map(item => ({
-      name: item.name,
-      quantity: item.quantity,
-      unit_price: 1500
-    }));
+    const { data: idData, error: idErr } = await sb.rpc('generate_order_id');
+    if (idErr) throw idErr;
+    const orderId = idData;
     
-    const result = await dbCreateOrder({
+    let totalAmount = 0;
+    let totalCost = 0;
+    const itemsSummaryParts = [];
+    
+    const { data: products } = await sb.from('products').select('*');
+    const productMap = {};
+    (products || []).forEach(p => {
+      productMap[String(p.name || '').trim().toLowerCase()] = p;
+    });
+    
+    const itemsToInsert = cartItems.map(item => {
+      const qty = Number(item.quantity) || 1;
+      const unitPrice = 1500;
+      const product = productMap[String(item.name || '').trim().toLowerCase()];
+      const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
+      const totalIncome = unitPrice * qty;
+      const totalItemCost = unitCost * qty;
+      
+      totalAmount += totalIncome;
+      totalCost += totalItemCost;
+      itemsSummaryParts.push(item.name + ' x' + qty);
+      
+      return {
+        order_id: orderId,
+        product_name: item.name,
+        quantity: qty,
+        unit_price: unitPrice,
+        unit_cost: unitCost,
+        total_income: totalIncome,
+        total_cost: totalItemCost,
+        profit: totalIncome - totalItemCost
+      };
+    });
+    
+    const orderRow = {
+      order_id: orderId,
       customer_name: orderData.customer_name,
-      customer_phone: orderData.customer_phone,
-      customer_address: orderData.customer_address,
-      district: orderData.district,
-      delivery_charge: orderData.delivery_charge || 0,
-      platform: orderData.platform || 'WhatsApp',
+      customer_phone: orderData.customer_phone || '',
+      customer_address: orderData.customer_address || '',
+      district: orderData.district || '',
+      order_items: itemsSummaryParts.join(', '),
+      total_amount: totalAmount,
+      delivery_charge: Number(orderData.delivery_charge) || 0,
+      discount: 0,
       order_type: '',
-      payment_method: ''
-    }, items);
+      payment_method: '',
+      total_cost: totalCost,
+      commission: 0,
+      other_expenses: 0,
+      net_profit: 0,
+      profit_margin: 0,
+      status: 'Pending',
+      platform: orderData.platform || 'Website'
+    };
     
-    console.log('✅ Order saved to Supabase:', result.order_id);
-    return { success: true, orderId: result.order_id };
+    const { data: newOrder, error: orderErr } = await sb.from('orders').insert([orderRow]).select().single();
+    if (orderErr) throw orderErr;
+    
+    const { error: itemsErr } = await sb.from('order_items').insert(itemsToInsert);
+    if (itemsErr) throw itemsErr;
+    
+    return { success: true, orderId: orderId };
   } catch (err) {
-    console.error('❌ Failed to save order:', err);
+    console.error('❌ Order save failed:', err);
     return { success: false, error: err.message };
   }
 };
 
 // ============================================================
-// UI — ADMIN LOGIN MODAL (Supabase Auth)
+// UI — ADMIN LOGIN MODAL
 // ============================================================
 
 function AdminOrdersLogin({ onSuccess, onClose }) {
@@ -448,7 +494,6 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
     setTimeout(() => setMessage(''), 3000);
   }
   
-  // Not authenticated — show login prompt
   if (!isAuthenticated) {
     return (
       <div className="ao-overlay">
@@ -586,6 +631,12 @@ function OrdersList({ orders, status, onRefresh, showMsg, onSelectOrder }) {
             
             {status === 'completed' && (
               <>
+                {Number(order.discount) > 0 && (
+                  <div className="ao-order-row">
+                    <span className="ao-label">Discount:</span>
+                    <span className="ao-value" style={{color: '#d97706'}}>− {fmtRs(order.discount)}</span>
+                  </div>
+                )}
                 <div className="ao-order-row">
                   <span className="ao-label">Profit:</span>
                   <span className="ao-value ao-profit">{fmtRs(order.net_profit)}</span>
@@ -622,9 +673,23 @@ function OrdersList({ orders, status, onRefresh, showMsg, onSelectOrder }) {
                 </button>
               </>
             )}
+            {status === 'completed' && (
+              <button className="ao-btn ao-btn-delete" onClick={async () => {
+                if (!window.confirm('⚠️ Delete this order permanently?\n\nඑය orders, order_items, PnL සහ හැම තැනකින්ම අයින් වෙනවා.')) return;
+                try {
+                  await dbDeleteOrder(order.order_id);
+                  showMsg('🗑️ Order deleted from entire system');
+                  onRefresh();
+                } catch (e) {
+                  showMsg('Error: ' + e.message);
+                }
+              }}>
+                🗑️ Delete Permanently
+              </button>
+            )}
             {status === 'cancelled' && (
               <button className="ao-btn ao-btn-delete" onClick={async () => {
-                if (!window.confirm('Delete this order permanently?')) return;
+                if (!window.confirm('⚠️ Delete this order permanently?')) return;
                 try {
                   await dbDeleteOrder(order.order_id);
                   showMsg('🗑️ Order deleted');
@@ -644,48 +709,107 @@ function OrdersList({ orders, status, onRefresh, showMsg, onSelectOrder }) {
 }
 
 // ============================================================
-// UI — ORDER COMPLETE MODAL
+// UI — ORDER COMPLETE MODAL (with Items Edit + Discount)
 // ============================================================
 
 function OrderCompleteModal({ order, onClose, onComplete }) {
   const [orderType, setOrderType] = aoUseState('Deliver');
   const [paymentMethod, setPaymentMethod] = aoUseState('Cash');
   const [deliveryCharge, setDeliveryCharge] = aoUseState(order.delivery_charge || 0);
+  const [discount, setDiscount] = aoUseState(order.discount || 0);
   const [commission, setCommission] = aoUseState(0);
   const [loading, setLoading] = aoUseState(false);
   const [error, setError] = aoUseState('');
+  
+  // Items state
   const [items, setItems] = aoUseState([]);
+  const [products, setProducts] = aoUseState([]);
+  const [showAddItem, setShowAddItem] = aoUseState(false);
+  const [newItem, setNewItem] = aoUseState({ product_name: '', quantity: 1 });
   
   const orderTypes = ['Deliver', 'In-Store'];
   const paymentMethods = ['Cash', 'Card', 'Online', 'KOKO', 'Bank', 'Daraz COD'];
   
+  // Load items + products
   aoUseEffect(() => {
-    async function loadItems() {
+    async function load() {
       try {
         const its = await dbGetOrderItems(order.order_id);
-        setItems(its);
+        setItems(its.map(it => ({
+          id: it.id,
+          product_name: it.product_name,
+          quantity: Number(it.quantity) || 1,
+          unit_price: Number(it.unit_price) || 1500,
+          unit_cost: Number(it.unit_cost) || 0
+        })));
+        
+        const prods = await dbGetProducts();
+        setProducts(prods);
       } catch (e) { console.error(e); }
     }
-    loadItems();
+    load();
   }, [order.order_id]);
   
+  // ---- Item actions ----
+  function updateItemQty(idx, newQty) {
+    if (newQty < 1) return;
+    setItems(items.map((it, i) => i === idx ? { ...it, quantity: newQty } : it));
+  }
+  
+  function updateItemPrice(idx, newPrice) {
+    setItems(items.map((it, i) => i === idx ? { ...it, unit_price: Number(newPrice) || 0 } : it));
+  }
+  
+  function removeItem(idx) {
+    if (!window.confirm('Remove this item?')) return;
+    setItems(items.filter((_, i) => i !== idx));
+  }
+  
+  function addNewItem() {
+    if (!newItem.product_name) {
+      alert('Select a product');
+      return;
+    }
+    const product = products.find(p => p.name === newItem.product_name);
+    const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
+    
+    setItems([...items, {
+      id: null,  // new item
+      product_name: newItem.product_name,
+      quantity: Number(newItem.quantity) || 1,
+      unit_price: 1500,
+      unit_cost: unitCost
+    }]);
+    
+    setNewItem({ product_name: '', quantity: 1 });
+    setShowAddItem(false);
+  }
+  
+  // ---- Commission auto-calculate ----
   aoUseEffect(() => {
     async function calc() {
       try {
         const comms = await dbGetCommissions();
         const comm = comms.find(c => String(c.method).toLowerCase() === String(paymentMethod).toLowerCase());
         if (comm) {
-          const c = (Number(order.total_amount) * Number(comm.rate) / 100) + Number(comm.fixed_fee || 0);
+          const itemsTotal = items.reduce((s, it) => s + (it.unit_price * it.quantity), 0);
+          const netForComm = itemsTotal + Number(deliveryCharge) - Number(discount);
+          const c = (netForComm * Number(comm.rate) / 100) + Number(comm.fixed_fee || 0);
           setCommission(Math.round(c * 100) / 100);
         } else {
           setCommission(0);
         }
       } catch (e) { console.error(e); }
     }
-    if (paymentMethod) calc();
-  }, [paymentMethod, order.total_amount]);
+    calc();
+  }, [paymentMethod, items, deliveryCharge, discount]);
   
   async function handleComplete() {
+    if (items.length === 0) {
+      setError('Order එකේ items අඩුම එකක්වත් තියෙන්න ඕන');
+      return;
+    }
+    
     setLoading(true);
     setError('');
     try {
@@ -693,7 +817,9 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
         order_type: orderType,
         payment_method: paymentMethod,
         delivery_charge: Number(deliveryCharge) || 0,
-        commission_override: Number(commission) || 0
+        discount: Number(discount) || 0,
+        commission_override: Number(commission) || 0,
+        updated_items: items
       });
       onComplete();
     } catch (e) {
@@ -702,10 +828,14 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     setLoading(false);
   }
   
+  // ---- Live calculations ----
+  const itemsTotal = items.reduce((s, it) => s + (it.unit_price * it.quantity), 0);
+  const totalCost = items.reduce((s, it) => s + (it.unit_cost * it.quantity), 0);
   const deliveryNum = Number(deliveryCharge) || 0;
+  const discountNum = Number(discount) || 0;
   const commissionNum = Number(commission) || 0;
-  const totalCostEst = items.reduce((s, it) => s + (Number(it.total_cost) || 0), 0);
-  const profitEst = Number(order.total_amount) - totalCostEst - commissionNum + deliveryNum;
+  const netTotal = itemsTotal + deliveryNum - discountNum;
+  const netProfit = netTotal - totalCost - commissionNum;
   
   return (
     <div className="ao-modal-overlay" onClick={onClose}>
@@ -716,6 +846,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
         </div>
         
         <div className="ao-modal-body">
+          {/* Customer */}
           <div className="ao-modal-section">
             <div className="ao-modal-customer">
               <p><strong>{order.customer_name}</strong></p>
@@ -723,6 +854,65 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             </div>
           </div>
           
+          {/* ---- ITEMS SECTION ---- */}
+          <div className="ao-modal-section">
+            <label className="ao-modal-label">Order Items</label>
+            <div className="ao-items-edit-list">
+              {items.length === 0 ? (
+                <p className="ao-items-empty">No items — add at least one</p>
+              ) : (
+                items.map((it, idx) => (
+                  <div key={idx} className="ao-item-edit-row">
+                    <div className="ao-item-edit-name">
+                      <div className="ao-item-edit-title">{it.product_name}</div>
+                      <div className="ao-item-edit-price">Rs. {it.unit_price} each</div>
+                    </div>
+                    <div className="ao-item-edit-qty">
+                      <button onClick={() => updateItemQty(idx, it.quantity - 1)}>−</button>
+                      <span>{it.quantity}</span>
+                      <button onClick={() => updateItemQty(idx, it.quantity + 1)}>+</button>
+                    </div>
+                    <div className="ao-item-edit-total">Rs. {(it.unit_price * it.quantity).toLocaleString()}</div>
+                    <button className="ao-item-edit-remove" onClick={() => removeItem(idx)}>✕</button>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            {/* Add Item */}
+            {!showAddItem ? (
+              <button 
+                className="ao-add-item-btn" 
+                onClick={() => setShowAddItem(true)}
+                disabled={products.length === 0}
+              >
+                ➕ Add Item
+              </button>
+            ) : (
+              <div className="ao-add-item-form">
+                <select 
+                  value={newItem.product_name} 
+                  onChange={(e) => setNewItem({...newItem, product_name: e.target.value})}
+                >
+                  <option value="">Select product...</option>
+                  {products.map(p => (
+                    <option key={p.id} value={p.name}>{p.name}</option>
+                  ))}
+                </select>
+                <input 
+                  type="number" 
+                  min="1" 
+                  value={newItem.quantity}
+                  onChange={(e) => setNewItem({...newItem, quantity: e.target.value})}
+                  placeholder="Qty"
+                />
+                <button className="ao-btn ao-btn-primary" onClick={addNewItem}>Add</button>
+                <button className="ao-btn ao-btn-secondary" onClick={() => { setShowAddItem(false); setNewItem({ product_name: '', quantity: 1 }); }}>Cancel</button>
+              </div>
+            )}
+          </div>
+          
+          {/* Order Type */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Order Type</label>
             <select className="ao-modal-input" value={orderType} onChange={(e) => setOrderType(e.target.value)}>
@@ -730,6 +920,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             </select>
           </div>
           
+          {/* Payment Method */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Payment Method</label>
             <select className="ao-modal-input" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
@@ -737,24 +928,41 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
             </select>
           </div>
           
+          {/* Delivery Charge */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Delivery Charge (Rs.)</label>
             <input type="number" className="ao-modal-input" value={deliveryCharge} 
               onChange={(e) => setDeliveryCharge(e.target.value)} />
           </div>
           
+          {/* ✅ Discount — Delivery Charge එකට පහළින් */}
+          <div className="ao-modal-section">
+            <label className="ao-modal-label" style={{color: '#d97706'}}>🎁 Discount (Rs.) — Customer ට අඩුවෙන් දුන්නා නම්</label>
+            <input type="number" className="ao-modal-input" value={discount} 
+              onChange={(e) => setDiscount(e.target.value)} 
+              placeholder="0" />
+          </div>
+          
+          {/* Commission */}
           <div className="ao-modal-section">
             <label className="ao-modal-label">Commission (Auto-calculated)</label>
             <input type="number" className="ao-modal-input" value={commission} 
               onChange={(e) => setCommission(e.target.value)} />
           </div>
           
+          {/* ---- SUMMARY ---- */}
           <div className="ao-modal-section ao-modal-summary">
-            <div className="ao-modal-row"><span>Total Amount:</span><span>{fmtRs(order.total_amount)}</span></div>
-            <div className="ao-modal-row"><span>Total Cost:</span><span>- {fmtRs(totalCostEst)}</span></div>
-            <div className="ao-modal-row"><span>Commission:</span><span>- {fmtRs(commissionNum)}</span></div>
+            <div className="ao-modal-row"><span>Items Total:</span><span>{fmtRs(itemsTotal)}</span></div>
             <div className="ao-modal-row"><span>Delivery:</span><span>+ {fmtRs(deliveryNum)}</span></div>
-            <div className="ao-modal-row ao-modal-profit"><span>Net Profit:</span><span>{fmtRs(profitEst)}</span></div>
+            {discountNum > 0 && (
+              <div className="ao-modal-row" style={{color: '#d97706'}}><span>Discount:</span><span>− {fmtRs(discountNum)}</span></div>
+            )}
+            <div className="ao-modal-row" style={{fontWeight: 600, borderTop: '1px solid #eee', paddingTop: '8px'}}>
+              <span>Net Total:</span><span>{fmtRs(netTotal)}</span>
+            </div>
+            <div className="ao-modal-row"><span>Total Cost:</span><span>− {fmtRs(totalCost)}</span></div>
+            <div className="ao-modal-row"><span>Commission:</span><span>− {fmtRs(commissionNum)}</span></div>
+            <div className="ao-modal-row ao-modal-profit"><span>Net Profit:</span><span>{fmtRs(netProfit)}</span></div>
           </div>
           
           {error && <div className="ao-modal-error">❌ {error}</div>}
@@ -772,7 +980,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
 }
 
 // ============================================================
-// UI — SETTINGS TAB (with Auto-Refresh + Manual Refresh)
+// UI — SETTINGS TAB
 // ============================================================
 
 function SettingsTab({ showMsg }) {
@@ -1110,6 +1318,7 @@ function PnLReportTab({ showMsg }) {
   const totalIncome = filteredOrders.reduce((s, o) => s + (Number(o.total_amount) || 0), 0);
   const totalCost = filteredOrders.reduce((s, o) => s + (Number(o.total_cost) || 0), 0);
   const totalCommission = filteredOrders.reduce((s, o) => s + (Number(o.commission) || 0), 0);
+  const totalDiscount = filteredOrders.reduce((s, o) => s + (Number(o.discount) || 0), 0);
   const totalExpenses = filteredExpenses.reduce((s, e) => s + (Number(e.total_cost) || 0), 0);
   const netProfit = totalIncome - totalCost - totalCommission - totalExpenses;
   const margin = totalIncome > 0 ? (netProfit / totalIncome * 100) : 0;
@@ -1177,7 +1386,7 @@ function PnLReportTab({ showMsg }) {
       
       <div className="ao-pnl-summary">
         <div className="ao-pnl-card ao-pnl-income">
-          <div className="ao-pnl-label">Total Income</div>
+          <div className="ao-pnl-label">Net Income</div>
           <div className="ao-pnl-value">{fmtRs(totalIncome)}</div>
         </div>
         <div className="ao-pnl-card ao-pnl-cost">
@@ -1188,6 +1397,12 @@ function PnLReportTab({ showMsg }) {
           <div className="ao-pnl-label">Commission</div>
           <div className="ao-pnl-value">{fmtRs(totalCommission)}</div>
         </div>
+        {totalDiscount > 0 && (
+          <div className="ao-pnl-card">
+            <div className="ao-pnl-label">Discounts Given</div>
+            <div className="ao-pnl-value" style={{color: '#d97706'}}>{fmtRs(totalDiscount)}</div>
+          </div>
+        )}
         <div className="ao-pnl-card ao-pnl-exp">
           <div className="ao-pnl-label">Expenses</div>
           <div className="ao-pnl-value">{fmtRs(totalExpenses)}</div>
@@ -1240,7 +1455,6 @@ function OrdersButton() {
   const [authChecked, setAuthChecked] = aoUseState(false);
   const [isAuthenticated, setIsAuthenticated] = aoUseState(false);
   
-  // Check Firebase admin (button visibility)
   aoUseEffect(() => {
     const check = () => {
       let admin = false;
@@ -1268,7 +1482,6 @@ function OrdersButton() {
     return () => clearInterval(interval);
   }, []);
   
-  // Check Supabase auth (data access)
   aoUseEffect(() => {
     async function checkAuth() {
       const session = await getSupabaseSession();
@@ -1283,7 +1496,7 @@ function OrdersButton() {
     
     const interval = setInterval(checkAuth, 5000);
     return () => clearInterval(interval);
-  }, [open]); // Re-check when panel opens
+  }, [open]);
   
   if (!isAdmin) return null;
   
@@ -1301,7 +1514,6 @@ function OrdersButton() {
           onClose={() => setOpen(false)} 
           isAuthenticated={isAuthenticated}
           onNeedAuth={async () => {
-            // After login, re-check
             const session = await getSupabaseSession();
             if (session && session.user && session.user.email === ADMIN_EMAIL_ORDERS) {
               setIsAuthenticated(true);
@@ -1372,4 +1584,4 @@ if (document.readyState === 'loading') {
   injectOrdersButton();
 }
 
-console.log('✅ AROMA LAB Admin Orders System loaded');
+console.log('✅ AROMA LAB Admin Orders System v2 loaded');
