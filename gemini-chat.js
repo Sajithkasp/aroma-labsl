@@ -1,7 +1,7 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot (FIXED)
+ * AROMA LAB — AI Chat Bot (FINAL FIXED VERSION)
  * File: gemini-chat.js
- * Pure JavaScript — React නැහැ, Babel නැහැ
+ * Pure JavaScript — No React, No Babel
  *************************************************************/
 
 // ============================================================
@@ -21,35 +21,64 @@ var GC_STATE = {
 };
 
 // ============================================================
-// LOAD DATA FROM SUPABASE
+// SAFE SUPABASE CLIENT GETTER
+// ============================================================
+
+function gcGetSupabaseClient() {
+  if (window.supabaseClient) return window.supabaseClient;
+  if (window.supabase && typeof window.supabase.from === 'function') return window.supabase;
+  if (typeof window.supabase !== 'undefined' && window.supabase.from) return window.supabase;
+  return null;
+}
+
+// ============================================================
+// LOAD DATA FROM SUPABASE (SAFE)
 // ============================================================
 
 async function gcLoadProducts() {
   try {
-    var res = await window.supabaseClient
+    var sb = gcGetSupabaseClient();
+    if (!sb) {
+      console.warn('⚠️ Supabase client not found — skipping products');
+      return [];
+    }
+    var res = await sb
       .from('products')
       .select('*')
       .order('created_at', { ascending: true });
-    if (res.error) return [];
+    if (res.error) {
+      console.warn('Products load error:', res.error);
+      return [];
+    }
     return res.data || [];
   } catch (e) {
+    console.warn('Products fetch failed:', e);
     return [];
   }
 }
 
 async function gcLoadBotSettings() {
+  var defaultSettings = {
+    system_prompt: '',
+    welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸"
+  };
   try {
-    var res = await window.supabaseClient
+    var sb = gcGetSupabaseClient();
+    if (!sb) {
+      console.warn('⚠️ Supabase client not found — using defaults');
+      return defaultSettings;
+    }
+    var res = await sb
       .from('bot_settings')
       .select('*')
       .eq('id', 1)
       .single();
     if (res.error) {
-      return { system_prompt: '', welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸" };
+      return defaultSettings;
     }
-    return res.data || { system_prompt: '', welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸" };
+    return res.data || defaultSettings;
   } catch (e) {
-    return { system_prompt: '', welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸" };
+    return defaultSettings;
   }
 }
 
@@ -128,8 +157,13 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
 // ============================================================
 
 async function gcCallEdge(systemPrompt, chatHistory) {
-  // 👇 History එකේ අන්තිම messages 10 විතරක් යවන්න (token limit නිසා)
+  // Keep only last 10 messages to avoid token limits
   var recentHistory = chatHistory.slice(-10);
+
+  console.log('📤 Sending to edge:', {
+    url: GC_EDGE_URL,
+    historyLength: recentHistory.length
+  });
 
   var response = await fetch(GC_EDGE_URL, {
     method: 'POST',
@@ -143,13 +177,17 @@ async function gcCallEdge(systemPrompt, chatHistory) {
     })
   });
 
+  console.log('📥 Edge response status:', response.status);
+
   if (!response.ok) {
     var errText = await response.text();
-    console.error('❌ Edge function error:', response.status, errText);
+    console.error('❌ Edge error body:', errText);
     throw new Error('API error ' + response.status + ': ' + errText.substring(0, 200));
   }
 
   var data = await response.json();
+  console.log('✅ Edge data:', data);
+
   if (!data.reply) throw new Error('No reply from AI');
   return data.reply;
 }
@@ -195,7 +233,7 @@ function gcRender() {
 
   mount.innerHTML = '';
 
-  // ---- FLOATING BUTTON ----
+  // FLOATING BUTTON
   var btn = document.createElement('button');
   btn.className = 'gc-float-btn' + (GC_STATE.isOpen ? ' gc-open' : '');
   btn.title = 'Ask AI';
@@ -211,7 +249,7 @@ function gcRender() {
 
   if (!GC_STATE.isOpen) return;
 
-  // ---- CHAT WINDOW ----
+  // CHAT WINDOW
   var win = document.createElement('div');
   win.className = 'gc-window';
 
@@ -379,7 +417,7 @@ function gcRender() {
 }
 
 // ============================================================
-// SEND MESSAGE (FIXED with better error logging)
+// SEND MESSAGE
 // ============================================================
 
 async function gcSendMessage(text) {
@@ -400,11 +438,13 @@ async function gcSendMessage(text) {
   } catch (err) {
     console.error('❌ Chat error:', err);
     console.error('❌ Error message:', err.message);
+
     var errMsg = GC_STATE.language === 'sinhala'
       ? "❌ කණගාටුයි, දැන් ප්‍රතිචාර දක්වන්න බැහැ. කරුණාකර WhatsApp 0777 804 705 අමතන්න."
       : GC_STATE.language === 'tamil'
       ? "❌ மன்னிக்கவும், இப்போது பதிலளிக்க முடியவில்லை. WhatsApp 0777 804 705."
       : "❌ Sorry, I couldn't respond right now. Please WhatsApp 0777 804 705.";
+
     GC_STATE.messages.push({ role: 'model', text: errMsg, isError: true });
   }
 
@@ -441,4 +481,4 @@ if (document.readyState === 'loading') {
   });
 } else {
   setTimeout(gcInit, 1500);
-}
+        }
