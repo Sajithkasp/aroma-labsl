@@ -29,8 +29,11 @@
   <!-- Style -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- ✅ අලුතෙන් එකතු කරපු එක — Admin Orders Styles -->
+  <!-- Admin Orders Styles -->
   <link rel="stylesheet" href="admin-orders.css">
+
+  <!-- ✅ අලුතෙන් — AI Chat Bot Styles -->
+  <link rel="stylesheet" href="gemini-chat.css">
 
   <!-- React & Babel CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -104,10 +107,13 @@
     window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
-  <!-- React App -->
+  <!-- React App (Site + Admin Panel) -->
   <script type="text/babel" src="script.js"></script>
 
-  <!-- ✅ අලුතෙන් එකතු කරපු එක — Admin Orders System -->
+  <!-- Admin Orders System (Orders + PnL) -->
   <script type="text/babel" src="admin-orders.js"></script>
+
+  <!-- ✅ අලුතෙන් — AI Chat Bot -->
+  <script type="text/babel" src="gemini-chat.js"></script>
 </body>
 </html>
