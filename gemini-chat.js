@@ -218,7 +218,7 @@ function gcRender() {
   var btn = document.createElement('button');
   btn.className = 'gc-float-btn' + (GC_STATE.isOpen ? ' gc-open' : '');
   btn.title = 'Ask AI';
-  btn.innerHTML = GC_STATE.isOpen ? '×' : '✨ Ask AI';
+  btn.innerHTML = GC_STATE.isOpen ? '×' : '👩‍🦰 Ask Aroma';
   btn.onclick = function() {
     GC_STATE.isOpen = !GC_STATE.isOpen;
     if (GC_STATE.isOpen && GC_STATE.messages.length === 0 && GC_STATE.botSettings) {
