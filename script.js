@@ -6,14 +6,6 @@ const WHATSAPP_LINK = "https://wa.me/94777804705";
 const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
 const ADMIN_EMAIL = "sajith.kasp@gmail.com";
 
-const defaultProducts = [
-  { id: "goodgirl", name: "Good Girl", for: "FOR LADIES", filter: "Ladies", tagline: "Sweet, Floral & Sensual", top: "Almond, Coffee", heart: "Jasmine, Tuberose", base: "Cocoa, Vanilla, Tonka Bean", image: "https://sajithkasp.github.io/aroma-labsl/goodgirl.jpg", accent: "#E8A8C0" },
-  { id: "black", name: "Black Temptation", for: "FOR LADIES", filter: "Ladies", tagline: "Dark, Mysterious & Seductive", top: "Blackcurrant, Pear", heart: "Jasmine, Orange Blossom", base: "Vanilla, Praline, Musk", image: "https://sajithkasp.github.io/aroma-labsl/black.jpg", accent: "#2A2A2A" },
-  { id: "hunter", name: "Hunters Dusk", for: "FOR MEN", filter: "Men", tagline: "Woody, Smoky & Adventurous", top: "Bergamot, Pine", heart: "Cedarwood, Leather", base: "Amber, Musk, Vetiver", image: "https://sajithkasp.github.io/aroma-labsl/hunter.jpg", accent: "#4A5A3A" },
-  { id: "gold", name: "Million Gold", for: "FOR MEN", filter: "Men", tagline: "Rich, Luxurious & Powerful", top: "Blood Mandarin, Grapefruit", heart: "Cinnamon, Rose", base: "Amber, Leather, Patchouli", image: "https://sajithkasp.github.io/aroma-labsl/gold.jpg", accent: "#B8963E" },
-  { id: "vanilla", name: "Vanilla", for: "FOR UNISEX", filter: "Unisex", tagline: "Warm, Sweet & Cozy", top: "Vanilla Orchid, Mandarin", heart: "Vanilla, Jasmine", base: "Sandalwood, Musk", image: "https://sajithkasp.github.io/aroma-labsl/vanilla.jpg", accent: "#D4B896" }
-];
-
 const DEFAULT_HERO = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
 const DEFAULT_LIFESTYLE_1 = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
 const DEFAULT_LIFESTYLE_2 = "https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg";
@@ -23,7 +15,18 @@ const defaultLifestyleDetails = [
   { eyebrow: "MUSE — HUNTERS DUSK", title: "Woody, smoky,", titleAccent: "& adventurous.", description: "Bergamot and pine open with a fresh, woody bite, cedarwood and leather deepen the heart, and amber, musk, and vetiver leave a bold, masculine trail. Perfect for the modern man.", image: DEFAULT_LIFESTYLE_2 }
 ];
 
-// === SVG ICONS ===
+const defaultProducts = [
+  { id: "goodgirl", name: "Good Girl", for: "FOR LADIES", filter: "Ladies", product_type: "Perfume", price: 1500, selling_price: 1500, tagline: "Sweet, Floral & Sensual", top: "Almond, Coffee", heart: "Jasmine, Tuberose", base: "Cocoa, Vanilla, Tonka Bean", image: "https://sajithkasp.github.io/aroma-labsl/goodgirl.jpg", accent: "#E8A8C0" },
+  { id: "black", name: "Black Temptation", for: "FOR LADIES", filter: "Ladies", product_type: "Perfume", price: 1500, selling_price: 1500, tagline: "Dark, Mysterious & Seductive", top: "Blackcurrant, Pear", heart: "Jasmine, Orange Blossom", base: "Vanilla, Praline, Musk", image: "https://sajithkasp.github.io/aroma-labsl/black.jpg", accent: "#2A2A2A" },
+  { id: "hunter", name: "Hunters Dusk", for: "FOR MEN", filter: "Men", product_type: "Perfume", price: 1500, selling_price: 1500, tagline: "Woody, Smoky & Adventurous", top: "Bergamot, Pine", heart: "Cedarwood, Leather", base: "Amber, Musk, Vetiver", image: "https://sajithkasp.github.io/aroma-labsl/hunter.jpg", accent: "#4A5A3A" },
+  { id: "gold", name: "Million Gold", for: "FOR MEN", filter: "Men", product_type: "Perfume", price: 1500, selling_price: 1500, tagline: "Rich, Luxurious & Powerful", top: "Blood Mandarin, Grapefruit", heart: "Cinnamon, Rose", base: "Amber, Leather, Patchouli", image: "https://sajithkasp.github.io/aroma-labsl/gold.jpg", accent: "#B8963E" },
+  { id: "vanilla", name: "Vanilla", for: "FOR UNISEX", filter: "Unisex", product_type: "Perfume", price: 1500, selling_price: 1500, tagline: "Warm, Sweet & Cozy", top: "Vanilla Orchid, Mandarin", heart: "Vanilla, Jasmine", base: "Sandalwood, Musk", image: "https://sajithkasp.github.io/aroma-labsl/vanilla.jpg", accent: "#D4B896" }
+];
+
+// ============================================================
+// SVG ICONS
+// ============================================================
+
 const SearchIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
 );
@@ -61,7 +64,235 @@ const MapPinIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
 );
 
-// === SUPABASE DIRECT SAVE ===
+// ============================================================
+// HELPERS
+// ============================================================
+
+function fmtRs(num) {
+  const n = Number(num) || 0;
+  return 'Rs. ' + n.toLocaleString('en-LK', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function todayStr() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return yyyy + '-' + mm + '-' + dd;
+}
+
+// ============================================================
+// DATABASE — CATEGORIES (Dynamic)
+// ============================================================
+
+async function dbGetCategories() {
+  const { data, error } = await window.supabaseClient
+    .from('categories')
+    .select('*')
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function dbAddCategory(name) {
+  const { data, error } = await window.supabaseClient
+    .from('categories')
+    .insert([{ name: name.trim(), display_order: 999 }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbDeleteCategory(id) {
+  const { error } = await window.supabaseClient.from('categories').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// ============================================================
+// DATABASE — PRODUCT TYPES (Dynamic)
+// ============================================================
+
+async function dbGetProductTypes() {
+  const { data, error } = await window.supabaseClient
+    .from('product_types')
+    .select('*')
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function dbAddProductType(name) {
+  const { data, error } = await window.supabaseClient
+    .from('product_types')
+    .insert([{ name: name.trim(), display_order: 999 }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbDeleteProductType(id) {
+  const { error } = await window.supabaseClient.from('product_types').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// ============================================================
+// DATABASE — COST TYPES (Dynamic)
+// ============================================================
+
+async function dbGetCostTypes() {
+  const { data, error } = await window.supabaseClient
+    .from('cost_types')
+    .select('*')
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function dbAddCostType(name) {
+  const { data, error } = await window.supabaseClient
+    .from('cost_types')
+    .insert([{ name: name.trim(), display_order: 999 }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbDeleteCostType(id) {
+  const { error } = await window.supabaseClient.from('cost_types').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// ============================================================
+// DATABASE — PAYMENT METHODS (Dynamic)
+// ============================================================
+
+async function dbGetPaymentMethods() {
+  const { data, error } = await window.supabaseClient
+    .from('payment_methods')
+    .select('*')
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function dbAddPaymentMethod(name) {
+  const { data, error } = await window.supabaseClient
+    .from('payment_methods')
+    .insert([{ name: name.trim(), display_order: 999 }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbDeletePaymentMethod(id) {
+  const { error } = await window.supabaseClient.from('payment_methods').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// ============================================================
+// DATABASE — DELIVERY SETTINGS
+// ============================================================
+
+async function dbGetDeliverySettings() {
+  const { data, error } = await window.supabaseClient
+    .from('delivery_settings')
+    .select('*')
+    .eq('id', 1)
+    .single();
+  if (error) {
+    return { base_charge: 350, free_delivery_threshold: 3 };
+  }
+  return data || { base_charge: 350, free_delivery_threshold: 3 };
+}
+
+async function dbUpdateDeliverySettings(baseCharge, threshold) {
+  const { data, error } = await window.supabaseClient
+    .from('delivery_settings')
+    .update({
+      base_charge: Number(baseCharge),
+      free_delivery_threshold: Number(threshold),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', 1)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================
+// DATABASE — PRODUCTS (Dynamic)
+// ============================================================
+
+async function dbGetProducts() {
+  const { data, error } = await window.supabaseClient
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function dbAddProduct(productData) {
+  const { data, error } = await window.supabaseClient
+    .from('products')
+    .insert([productData])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbUpdateProduct(id, updates) {
+  const { data, error } = await window.supabaseClient
+    .from('products')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function dbDeleteProduct(id) {
+  const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// ============================================================
+// SUPABASE AUTH (Admin Panel)
+// ============================================================
+
+async function getSupabaseSession() {
+  try {
+    const { data } = await window.supabaseClient.auth.getSession();
+    return data.session;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function signInAdmin(password) {
+  const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+    email: 'sajith.kasp@gmail.com',
+    password: password
+  });
+  if (error) throw error;
+  return data;
+  }
+// ============================================================
+// ORDER SAVE (Direct Supabase)
+// ============================================================
+
 async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
   try {
     const sb = window.supabaseClient;
@@ -84,7 +315,7 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
 
     const itemsToInsert = cartItems.map(item => {
       const qty = Number(item.quantity) || 1;
-      const unitPrice = 1500;
+      const unitPrice = Number(item.price) || Number(item.selling_price) || 1500;
       const product = productMap[String(item.name || '').trim().toLowerCase()];
       const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
       const totalIncome = unitPrice * qty;
@@ -139,7 +370,10 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
   }
 }
 
-// === CART MODAL ===
+// ============================================================
+// CART MODAL
+// ============================================================
+
 function CartModal({ 
   isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
   getSubtotal, getDeliveryCharge, getTotal, getCartCount,
@@ -169,14 +403,14 @@ function CartModal({
                 <img src={item.image} alt={item.name} className="cart-item-img" />
                 <div className="cart-item-info">
                   <div className="cart-item-name">{item.name}</div>
-                  <div className="cart-item-price">Rs. 1,500 each</div>
+                  <div className="cart-item-price">{fmtRs(item.price || item.selling_price || 1500)} each</div>
                 </div>
                 <div className="cart-qty-controls">
                   <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
                   <span className="cart-qty-num">{item.quantity}</span>
                   <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
                 </div>
-                <div className="cart-item-total">Rs. {(1500 * item.quantity).toLocaleString()}</div>
+                <div className="cart-item-total">{fmtRs((item.price || item.selling_price || 1500) * item.quantity)}</div>
                 <button className="cart-item-remove" onClick={() => removeFromCart(item.id)}>✕</button>
               </div>
             ))}
@@ -184,12 +418,12 @@ function CartModal({
         )}
 
         <div className="cart-totals">
-          <div className="cart-total-row"><span>Subtotal</span><span>Rs. {getSubtotal().toLocaleString()}</span></div>
-          <div className="cart-total-row"><span>Delivery</span><span>{getDeliveryCharge() === 0 ? 'FREE 🎉' : `Rs. ${getDeliveryCharge()}`}</span></div>
+          <div className="cart-total-row"><span>Subtotal</span><span>{fmtRs(getSubtotal())}</span></div>
+          <div className="cart-total-row"><span>Delivery</span><span>{getDeliveryCharge() === 0 ? 'FREE 🎉' : fmtRs(getDeliveryCharge())}</span></div>
           {getDeliveryCharge() > 0 && (
             <p className="cart-delivery-hint">Add {3 - getCartCount()} more item(s) for FREE delivery!</p>
           )}
-          <div className="cart-total-row cart-total-final"><span>Total</span><span>Rs. {getTotal().toLocaleString()}</span></div>
+          <div className="cart-total-row cart-total-final"><span>Total</span><span>{fmtRs(getTotal())}</span></div>
         </div>
 
         {isLoggedIn ? (
@@ -232,7 +466,10 @@ function CartModal({
   );
 }
 
-// === REVIEW SECTION ===
+// ============================================================
+// REVIEW SECTION
+// ============================================================
+
 function ReviewSection({ 
   isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, 
   reviewRating, setReviewRating, reviewComment, setReviewComment,
@@ -295,7 +532,10 @@ function ReviewSection({
   );
 }
 
-// === ADMIN AUTH ===
+// ============================================================
+// ADMIN AUTH
+// ============================================================
+
 function AdminAuth({ onSuccess, onClose }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -306,11 +546,7 @@ function AdminAuth({ onSuccess, onClose }) {
     setLoading(true);
     setError('');
     try {
-      const { data, error: authError } = await window.supabaseClient.auth.signInWithPassword({
-        email: 'sajith.kasp@gmail.com',
-        password: password
-      });
-      if (authError) throw authError;
+      await signInAdmin(password);
       onSuccess();
     } catch (err) {
       setError('❌ Wrong Password. Try again.');
@@ -342,26 +578,66 @@ function AdminAuth({ onSuccess, onClose }) {
       </div>
     </div>
   );
-}
+    }
+// ============================================================
+// ADMIN PANEL MODAL — FULL (Tabs 10ක්)
+// ============================================================
 
-// === ADMIN PANEL MODAL ===
 function AdminPanelModal({ 
   isAdminOpen, setIsAdminOpen, products, setProducts, 
   heroImages, setHeroImages, lifestyleImages, setLifestyleImages, 
   lifestyleDetails, setLifestyleDetails, pages, setPages,
+  categories, setCategories, productTypes, setProductTypes,
+  costTypes, setCostTypes, paymentMethods, setPaymentMethods,
+  deliverySettings, setDeliverySettings,
   onCloseAndSignOut
 }) {
   const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [newProduct, setNewProduct] = useState({ name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: '' });
+
+  // Product form
+  const [newProduct, setNewProduct] = useState({
+    name: '', category: '', product_type: 'Perfume', tagline: '',
+    top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0
+  });
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [showProductForm, setShowProductForm] = useState(false);
+
+  // Category
+  const [newCategory, setNewCategory] = useState('');
+  
+  // Product Type
+  const [newProductType, setNewProductType] = useState('');
+  
+  // Cost Type
+  const [newCostType, setNewCostType] = useState('');
+  
+  // Payment Method
+  const [newPaymentMethod, setNewPaymentMethod] = useState('');
+
+  // Hero
   const [newHeroUploading, setNewHeroUploading] = useState(false);
+
+  // Lifestyle
   const [newLifestyleUploading, setNewLifestyleUploading] = useState(false);
+
+  // Pages
   const [newPage, setNewPage] = useState({ title: '', content: '' });
   const [editingPageId, setEditingPageId] = useState(null);
 
+  // Chat Bot
+  const [botSystemPrompt, setBotSystemPrompt] = useState('');
+  const [botWelcomeMessage, setBotWelcomeMessage] = useState('');
+
   if (!isAdminOpen) return null;
 
+  function showMsg(text) {
+    setMessage(text);
+    setTimeout(() => setMessage(''), 3000);
+  }
+
+  // ---- Image Upload ----
   const handleImageUpload = async (file, callback) => {
     if (!file) return;
     setUploading(true);
@@ -371,14 +647,14 @@ function AdminPanelModal({
       if (error) throw error;
       const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
       callback(urlData.publicUrl);
-      setMessage('✅ Image uploaded!');
-      setTimeout(() => setMessage(''), 3000);
+      showMsg('✅ Image uploaded!');
     } catch (err) {
-      setMessage('❌ Upload error: ' + err.message);
+      showMsg('❌ Upload error: ' + err.message);
     }
     setUploading(false);
   };
 
+  // ---- Site Settings ----
   const saveSiteSettings = async (newHeroImages, newLifestyleImages, newLifestyleDetails) => {
     try {
       const { error } = await window.supabaseClient.from('site_settings').update({
@@ -388,14 +664,224 @@ function AdminPanelModal({
         updated_at: new Date().toISOString()
       }).eq('id', 1);
       if (error) throw error;
-      setMessage('✅ Saved successfully!');
-      setTimeout(() => setMessage(''), 3000);
+      showMsg('✅ Saved successfully!');
     } catch (err) {
-      setMessage('❌ Error: ' + err.message);
+      showMsg('❌ Error: ' + err.message);
     }
   };
 
-  const handleAddHeroImage = async (file) => {
+  // ---- PRODUCTS ----
+  async function handleAddOrUpdateProduct() {
+    if (!newProduct.name || !newProduct.image) {
+      showMsg('❌ Name and image required');
+      return;
+    }
+
+    try {
+      const productData = {
+        name: newProduct.name,
+        category: newProduct.category || (categories[0]?.name || 'Ladies'),
+        product_type: newProduct.product_type || 'Perfume',
+        description: newProduct.tagline,
+        top_notes: newProduct.top,
+        heart_notes: newProduct.heart,
+        base_notes: newProduct.base,
+        image_url: newProduct.image,
+        price: String(newProduct.selling_price || newProduct.price || 1500),
+        selling_price: Number(newProduct.selling_price || newProduct.price || 1500),
+        stock: Number(newProduct.stock) || 0
+      };
+
+      if (editingProduct) {
+        await dbUpdateProduct(editingProduct.id, productData);
+        showMsg('✅ Product updated!');
+      } else {
+        await dbAddProduct(productData);
+        showMsg('✅ Product added!');
+      }
+
+      const fresh = await dbGetProducts();
+      setProducts(fresh.map(mapProduct));
+
+      setNewProduct({
+        name: '', category: '', product_type: 'Perfume', tagline: '',
+        top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0
+      });
+      setEditingProduct(null);
+      setShowProductForm(false);
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  function editProduct(p) {
+    setNewProduct({
+      name: p.name,
+      category: p.category || '',
+      product_type: p.product_type || 'Perfume',
+      tagline: p.description || '',
+      top: p.top_notes || '',
+      heart: p.heart_notes || '',
+      base: p.base_notes || '',
+      image: p.image_url || '',
+      price: p.selling_price || 1500,
+      selling_price: p.selling_price || 1500,
+      stock: p.stock || 0
+    });
+    setEditingProduct(p);
+    setShowProductForm(true);
+  }
+
+  async function handleDeleteProduct(id) {
+    if (!window.confirm('Delete this product?')) return;
+    try {
+      await dbDeleteProduct(id);
+      const fresh = await dbGetProducts();
+      setProducts(fresh.map(mapProduct));
+      showMsg('✅ Product deleted');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  function mapProduct(p) {
+    return {
+      id: p.id,
+      name: p.name,
+      for: p.category ? 'FOR ' + p.category.toUpperCase() : '',
+      filter: p.category,
+      category: p.category,
+      product_type: p.product_type || 'Perfume',
+      tagline: p.description || '',
+      top: p.top_notes || '',
+      heart: p.heart_notes || '',
+      base: p.base_notes || '',
+      image: p.image_url || '',
+      price: Number(p.selling_price) || Number(p.price) || 1500,
+      selling_price: Number(p.selling_price) || Number(p.price) || 1500,
+      stock: p.stock || 0,
+      accent: '#B8963E'
+    };
+  }
+
+  // ---- CATEGORIES ----
+  async function handleAddCategory() {
+    if (!newCategory.trim()) return;
+    try {
+      await dbAddCategory(newCategory);
+      const fresh = await dbGetCategories();
+      setCategories(fresh);
+      setNewCategory('');
+      showMsg('✅ Category added');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  async function handleDeleteCategory(id) {
+    if (!window.confirm('Delete this category?')) return;
+    try {
+      await dbDeleteCategory(id);
+      const fresh = await dbGetCategories();
+      setCategories(fresh);
+      showMsg('✅ Category deleted');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  // ---- PRODUCT TYPES ----
+  async function handleAddProductType() {
+    if (!newProductType.trim()) return;
+    try {
+      await dbAddProductType(newProductType);
+      const fresh = await dbGetProductTypes();
+      setProductTypes(fresh);
+      setNewProductType('');
+      showMsg('✅ Product Type added');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  async function handleDeleteProductType(id) {
+    if (!window.confirm('Delete this product type?')) return;
+    try {
+      await dbDeleteProductType(id);
+      const fresh = await dbGetProductTypes();
+      setProductTypes(fresh);
+      showMsg('✅ Product Type deleted');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  // ---- COST TYPES ----
+  async function handleAddCostType() {
+    if (!newCostType.trim()) return;
+    try {
+      await dbAddCostType(newCostType);
+      const fresh = await dbGetCostTypes();
+      setCostTypes(fresh);
+      setNewCostType('');
+      showMsg('✅ Cost Type added');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  async function handleDeleteCostType(id) {
+    if (!window.confirm('Delete this cost type?')) return;
+    try {
+      await dbDeleteCostType(id);
+      const fresh = await dbGetCostTypes();
+      setCostTypes(fresh);
+      showMsg('✅ Cost Type deleted');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  // ---- PAYMENT METHODS ----
+  async function handleAddPaymentMethod() {
+    if (!newPaymentMethod.trim()) return;
+    try {
+      await dbAddPaymentMethod(newPaymentMethod);
+      const fresh = await dbGetPaymentMethods();
+      setPaymentMethods(fresh);
+      setNewPaymentMethod('');
+      showMsg('✅ Payment Method added');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  async function handleDeletePaymentMethod(id) {
+    if (!window.confirm('Delete this payment method?')) return;
+    try {
+      await dbDeletePaymentMethod(id);
+      const fresh = await dbGetPaymentMethods();
+      setPaymentMethods(fresh);
+      showMsg('✅ Payment Method deleted');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  // ---- DELIVERY ----
+  async function handleSaveDelivery() {
+    try {
+      await dbUpdateDeliverySettings(deliverySettings.base_charge, deliverySettings.free_delivery_threshold);
+      const fresh = await dbGetDeliverySettings();
+      setDeliverySettings(fresh);
+      showMsg('✅ Delivery settings updated');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  // ---- HERO ----
+  async function handleAddHeroImage(file) {
     if (!file) return;
     setNewHeroUploading(true);
     try {
@@ -407,19 +893,20 @@ function AdminPanelModal({
       setHeroImages(updated);
       await saveSiteSettings(updated, lifestyleImages, lifestyleDetails);
     } catch (err) {
-      setMessage('❌ Error: ' + err.message);
+      showMsg('❌ Error: ' + err.message);
     }
     setNewHeroUploading(false);
-  };
+  }
 
-  const handleDeleteHeroImage = async (index) => {
+  async function handleDeleteHeroImage(index) {
     if (!window.confirm('Delete this Hero Image?')) return;
     const updated = heroImages.filter((_, i) => i !== index);
     setHeroImages(updated);
     await saveSiteSettings(updated, lifestyleImages, lifestyleDetails);
-  };
+  }
 
-  const handleAddLifestyleImage = async (file) => {
+  // ---- LIFESTYLE ----
+  async function handleAddLifestyleImage(file) {
     if (!file) return;
     setNewLifestyleUploading(true);
     try {
@@ -428,25 +915,31 @@ function AdminPanelModal({
       if (error) throw error;
       const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
       const updated = [...lifestyleImages, urlData.publicUrl];
-      const newDetail = { eyebrow: "NEW COLLECTION", title: "New Fragrance,", titleAccent: "& elegant.", description: "Discover our latest addition.", image: urlData.publicUrl };
+      const newDetail = { 
+        eyebrow: "NEW COLLECTION", 
+        title: "New Fragrance,", 
+        titleAccent: "& elegant.", 
+        description: "Discover our latest addition.", 
+        image: urlData.publicUrl 
+      };
       const updatedDetails = [...lifestyleDetails, newDetail];
       setLifestyleImages(updated);
       setLifestyleDetails(updatedDetails);
       await saveSiteSettings(heroImages, updated, updatedDetails);
     } catch (err) {
-      setMessage('❌ Error: ' + err.message);
+      showMsg('❌ Error: ' + err.message);
     }
     setNewLifestyleUploading(false);
-  };
+  }
 
-  const handleDeleteLifestyleImage = async (index) => {
+  async function handleDeleteLifestyleImage(index) {
     if (!window.confirm('Delete this Lifestyle Image?')) return;
     const updated = lifestyleImages.filter((_, i) => i !== index);
     const updatedDetails = lifestyleDetails.filter((_, i) => i !== index);
     setLifestyleImages(updated);
     setLifestyleDetails(updatedDetails);
     await saveSiteSettings(heroImages, updated, updatedDetails);
-  };
+  }
 
   const handleUpdateLifestyleDetail = (index, field, value) => {
     const updated = lifestyleDetails.map((d, i) => i === index ? { ...d, [field]: value } : d);
@@ -457,91 +950,78 @@ function AdminPanelModal({
     await saveSiteSettings(heroImages, lifestyleImages, lifestyleDetails);
   };
 
-  const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.image) {
-      setMessage('❌ Product name and image are required.');
-      return;
-    }
-    try {
-      const { error } = await window.supabaseClient.from('products').insert([{
-        name: newProduct.name, price: 'Rs. 1,500', category: newProduct.category,
-        description: newProduct.tagline, top_notes: newProduct.top, heart_notes: newProduct.heart,
-        base_notes: newProduct.base, image_url: newProduct.image
-      }]);
-      if (error) throw error;
-      const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
-      if (fresh.data) {
-        setProducts(fresh.data.map(p => ({
-          id: p.id, name: p.name,
-          for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-          filter: p.category, tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
-          image: p.image_url || '', accent: '#B8963E'
-        })));
-      }
-      setNewProduct({ name: '', category: 'Ladies', tagline: '', top: '', heart: '', base: '', image: '' });
-      setMessage('✅ Product added successfully!');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      setMessage('❌ Error: ' + err.message);
-    }
-  };
-
-  const handleDeleteProduct = async (id) => {
-    if (!window.confirm('Delete this product?')) return;
-    try {
-      const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
-      if (error) throw error;
-      const fresh = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
-      if (fresh.data) {
-        setProducts(fresh.data.map(p => ({
-          id: p.id, name: p.name,
-          for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-          filter: p.category, tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
-          image: p.image_url || '', accent: '#B8963E'
-        })));
-      }
-      setMessage('✅ Product deleted.');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      setMessage('❌ Error: ' + err.message);
-    }
-  };
-
-  const handleAddPage = async () => {
-    if (!newPage.title) { setMessage('❌ Title is required.'); return; }
+  // ---- PAGES ----
+  async function handleAddPage() {
+    if (!newPage.title) { showMsg('❌ Title is required.'); return; }
     try {
       if (editingPageId) {
-        const { error } = await window.supabaseClient.from('pages').update({ title: newPage.title, content: newPage.content }).eq('id', editingPageId);
+        const { error } = await window.supabaseClient.from('pages').update({ 
+          title: newPage.title, 
+          content: newPage.content 
+        }).eq('id', editingPageId);
         if (error) throw error;
-        setMessage('✅ Page updated!');
+        showMsg('✅ Page updated!');
       } else {
-        const { error } = await window.supabaseClient.from('pages').insert([{ title: newPage.title, content: newPage.content }]);
+        const { error } = await window.supabaseClient.from('pages').insert([{ 
+          title: newPage.title, 
+          content: newPage.content 
+        }]);
         if (error) throw error;
-        setMessage('✅ Page added!');
+        showMsg('✅ Page added!');
       }
       const fresh = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
       setPages(fresh.data || []);
       setNewPage({ title: '', content: '' });
       setEditingPageId(null);
-      setTimeout(() => setMessage(''), 3000);
     } catch (err) {
-      setMessage('❌ Error: ' + err.message);
+      showMsg('❌ Error: ' + err.message);
     }
-  };
+  }
 
-  const handleDeletePage = async (id) => {
+  async function handleDeletePage(id) {
     if (!window.confirm('Delete this page?')) return;
     try {
       const { error } = await window.supabaseClient.from('pages').delete().eq('id', id);
       if (error) throw error;
       const fresh = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
       setPages(fresh.data || []);
-      setMessage('✅ Page deleted.');
-      setTimeout(() => setMessage(''), 3000);
+      showMsg('✅ Page deleted.');
     } catch (err) {
-      setMessage('❌ Error: ' + err.message);
+      showMsg('❌ Error: ' + err.message);
     }
-  };
+  }
+
+  // ---- CHAT BOT ----
+  useEffect(() => {
+    async function loadBotSettings() {
+      try {
+        const { data, error } = await window.supabaseClient.from('bot_settings').select('*').eq('id', 1).single();
+        if (!error && data) {
+          setBotSystemPrompt(data.system_prompt || '');
+          setBotWelcomeMessage(data.welcome_message || '');
+        }
+      } catch (e) { console.error(e); }
+    }
+    if (isAdminOpen) loadBotSettings();
+  }, [isAdminOpen]);
+
+  async function handleSaveBotSettings() {
+    try {
+      const { error } = await window.supabaseClient.from('bot_settings').update({
+        system_prompt: botSystemPrompt,
+        welcome_message: botWelcomeMessage,
+        updated_at: new Date().toISOString()
+      }).eq('id', 1);
+      if (error) throw error;
+      showMsg('✅ Chat Bot settings saved');
+    } catch (err) {
+      showMsg('❌ Error: ' + err.message);
+    }
+  }
+
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   return (
     <div className="admin-overlay">
@@ -550,54 +1030,202 @@ function AdminPanelModal({
         <h2 className="admin-title">Admin Panel</h2>
 
         <div className="admin-tabs">
-          <button className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>Products</button>
-          <button className={`admin-tab ${activeTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveTab('hero')}>Hero</button>
-          <button className={`admin-tab ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>Lifestyle</button>
-          <button className={`admin-tab ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => setActiveTab('pages')}>Pages</button>
+          <button className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>📦 Products</button>
+          <button className={`admin-tab ${activeTab === 'categories' ? 'active' : ''}`} onClick={() => setActiveTab('categories')}>🏷️ Categories</button>
+          <button className={`admin-tab ${activeTab === 'types' ? 'active' : ''}`} onClick={() => setActiveTab('types')}>🎁 Types</button>
+          <button className={`admin-tab ${activeTab === 'costs' ? 'active' : ''}`} onClick={() => setActiveTab('costs')}>💰 Costs</button>
+          <button className={`admin-tab ${activeTab === 'payments' ? 'active' : ''}`} onClick={() => setActiveTab('payments')}>💳 Payments</button>
+          <button className={`admin-tab ${activeTab === 'delivery' ? 'active' : ''}`} onClick={() => setActiveTab('delivery')}>🚚 Delivery</button>
+          <button className={`admin-tab ${activeTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveTab('hero')}>🎨 Hero</button>
+          <button className={`admin-tab ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>📸 Lifestyle</button>
+          <button className={`admin-tab ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => setActiveTab('pages')}>📄 Pages</button>
+          <button className={`admin-tab ${activeTab === 'bot' ? 'active' : ''}`} onClick={() => setActiveTab('bot')}>🤖 Chat Bot</button>
         </div>
 
         {message && <div className="admin-message">{message}</div>}
 
+        {/* PRODUCTS */}
         {activeTab === 'products' && (
           <div>
-            <h3 className="admin-subtitle">Add New Product</h3>
-            <div className="admin-form-grid">
-              <input type="text" placeholder="Product Name *" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} className="admin-input" />
-              <select value={newProduct.category} onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })} className="admin-input">
-                <option value="Ladies">Ladies</option>
-                <option value="Men">Men</option>
-                <option value="Unisex">Unisex</option>
-              </select>
-              <input type="text" placeholder="Tagline" value={newProduct.tagline} onChange={(e) => setNewProduct({ ...newProduct, tagline: e.target.value })} className="admin-input" />
-              <input type="text" placeholder="Top Notes" value={newProduct.top} onChange={(e) => setNewProduct({ ...newProduct, top: e.target.value })} className="admin-input" />
-              <input type="text" placeholder="Heart Notes" value={newProduct.heart} onChange={(e) => setNewProduct({ ...newProduct, heart: e.target.value })} className="admin-input" />
-              <input type="text" placeholder="Base Notes" value={newProduct.base} onChange={(e) => setNewProduct({ ...newProduct, base: e.target.value })} className="admin-input" />
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
+              <h3 className="admin-subtitle" style={{margin: 0}}>Products ({products.length})</h3>
+              <button 
+                className="admin-btn-primary" 
+                onClick={() => { 
+                  setShowProductForm(!showProductForm); 
+                  setEditingProduct(null);
+                  setNewProduct({
+                    name: '', category: categories[0]?.name || '', product_type: 'Perfume', tagline: '',
+                    top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0
+                  });
+                }}
+              >
+                {showProductForm ? '✕ Cancel' : '+ Add Product'}
+              </button>
             </div>
-            <div className="admin-upload-section">
-              <label className="admin-upload-label">
-                {uploading ? 'Uploading...' : '📤 Upload Product Image *'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], (url) => setNewProduct({ ...newProduct, image: url }))} />
-              </label>
-              {newProduct.image && <img src={newProduct.image} alt="Preview" className="admin-preview-img" />}
-            </div>
-            <button onClick={handleAddProduct} className="admin-btn-primary">+ Add Product</button>
 
-            <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Products</h3>
+            {showProductForm && (
+              <div style={{background: '#f9f9f9', padding: '20px', borderRadius: '10px', marginBottom: '20px'}}>
+                <h4 style={{marginBottom: '15px'}}>{editingProduct ? 'Edit Product' : 'Add New Product'}</h4>
+                <div className="admin-form-grid">
+                  <input type="text" placeholder="Product Name *" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} className="admin-input" />
+                  <select value={newProduct.category} onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })} className="admin-input">
+                    <option value="">Select Category</option>
+                    {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                  </select>
+                  <select value={newProduct.product_type} onChange={(e) => setNewProduct({ ...newProduct, product_type: e.target.value })} className="admin-input">
+                    {productTypes.map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
+                  </select>
+                  <input type="number" placeholder="Price (Rs.)" value={newProduct.selling_price} onChange={(e) => setNewProduct({ ...newProduct, selling_price: e.target.value })} className="admin-input" />
+                  <input type="number" placeholder="Stock" value={newProduct.stock} onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })} className="admin-input" />
+                  <input type="text" placeholder="Tagline" value={newProduct.tagline} onChange={(e) => setNewProduct({ ...newProduct, tagline: e.target.value })} className="admin-input admin-input-full" />
+                  
+                  {newProduct.product_type === 'Perfume' && (
+                    <>
+                      <input type="text" placeholder="Top Notes" value={newProduct.top} onChange={(e) => setNewProduct({ ...newProduct, top: e.target.value })} className="admin-input" />
+                      <input type="text" placeholder="Heart Notes" value={newProduct.heart} onChange={(e) => setNewProduct({ ...newProduct, heart: e.target.value })} className="admin-input" />
+                      <input type="text" placeholder="Base Notes" value={newProduct.base} onChange={(e) => setNewProduct({ ...newProduct, base: e.target.value })} className="admin-input admin-input-full" />
+                    </>
+                  )}
+                </div>
+                
+                <div className="admin-upload-section">
+                  <label className="admin-upload-label">
+                    {uploading ? 'Uploading...' : '📤 Upload Product Image *'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e.target.files[0], (url) => setNewProduct({ ...newProduct, image: url }))} />
+                  </label>
+                  {newProduct.image && <img src={newProduct.image} alt="Preview" className="admin-preview-img" />}
+                </div>
+
+                <button onClick={handleAddOrUpdateProduct} className="admin-btn-primary">
+                  {editingProduct ? '💾 Update Product' : '+ Add Product'}
+                </button>
+              </div>
+            )}
+
             <div className="admin-product-list">
               {products.map(p => (
                 <div key={p.id} className="admin-product-row">
                   <img src={p.image} alt={p.name} className="admin-product-img" />
                   <div className="admin-product-info">
                     <div className="admin-product-name">{p.name}</div>
-                    <div className="admin-product-cat">{p.for}</div>
+                    <div className="admin-product-cat">{p.for} • {fmtRs(p.price)}</div>
                   </div>
-                  <button onClick={() => handleDeleteProduct(p.id)} className="admin-btn-delete">Delete</button>
+                  <button onClick={() => editProduct({...p, image_url: p.image})} className="admin-btn-primary" style={{padding: '8px 14px', fontSize: '12px', marginRight: '5px'}}>✏️ Edit</button>
+                  <button onClick={() => handleDeleteProduct(p.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
               ))}
             </div>
           </div>
         )}
 
+        {/* CATEGORIES */}
+        {activeTab === 'categories' && (
+          <div>
+            <h3 className="admin-subtitle">Categories ({categories.length})</h3>
+            <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
+              <input type="text" placeholder="New category name" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className="admin-input" style={{flex: 1}} />
+              <button onClick={handleAddCategory} className="admin-btn-primary">+ Add</button>
+            </div>
+            <div className="admin-product-list">
+              {categories.map(c => (
+                <div key={c.id} className="admin-product-row">
+                  <div className="admin-product-info">
+                    <div className="admin-product-name">{c.name}</div>
+                  </div>
+                  <button onClick={() => handleDeleteCategory(c.id)} className="admin-btn-delete">🗑️ Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PRODUCT TYPES */}
+        {activeTab === 'types' && (
+          <div>
+            <h3 className="admin-subtitle">Product Types ({productTypes.length})</h3>
+            <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
+              <input type="text" placeholder="New product type" value={newProductType} onChange={(e) => setNewProductType(e.target.value)} className="admin-input" style={{flex: 1}} />
+              <button onClick={handleAddProductType} className="admin-btn-primary">+ Add</button>
+            </div>
+            <div className="admin-product-list">
+              {productTypes.map(t => (
+                <div key={t.id} className="admin-product-row">
+                  <div className="admin-product-info">
+                    <div className="admin-product-name">{t.name}</div>
+                  </div>
+                  <button onClick={() => handleDeleteProductType(t.id)} className="admin-btn-delete">🗑️ Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* COST TYPES */}
+        {activeTab === 'costs' && (
+          <div>
+            <h3 className="admin-subtitle">Cost Types ({costTypes.length})</h3>
+            <p className="admin-hint" style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>මේවා Settings tab එකේ PnL costs විදිහට පේනවා.</p>
+            <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
+              <input type="text" placeholder="New cost type" value={newCostType} onChange={(e) => setNewCostType(e.target.value)} className="admin-input" style={{flex: 1}} />
+              <button onClick={handleAddCostType} className="admin-btn-primary">+ Add</button>
+            </div>
+            <div className="admin-product-list">
+              {costTypes.map(t => (
+                <div key={t.id} className="admin-product-row">
+                  <div className="admin-product-info">
+                    <div className="admin-product-name">{t.name}</div>
+                  </div>
+                  <button onClick={() => handleDeleteCostType(t.id)} className="admin-btn-delete">🗑️ Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PAYMENT METHODS */}
+        {activeTab === 'payments' && (
+          <div>
+            <h3 className="admin-subtitle">Payment Methods ({paymentMethods.length})</h3>
+            <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
+              <input type="text" placeholder="New payment method" value={newPaymentMethod} onChange={(e) => setNewPaymentMethod(e.target.value)} className="admin-input" style={{flex: 1}} />
+              <button onClick={handleAddPaymentMethod} className="admin-btn-primary">+ Add</button>
+            </div>
+            <div className="admin-product-list">
+              {paymentMethods.map(p => (
+                <div key={p.id} className="admin-product-row">
+                  <div className="admin-product-info">
+                    <div className="admin-product-name">{p.name}</div>
+                  </div>
+                  <button onClick={() => handleDeletePaymentMethod(p.id)} className="admin-btn-delete">🗑️ Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* DELIVERY */}
+        {activeTab === 'delivery' && (
+          <div>
+            <h3 className="admin-subtitle">🚚 Delivery Settings</h3>
+            <div className="admin-form-grid">
+              <div className="admin-input-group">
+                <label>Base Delivery Charge (Rs.)</label>
+                <input type="number" value={deliverySettings.base_charge} onChange={(e) => setDeliverySettings({...deliverySettings, base_charge: e.target.value})} className="admin-input" />
+              </div>
+              <div className="admin-input-group">
+                <label>Free Delivery Threshold (items)</label>
+                <input type="number" value={deliverySettings.free_delivery_threshold} onChange={(e) => setDeliverySettings({...deliverySettings, free_delivery_threshold: e.target.value})} className="admin-input" />
+              </div>
+            </div>
+            <p style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>
+              ⚠️ {deliverySettings.free_delivery_threshold}+ items ගත්තොත් delivery FREE.
+            </p>
+            <button onClick={handleSaveDelivery} className="admin-btn-primary">💾 Save Delivery Settings</button>
+          </div>
+        )}
+
+        {/* HERO */}
         {activeTab === 'hero' && (
           <div>
             <h3 className="admin-subtitle">Hero Images (Auto Slide)</h3>
@@ -611,13 +1239,14 @@ function AdminPanelModal({
               {heroImages.map((img, i) => (
                 <div key={i} className="admin-image-item">
                   <img src={img} alt={`Hero ${i + 1}`} className="admin-preview-img" />
-                  <button onClick={() => handleDeleteHeroImage(i)} className="admin-btn-delete" style={{ marginTop: '8px', display: 'block', width: '100%' }}>Delete</button>
+                  <button onClick={() => handleDeleteHeroImage(i)} className="admin-btn-delete" style={{ marginTop: '8px', display: 'block', width: '100%' }}>🗑️ Delete</button>
                 </div>
               ))}
             </div>
           </div>
         )}
 
+        {/* LIFESTYLE */}
         {activeTab === 'lifestyle' && (
           <div>
             <h3 className="admin-subtitle">Lifestyle Images & Details</h3>
@@ -636,13 +1265,14 @@ function AdminPanelModal({
                   <input type="text" placeholder="Title Accent" value={detail.titleAccent} onChange={(e) => handleUpdateLifestyleDetail(i, 'titleAccent', e.target.value)} className="admin-input" />
                   <textarea placeholder="Description" value={detail.description} onChange={(e) => handleUpdateLifestyleDetail(i, 'description', e.target.value)} className="admin-input admin-input-full" style={{ minHeight: '60px' }}></textarea>
                 </div>
-                <button onClick={() => handleDeleteLifestyleImage(i)} className="admin-btn-delete" style={{ marginTop: '8px' }}>Delete Image</button>
+                <button onClick={() => handleDeleteLifestyleImage(i)} className="admin-btn-delete" style={{ marginTop: '8px' }}>🗑️ Delete Image</button>
               </div>
             ))}
-            <button onClick={handleSaveLifestyleDetails} className="admin-btn-primary" style={{ marginTop: '20px' }}>Save Lifestyle Details</button>
+            <button onClick={handleSaveLifestyleDetails} className="admin-btn-primary" style={{ marginTop: '20px' }}>💾 Save Lifestyle Details</button>
           </div>
         )}
 
+        {/* PAGES */}
         {activeTab === 'pages' && (
           <div>
             <h3 className="admin-subtitle">{editingPageId ? 'Edit Page' : 'Add New Page'}</h3>
@@ -650,7 +1280,7 @@ function AdminPanelModal({
               <input type="text" placeholder="Page Title *" value={newPage.title} onChange={(e) => setNewPage({ ...newPage, title: e.target.value })} className="admin-input admin-input-full" />
               <textarea placeholder="Page Content" value={newPage.content} onChange={(e) => setNewPage({ ...newPage, content: e.target.value })} className="admin-input admin-input-full" style={{ minHeight: '120px' }}></textarea>
             </div>
-            <button onClick={handleAddPage} className="admin-btn-primary">{editingPageId ? 'Update Page' : '+ Add Page'}</button>
+            <button onClick={handleAddPage} className="admin-btn-primary">{editingPageId ? '💾 Update Page' : '+ Add Page'}</button>
             {editingPageId && <button onClick={() => { setEditingPageId(null); setNewPage({ title: '', content: '' }); }} className="admin-btn-delete" style={{ marginLeft: '10px' }}>Cancel Edit</button>}
 
             <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Pages</h3>
@@ -660,19 +1290,55 @@ function AdminPanelModal({
                   <div className="admin-product-info">
                     <div className="admin-product-name">{p.title}</div>
                   </div>
-                  <button onClick={() => { setEditingPageId(p.id); setNewPage({ title: p.title, content: p.content || '' }); }} className="admin-btn-primary" style={{ padding: '8px 14px', fontSize: '12px' }}>Edit</button>
-                  <button onClick={() => handleDeletePage(p.id)} className="admin-btn-delete">Delete</button>
+                  <button onClick={() => { setEditingPageId(p.id); setNewPage({ title: p.title, content: p.content || '' }); }} className="admin-btn-primary" style={{ padding: '8px 14px', fontSize: '12px', marginRight: '5px' }}>✏️ Edit</button>
+                  <button onClick={() => handleDeletePage(p.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
               ))}
             </div>
           </div>
         )}
+
+        {/* CHAT BOT */}
+        {activeTab === 'bot' && (
+          <div>
+            <h3 className="admin-subtitle">🤖 Chat Bot Settings</h3>
+            <p style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>
+              Chat Bot එකේ system prompt එක මෙතනින් edit කරන්න. Products auto-load වෙනවා Supabase එකෙන්.
+            </p>
+            
+            <div style={{marginBottom: '20px'}}>
+              <label style={{fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px'}}>Welcome Message</label>
+              <input 
+                type="text" 
+                value={botWelcomeMessage} 
+                onChange={(e) => setBotWelcomeMessage(e.target.value)} 
+                className="admin-input" 
+                placeholder="Hi! How can I help you today?"
+              />
+            </div>
+
+            <div style={{marginBottom: '20px'}}>
+              <label style={{fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px'}}>System Prompt</label>
+              <textarea 
+                value={botSystemPrompt} 
+                onChange={(e) => setBotSystemPrompt(e.target.value)} 
+                className="admin-input" 
+                style={{minHeight: '250px', fontFamily: 'monospace', fontSize: '12px'}}
+                placeholder="You are AROMA Assistant..."
+              />
+            </div>
+
+            <button onClick={handleSaveBotSettings} className="admin-btn-primary">💾 Save Chat Bot Settings</button>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+  }
+// ============================================================
+// PAGE POPUP
+// ============================================================
 
-// === PAGE POPUP ===
 function PagePopup({ page, onClose }) {
   if (!page) return null;
   return (
@@ -686,8 +1352,19 @@ function PagePopup({ page, onClose }) {
   );
 }
 
+// ============================================================
+// APP COMPONENT
+// ============================================================
+
 function App() {
+  // ---- State ----
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  const [costTypes, setCostTypes] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [deliverySettings, setDeliverySettings] = useState({ base_charge: 350, free_delivery_threshold: 3 });
+  
   const [activeFilter, setActiveFilter] = useState("All");
   const [renderCount, setRenderCount] = useState(0);
   const collectionRef = useRef(null);
@@ -727,22 +1404,42 @@ function App() {
     "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
   ];
 
-  // Load Products, Site Settings, Pages
+  // ============================================================
+  // LOAD DATA
+  // ============================================================
+
   useEffect(() => {
     async function loadData() {
       try {
-        const { data: prodData, error: prodErr } = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
-        if (!prodErr && prodData && prodData.length > 0) {
-          setProducts(prodData.map(p => ({
-            id: p.id, name: p.name,
-            for: p.category === 'Ladies' ? 'FOR LADIES' : p.category === 'Men' ? 'FOR MEN' : 'FOR UNISEX',
-            filter: p.category, tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
-            image: p.image_url || '', accent: '#B8963E'
-          })));
+        // Products
+        const prodData = await dbGetProducts();
+        if (prodData && prodData.length > 0) {
+          setProducts(prodData.map(mapProductForSite));
         } else {
           setProducts(defaultProducts);
         }
 
+        // Categories
+        const cats = await dbGetCategories();
+        setCategories(cats);
+
+        // Product Types
+        const types = await dbGetProductTypes();
+        setProductTypes(types);
+
+        // Cost Types
+        const costs = await dbGetCostTypes();
+        setCostTypes(costs);
+
+        // Payment Methods
+        const payments = await dbGetPaymentMethods();
+        setPaymentMethods(payments);
+
+        // Delivery Settings
+        const delivery = await dbGetDeliverySettings();
+        setDeliverySettings(delivery);
+
+        // Site Settings
         const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
         if (siteData) {
           if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImages(siteData.hero_images);
@@ -750,17 +1447,39 @@ function App() {
           if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) setLifestyleDetails(siteData.lifestyle_details);
         }
 
+        // Pages
         const { data: pagesData } = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
         if (pagesData) setPages(pagesData);
+
       } catch (e) {
-        console.error(e);
+        console.error('Load data error:', e);
         setProducts(defaultProducts);
       }
     }
     loadData();
   }, []);
 
-  // Load Reviews
+  function mapProductForSite(p) {
+    return {
+      id: p.id,
+      name: p.name,
+      for: p.category ? 'FOR ' + p.category.toUpperCase() : '',
+      filter: p.category,
+      category: p.category,
+      product_type: p.product_type || 'Perfume',
+      tagline: p.description || '',
+      top: p.top_notes || '',
+      heart: p.heart_notes || '',
+      base: p.base_notes || '',
+      image: p.image_url || '',
+      price: Number(p.selling_price) || Number(p.price) || 1500,
+      selling_price: Number(p.selling_price) || Number(p.price) || 1500,
+      stock: p.stock || 0,
+      accent: '#B8963E'
+    };
+  }
+
+  // ---- Reviews ----
   useEffect(() => {
     async function loadReviews() {
       try {
@@ -771,9 +1490,12 @@ function App() {
       }
     }
     loadReviews();
+
+    // Reviews setter එක global ව expose කරන්න (admin-orders.js එකට)
+    window.__setReviews = setReviews;
   }, []);
 
-  // Hero Auto Slide
+  // ---- Hero Auto Slide ----
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => {
@@ -782,7 +1504,7 @@ function App() {
     return () => clearInterval(interval);
   }, [heroImages]);
 
-  // Review Auto Slide
+  // ---- Review Auto Slide ----
   useEffect(() => {
     if (reviews.length <= 1) return;
     const interval = setInterval(() => {
@@ -791,7 +1513,7 @@ function App() {
     return () => clearInterval(interval);
   }, [reviews]);
 
-  // Lifestyle Auto Slide
+  // ---- Lifestyle Auto Slide ----
   useEffect(() => {
     if (lifestyleDetails.length <= 1) return;
     const interval = setInterval(() => {
@@ -799,6 +1521,10 @@ function App() {
     }, 5000);
     return () => clearInterval(interval);
   }, [lifestyleDetails]);
+
+  // ============================================================
+  // CART FUNCTIONS
+  // ============================================================
 
   const addToCart = (product) => {
     setCartItems(prev => {
@@ -816,13 +1542,21 @@ function App() {
     setCartItems(prev => prev.map(item => item.id === id ? { ...item, quantity: newQty } : item));
   };
 
-  const getSubtotal = () => cartItems.reduce((sum, item) => sum + (1500 * item.quantity), 0);
+  const getSubtotal = () => cartItems.reduce((sum, item) => sum + ((item.price || item.selling_price || 1500) * item.quantity), 0);
+  
   const getDeliveryCharge = () => {
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    return totalItems >= 3 ? 0 : 350;
+    const threshold = Number(deliverySettings.free_delivery_threshold) || 3;
+    const base = Number(deliverySettings.base_charge) || 350;
+    return totalItems >= threshold ? 0 : base;
   };
+  
   const getTotal = () => getSubtotal() + getDeliveryCharge();
   const getCartCount = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // ============================================================
+  // ORDER FUNCTIONS
+  // ============================================================
 
   const sendWhatsAppOrder = async () => {
     if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { 
@@ -847,7 +1581,10 @@ function App() {
     }
 
     let message = "Hi Aroma Lab! I want to order:\n\n";
-    cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
+    cartItems.forEach(item => { 
+      const price = item.price || item.selling_price || 1500;
+      message += `- ${item.name} x ${item.quantity} = Rs. ${price * item.quantity}\n`; 
+    });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
     message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}`;
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
@@ -869,19 +1606,26 @@ function App() {
         customer_phone: customerPhone,
         customer_address: customerAddress,
         district: customerDistrict,
-        platform: 'WhatsApp'
+        platform: 'Bank Deposit'
       }, cartItems, getDeliveryCharge());
     } catch (err) {
       console.error('Order save error:', err);
     }
 
     let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
-    cartItems.forEach(item => { message += `- ${item.name} x ${item.quantity} = Rs. ${1500 * item.quantity}\n`; });
+    cartItems.forEach(item => { 
+      const price = item.price || item.selling_price || 1500;
+      message += `- ${item.name} x ${item.quantity} = Rs. ${price * item.quantity}\n`; 
+    });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
     message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}`;
     message += `\n\nI will send the bank deposit slip shortly.`;
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
+
+  // ============================================================
+  // REVIEWS
+  // ============================================================
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -901,11 +1645,14 @@ function App() {
     }
   };
 
-  // ✅ Admin Panel close කරාම — Supabase logout + reviews reload
+  // ============================================================
+  // ADMIN CLOSE + SIGN OUT
+  // ============================================================
+
   const handleCloseAdminAndSignOut = async () => {
     console.log('🔄 Closing Admin Panel — signing out Supabase + reloading reviews...');
     
-    // 1. Supabase Logout — admin session එක clear කරන්න
+    // 1. Supabase Logout
     try {
       await window.supabaseClient.auth.signOut();
       console.log('✅ Supabase signed out');
@@ -928,6 +1675,10 @@ function App() {
     }
   };
 
+  // ============================================================
+  // GLOBAL HOOKS
+  // ============================================================
+
   window.setAppUser = function(user) {
     if (user) {
       setIsLoggedIn(true);
@@ -946,13 +1697,25 @@ function App() {
     else setIsAdmin(false);
   };
 
+  // ============================================================
+  // FILTERS
+  // ============================================================
+
   const handleFilter = (filter) => {
     setActiveFilter(filter);
     setRenderCount(c => c + 1);
     setTimeout(() => { collectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
   };
 
-  const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.filter === activeFilter);
+  const filteredProducts = activeFilter === "All" 
+    ? products 
+    : products.filter(p => p.filter === activeFilter || p.category === activeFilter);
+
+  const filterLabels = ['All', ...categories.map(c => c.name)];
+
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   return (
     <div className="app-root">
@@ -987,6 +1750,11 @@ function App() {
         lifestyleImages={lifestyleImages} setLifestyleImages={setLifestyleImages}
         lifestyleDetails={lifestyleDetails} setLifestyleDetails={setLifestyleDetails}
         pages={pages} setPages={setPages}
+        categories={categories} setCategories={setCategories}
+        productTypes={productTypes} setProductTypes={setProductTypes}
+        costTypes={costTypes} setCostTypes={setCostTypes}
+        paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods}
+        deliverySettings={deliverySettings} setDeliverySettings={setDeliverySettings}
         onCloseAndSignOut={handleCloseAdminAndSignOut}
       />
 
@@ -994,9 +1762,10 @@ function App() {
 
       {showAddedPopup && <div className="added-popup">✅ Added to Cart!</div>}
 
+      {/* TOP BAR */}
       <div className="top-bar">
         <div className="top-bar-inner">
-          <span>🚚 FREE DELIVERY ON 3+ ITEMS</span>
+          <span>🚚 FREE DELIVERY ON {deliverySettings.free_delivery_threshold}+ ITEMS</span>
           <span className="divider">|</span>
           <span>🛡️ PREMIUM QUALITY</span>
           <span className="divider">|</span>
@@ -1004,6 +1773,7 @@ function App() {
         </div>
       </div>
 
+      {/* HEADER */}
       <header className="site-header">
         <div className="header-inner">
           <div className="header-logo">
@@ -1036,6 +1806,7 @@ function App() {
         </div>
       </header>
 
+      {/* HERO */}
       <section className="hero-section">
         <img 
           key={currentHeroIndex} 
@@ -1063,6 +1834,7 @@ function App() {
         )}
       </section>
 
+      {/* TRUST BADGES */}
       <section className="trust-badges">
         <div className="trust-grid">
           {[
@@ -1082,15 +1854,16 @@ function App() {
         </div>
       </section>
 
+      {/* COLLECTION */}
       <section ref={collectionRef} id="collection" className="collection-section">
         <div className="collection-header">
           <div className="collection-eyebrow">OUR COLLECTION</div>
           <h2 className="collection-title">Explore Our <span className="accent">Signature Scents</span></h2>
         </div>
         <div className="filter-buttons">
-          {['All', 'Ladies', 'Men', 'Unisex'].map((label) => (
+          {filterLabels.map((label) => (
             <button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>
-              {label === 'All' ? 'All' : `For ${label}`}
+              {label === 'All' ? 'All' : label}
             </button>
           ))}
         </div>
@@ -1100,16 +1873,18 @@ function App() {
               <div className="product-img-wrap">
                 {product.image ? <img src={product.image} alt={product.name} /> : <div className="product-img-placeholder">{product.name}</div>}
                 <div className="product-badge-for">{product.for}</div>
-                <div className="product-badge-price">Rs. 1,500</div>
+                <div className="product-badge-price">{fmtRs(product.price)}</div>
               </div>
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
                 <div className="product-tagline">{product.tagline}</div>
-                <div className="product-notes">
-                  <div><div className="note-label">Top</div><div className="note-value">{product.top}</div></div>
-                  <div><div className="note-label">Heart</div><div className="note-value">{product.heart}</div></div>
-                  <div><div className="note-label">Base</div><div className="note-value">{product.base}</div></div>
-                </div>
+                {product.product_type === 'Perfume' && (product.top || product.heart || product.base) && (
+                  <div className="product-notes">
+                    {product.top && <div><div className="note-label">Top</div><div className="note-value">{product.top}</div></div>}
+                    {product.heart && <div><div className="note-label">Heart</div><div className="note-value">{product.heart}</div></div>}
+                    {product.base && <div><div className="note-label">Base</div><div className="note-value">{product.base}</div></div>}
+                  </div>
+                )}
                 <button onClick={() => addToCart(product)} className="btn-add-cart">ADD TO CART</button>
                 <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-order-daraz">ORDER ON DARAZ</a>
               </div>
@@ -1118,6 +1893,7 @@ function App() {
         </div>
       </section>
 
+      {/* LIFESTYLE */}
       <section className="lifestyle-section">
         <div className="lifestyle-slider">
           <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}>
@@ -1135,7 +1911,7 @@ function App() {
                   <p className="lifestyle-desc">"{detail.description}"</p>
                   <div className="lifestyle-buttons">
                     <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-gold">BUY ON DARAZ</a>
-                    <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title} - Rs. 1,500`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
+                    <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aroma Lab! I want to order ${detail.title}`)}`} target="_blank" rel="noopener" className="btn-white">WHATSAPP</a>
                   </div>
                 </div>
               </div>
@@ -1154,6 +1930,7 @@ function App() {
         )}
       </section>
 
+      {/* KOKO */}
       <section className="koko-section">
         <div className="koko-box">
           <div className="koko-info">
@@ -1167,6 +1944,7 @@ function App() {
         </div>
       </section>
 
+      {/* REVIEWS */}
       <ReviewSection 
         isLoggedIn={isLoggedIn}
         reviewName={reviewName} setReviewName={setReviewName}
@@ -1179,6 +1957,7 @@ function App() {
         setCurrentReviewIndex={setCurrentReviewIndex}
       />
 
+      {/* FOOTER */}
       <footer className="site-footer">
         <div className="footer-grid">
           <div className="footer-col-1">
@@ -1235,6 +2014,10 @@ function App() {
     </div>
   );
 }
+
+// ============================================================
+// RENDER
+// ============================================================
 
 const root = createRoot(document.getElementById('root'));
 root.render(
