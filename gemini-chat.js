@@ -1,6 +1,6 @@
 /*************************************************************
  * AROMA LAB — AI Chat Bot (via Supabase Edge Function)
- * File: gemini-chat.js
+ * File: gemini-chat.js — DEBUG VERSION
  * 
  * ⚠️ API Key එක මෙතන නැහැ — Supabase Edge Function එකේ
  *    (GEMINI_API_KEY Secret එකේ) තියෙනවා.
@@ -11,6 +11,7 @@
  * - Auto-loads products from Supabase
  * - Loads system prompt from Supabase
  * - Calls Gemini API through Supabase Edge Function
+ * - DEBUG alerts for troubleshooting
  *************************************************************/
 
 // ============================================================
@@ -18,6 +19,7 @@
 // ============================================================
 
 const EDGE_FUNCTION_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co/functions/v1/gemini-chat';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM';
 
 // ============================================================
 // LANGUAGES
@@ -72,7 +74,6 @@ async function gcLoadBotSettings() {
 // ============================================================
 
 function gcBuildSystemPrompt(products, customPrompt, language) {
-  // Products list format
   let productsList = '\n=== AROMA LAB PRODUCTS ===\n\n';
   
   if (products && products.length > 0) {
@@ -93,7 +94,6 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
     productsList += 'No products available currently.\n';
   }
   
-  // Language instruction
   let languageInstruction = '';
   if (language === 'sinhala') {
     languageInstruction = 'You MUST reply in Sinhala language only. Use friendly Sinhala tone.';
@@ -103,7 +103,6 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
     languageInstruction = 'Reply in English. If customer speaks Sinhala or Singlish, you can reply in Singlish.';
   }
   
-  // Base prompt
   const basePrompt = customPrompt || `You are AROMA Assistant, the official AI assistant for AROMA LAB Fine Fragrances (Sri Lanka).`;
 
   return `${basePrompt}
@@ -150,16 +149,18 @@ ${productsList}
 }
 
 // ============================================================
-// CALL SUPABASE EDGE FUNCTION
+// CALL SUPABASE EDGE FUNCTION — DEBUG VERSION
 // ============================================================
 
 async function gcCallEdgeFunction(systemPrompt, chatHistory) {
   try {
+    console.log('📤 Sending request to Edge Function...');
+    
     const response = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM'
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
       },
       body: JSON.stringify({
         systemPrompt: systemPrompt,
@@ -167,20 +168,40 @@ async function gcCallEdgeFunction(systemPrompt, chatHistory) {
       })
     });
 
-    const data = await response.json();
+    console.log('📥 Response status:', response.status);
 
+    // Read response as text first
+    const responseText = await response.text();
+    console.log('📥 Response text:', responseText);
+
+    // 🔍 DEBUG ALERT — Show response to user
+    alert('🔍 DEBUG INFO:\n\n' +
+          'Status: ' + response.status + '\n\n' +
+          'Response:\n' + responseText.substring(0, 500));
+
+    // Try to parse as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      throw new Error('Invalid JSON response. Status: ' + response.status + '. Body: ' + responseText.substring(0, 200));
+    }
+
+    // Check for errors
     if (!response.ok) {
-      console.error('Edge function error:', data);
-      throw new Error(data.error || 'API error');
+      throw new Error(data.error || ('API error. Status: ' + response.status));
     }
 
     if (!data.reply) {
-      throw new Error('No response from AI');
+      throw new Error('No reply from AI. Response: ' + JSON.stringify(data).substring(0, 200));
     }
 
     return data.reply;
+
   } catch (err) {
-    console.error('Edge function call failed:', err);
+    console.error('❌ Edge function call failed:', err);
+    // 🔍 DEBUG ALERT — Show error to user
+    alert('❌ ERROR:\n\n' + err.message);
     throw err;
   }
 }
@@ -200,7 +221,6 @@ function AromaChatBot() {
   const [isInitialized, setIsInitialized] = React.useState(false);
   const messagesEndRef = React.useRef(null);
 
-  // Load products + settings on first open
   React.useEffect(() => {
     async function init() {
       if (isInitialized) return;
@@ -213,14 +233,12 @@ function AromaChatBot() {
     if (isOpen && !isInitialized) init();
   }, [isOpen, isInitialized]);
 
-  // Reload products every time chat opens (for fresh data)
   React.useEffect(() => {
     if (isOpen) {
       gcLoadProducts().then(setProducts);
     }
   }, [isOpen]);
 
-  // Welcome message when opened first time
   React.useEffect(() => {
     if (isOpen && messages.length === 0 && botSettings) {
       const welcome = botSettings.welcome_message || 'Hi! I\'m AROMA Assistant. How can I help you today? 🌸';
@@ -228,7 +246,6 @@ function AromaChatBot() {
     }
   }, [isOpen, botSettings]);
 
-  // Auto scroll to bottom
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
@@ -297,7 +314,6 @@ function AromaChatBot() {
 
   return (
     <>
-      {/* Floating Button */}
       <button 
         className={'gc-float-btn ' + (isOpen ? 'gc-open' : '')}
         onClick={() => setIsOpen(!isOpen)}
@@ -306,10 +322,8 @@ function AromaChatBot() {
         {isOpen ? '×' : '✨'}
       </button>
 
-      {/* Chat Window */}
       {isOpen && (
         <div className="gc-window">
-          {/* Header */}
           <div className="gc-header">
             <div className="gc-header-info">
               <div className="gc-header-avatar">🌸</div>
@@ -324,7 +338,6 @@ function AromaChatBot() {
             <button className="gc-close-btn" onClick={() => setIsOpen(false)}>×</button>
           </div>
 
-          {/* Language Selector */}
           <div className="gc-lang-selector">
             <span className="gc-lang-label">Language:</span>
             {LANGUAGES.map(lang => (
@@ -338,7 +351,6 @@ function AromaChatBot() {
             ))}
           </div>
 
-          {/* Messages */}
           <div className="gc-messages">
             {messages.length === 0 && (
               <div className="gc-welcome">
@@ -377,7 +389,6 @@ function AromaChatBot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
           <div className="gc-input-area">
             <textarea
               className="gc-input"
@@ -424,9 +435,8 @@ function gcMountChatBot() {
   console.log('✅ AROMA LAB Chat Bot loaded (via Edge Function)');
 }
 
-// Wait for React + Supabase to be ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => setTimeout(gcMountChatBot, 1500));
 } else {
   setTimeout(gcMountChatBot, 1500);
-                    }
+            }
