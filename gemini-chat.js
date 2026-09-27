@@ -339,3 +339,54 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(gcMountChatBot, 1500);
 }
+// ============================================================
+// SIMPLE TEST — Button එක විතරක්
+// ============================================================
+
+console.log('🔥 gemini-chat.js loaded!');
+
+function gcMountChatBot() {
+  console.log('🔥 gcMountChatBot called');
+  
+  const mountId = 'aroma-chat-bot-mount';
+  if (document.getElementById(mountId)) {
+    console.log('🔥 Mount already exists');
+    return;
+  }
+
+  const mount = document.createElement('div');
+  mount.id = mountId;
+  document.body.appendChild(mount);
+
+  const root = ReactDOM.createRoot(mount);
+  root.render(
+    React.createElement('button', {
+      className: 'gc-float-btn',
+      onClick: function() { alert('Button clicked!'); },
+      style: {
+        position: 'fixed',
+        bottom: '24px',
+        right: '24px',
+        width: '60px',
+        height: '60px',
+        borderRadius: '50%',
+        background: '#0A2E1F',
+        color: '#FFFBF5',
+        border: '3px solid #B8963E',
+        fontSize: '24px',
+        zIndex: 999999,
+        cursor: 'pointer'
+      }
+    }, '✨')
+  );
+  
+  console.log('🔥 Button mounted!');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(gcMountChatBot, 1500);
+  });
+} else {
+  setTimeout(gcMountChatBot, 1500);
+}
