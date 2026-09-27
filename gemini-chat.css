@@ -11,17 +11,21 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  padding: 14px 22px;
+  border-radius: 9999px;
   background: linear-gradient(135deg, #0A2E1F 0%, #123a28 100%);
   color: #FFFBF5;
-  border: 3px solid #B8963E;
+  border: 2px solid #B8963E;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  gap: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
   box-shadow: 0 6px 24px rgba(10, 46, 31, 0.4);
   z-index: 2147483640;
   transition: all 0.3s;
@@ -29,14 +33,19 @@
 }
 
 .gc-float-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.05) translateY(-2px);
   box-shadow: 0 8px 32px rgba(184, 150, 62, 0.5);
   background: linear-gradient(135deg, #B8963E 0%, #d4b356 100%);
   color: #0A2E1F;
+  border-color: #0A2E1F;
 }
 
 .gc-float-btn.gc-open {
   animation: none;
+  padding: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   transform: rotate(90deg);
 }
 
@@ -464,11 +473,10 @@
 
 @media (max-width: 640px) {
   .gc-float-btn {
-    width: 56px;
-    height: 56px;
+    padding: 12px 18px;
     bottom: 20px;
     right: 20px;
-    font-size: 22px;
+    font-size: 14px;
   }
   
   .gc-window {
@@ -513,4 +521,4 @@
   .gc-input-area {
     padding: 10px 12px;
   }
-  }
+}
