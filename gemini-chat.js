@@ -1,17 +1,9 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot (via Supabase Edge Function)
- * File: gemini-chat.js — DEBUG VERSION
+ * AROMA LAB — AI Chat Bot
+ * File: gemini-chat.js
  * 
- * ⚠️ API Key එක මෙතන නැහැ — Supabase Edge Function එකේ
- *    (GEMINI_API_KEY Secret එකේ) තියෙනවා.
- * 
- * Features:
- * - "Ask AI" floating button
- * - Language selector (English, Sinhala, Tamil)
- * - Auto-loads products from Supabase
- * - Loads system prompt from Supabase
- * - Calls Gemini API through Supabase Edge Function
- * - DEBUG alerts for troubleshooting
+ * ✅ API Key එක Supabase Edge Function එකේ — 100% secure
+ * ✅ Clean code, no debug alerts
  *************************************************************/
 
 // ============================================================
@@ -21,10 +13,6 @@
 const EDGE_FUNCTION_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co/functions/v1/gemini-chat';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM';
 
-// ============================================================
-// LANGUAGES
-// ============================================================
-
 const LANGUAGES = [
   { code: 'english', label: 'English', flag: '🇬🇧' },
   { code: 'sinhala', label: 'සිංහල', flag: '🇱🇰' },
@@ -32,7 +20,7 @@ const LANGUAGES = [
 ];
 
 // ============================================================
-// LOAD PRODUCTS FROM SUPABASE
+// DATABASE HELPERS
 // ============================================================
 
 async function gcLoadProducts() {
@@ -41,7 +29,6 @@ async function gcLoadProducts() {
       .from('products')
       .select('*')
       .order('created_at', { ascending: true });
-    
     if (error) return [];
     return data || [];
   } catch (e) {
@@ -50,10 +37,6 @@ async function gcLoadProducts() {
   }
 }
 
-// ============================================================
-// LOAD SYSTEM PROMPT FROM SUPABASE
-// ============================================================
-
 async function gcLoadBotSettings() {
   try {
     const { data, error } = await window.supabaseClient
@@ -61,11 +44,10 @@ async function gcLoadBotSettings() {
       .select('*')
       .eq('id', 1)
       .single();
-    
-    if (error) return { system_prompt: '', welcome_message: 'Hi! I\'m AROMA Assistant. How can I help you today? 🌸' };
-    return data || { system_prompt: '', welcome_message: 'Hi! I\'m AROMA Assistant. How can I help you today? 🌸' };
+    if (error) return { system_prompt: '', welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸" };
+    return data || { system_prompt: '', welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸" };
   } catch (e) {
-    return { system_prompt: '', welcome_message: 'Hi! I\'m AROMA Assistant. How can I help you today? 🌸' };
+    return { system_prompt: '', welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸" };
   }
 }
 
@@ -149,294 +131,32 @@ ${productsList}
 }
 
 // ============================================================
-// CALL SUPABASE EDGE FUNCTION — DEBUG VERSION
+// CALL SUPABASE EDGE FUNCTION
 // ============================================================
 
 async function gcCallEdgeFunction(systemPrompt, chatHistory) {
-  try {
-    console.log('📤 Sending request to Edge Function...');
-    
-    const response = await fetch(EDGE_FUNCTION_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-      },
-      body: JSON.stringify({
-        systemPrompt: systemPrompt,
-        chatHistory: chatHistory
-      })
-    });
+  const response = await fetch(EDGE_FUNCTION_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({
+      systemPrompt: systemPrompt,
+      chatHistory: chatHistory
+    })
+  });
 
-    console.log('📥 Response status:', response.status);
-
-    // Read response as text first
-    const responseText = await response.text();
-    console.log('📥 Response text:', responseText);
-
-    // 🔍 DEBUG ALERT — Show response to user
-    alert('🔍 DEBUG INFO:\n\n' +
-          'Status: ' + response.status + '\n\n' +
-          'Response:\n' + responseText.substring(0, 500));
-
-    // Try to parse as JSON
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      throw new Error('Invalid JSON response. Status: ' + response.status + '. Body: ' + responseText.substring(0, 200));
-    }
-
-    // Check for errors
-    if (!response.ok) {
-      throw new Error(data.error || ('API error. Status: ' + response.status));
-    }
-
-    if (!data.reply) {
-      throw new Error('No reply from AI. Response: ' + JSON.stringify(data).substring(0, 200));
-    }
-
-    return data.reply;
-
-  } catch (err) {
-    console.error('❌ Edge function call failed:', err);
-    // 🔍 DEBUG ALERT — Show error to user
-    alert('❌ ERROR:\n\n' + err.message);
-    throw err;
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error('API error ' + response.status + ': ' + errorText.substring(0, 100));
   }
+
+  const data = await response.json();
+  
+  if (!data.reply) {
+    throw new Error('No reply from AI');
+  }
+
+  return data.reply;
 }
-
-// ============================================================
-// MAIN CHAT COMPONENT
-// ============================================================
-
-function AromaChatBot() {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [language, setLanguage] = React.useState('english');
-  const [messages, setMessages] = React.useState([]);
-  const [input, setInput] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [products, setProducts] = React.useState([]);
-  const [botSettings, setBotSettings] = React.useState(null);
-  const [isInitialized, setIsInitialized] = React.useState(false);
-  const messagesEndRef = React.useRef(null);
-
-  React.useEffect(() => {
-    async function init() {
-      if (isInitialized) return;
-      const prods = await gcLoadProducts();
-      setProducts(prods);
-      const settings = await gcLoadBotSettings();
-      setBotSettings(settings);
-      setIsInitialized(true);
-    }
-    if (isOpen && !isInitialized) init();
-  }, [isOpen, isInitialized]);
-
-  React.useEffect(() => {
-    if (isOpen) {
-      gcLoadProducts().then(setProducts);
-    }
-  }, [isOpen]);
-
-  React.useEffect(() => {
-    if (isOpen && messages.length === 0 && botSettings) {
-      const welcome = botSettings.welcome_message || 'Hi! I\'m AROMA Assistant. How can I help you today? 🌸';
-      setMessages([{ role: 'model', text: welcome }]);
-    }
-  }, [isOpen, botSettings]);
-
-  React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
-
-  async function handleSend() {
-    const text = input.trim();
-    if (!text || isLoading) return;
-
-    const userMessage = { role: 'user', text };
-    const newHistory = [...messages, userMessage];
-    setMessages(newHistory);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const systemPrompt = gcBuildSystemPrompt(products, botSettings?.system_prompt, language);
-      const reply = await gcCallEdgeFunction(systemPrompt, newHistory);
-      
-      setMessages([...newHistory, { role: 'model', text: reply }]);
-    } catch (err) {
-      const errorMsg = language === 'sinhala'
-        ? '❌ කණගාටුයි, දැන් ප්‍රතිචාර දක්වන්න බැහැ. කරුණාකර WhatsApp 0777 804 705 අමතන්න.'
-        : language === 'tamil'
-        ? '❌ மன்னிக்கவும், இப்போது பதிலளிக்க முடியவில்லை. WhatsApp 0777 804 705 தொடர்பு கொள்ளவும்.'
-        : '❌ Sorry, I can\'t respond right now. Please contact us on WhatsApp 0777 804 705.';
-      
-      setMessages([...newHistory, { role: 'model', text: errorMsg, isError: true }]);
-    }
-    setIsLoading(false);
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  }
-
-  function askQuick(question) {
-    setInput(question);
-    setTimeout(() => {
-      document.querySelector('.gc-input')?.focus();
-    }, 100);
-  }
-
-  const quickQuestions = {
-    english: [
-      '🌸 What perfumes do you have?',
-      '✨ Which perfume is best for ladies?',
-      '🚚 How much is delivery?',
-      '💬 How do I order?'
-    ],
-    sinhala: [
-      '🌸 ඔයාලා ළඟ මොනවද තියෙන්නේ?',
-      '✨ Ladies වලට හොඳම එක මොකද්ද?',
-      '🚚 Delivery කීයද?',
-      '💬 Order කරන්නේ කොහොමද?'
-    ],
-    tamil: [
-      '🌸 உங்களிடம் என்ன வாசனை திரவியங்கள் உள்ளன?',
-      '✨ பெண்களுக்கு எது சிறந்தது?',
-      '🚚 டெலிவரி கட்டணம் எவ்வளவு?',
-      '💬 எப்படி ஆர்டர் செய்வது?'
-    ]
-  };
-
-  return (
-    <>
-      <button 
-        className={'gc-float-btn ' + (isOpen ? 'gc-open' : '')}
-        onClick={() => setIsOpen(!isOpen)}
-        title="Ask AI"
-      >
-        {isOpen ? '×' : '✨'}
-      </button>
-
-      {isOpen && (
-        <div className="gc-window">
-          <div className="gc-header">
-            <div className="gc-header-info">
-              <div className="gc-header-avatar">🌸</div>
-              <div className="gc-header-text">
-                <h3 className="gc-header-title">AROMA Assistant</h3>
-                <p className="gc-header-subtitle">
-                  <span className="gc-status-dot"></span>
-                  Online
-                </p>
-              </div>
-            </div>
-            <button className="gc-close-btn" onClick={() => setIsOpen(false)}>×</button>
-          </div>
-
-          <div className="gc-lang-selector">
-            <span className="gc-lang-label">Language:</span>
-            {LANGUAGES.map(lang => (
-              <button
-                key={lang.code}
-                className={'gc-lang-btn ' + (language === lang.code ? 'active' : '')}
-                onClick={() => setLanguage(lang.code)}
-              >
-                {lang.flag} {lang.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="gc-messages">
-            {messages.length === 0 && (
-              <div className="gc-welcome">
-                <div className="gc-welcome-icon">🌸</div>
-                <div className="gc-welcome-title">Welcome to AROMA LAB</div>
-                <p className="gc-welcome-desc">
-                  Ask me about our perfumes, prices, delivery, or how to order!
-                </p>
-                <div className="gc-quick-questions">
-                  {(quickQuestions[language] || quickQuestions.english).map((q, i) => (
-                    <button key={i} className="gc-quick-btn" onClick={() => askQuick(q)}>
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {messages.map((msg, i) => (
-              <div 
-                key={i} 
-                className={'gc-msg ' + (msg.role === 'user' ? 'gc-msg-user' : 'gc-msg-bot') + (msg.isError ? ' gc-msg-error' : '')}
-              >
-                {msg.text}
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="gc-typing">
-                <div className="gc-typing-dot"></div>
-                <div className="gc-typing-dot"></div>
-                <div className="gc-typing-dot"></div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          <div className="gc-input-area">
-            <textarea
-              className="gc-input"
-              placeholder={
-                language === 'sinhala' ? 'ඔබේ ප්‍රශ්නය type කරන්න...' :
-                language === 'tamil' ? 'உங்கள் கேள்வியை தட்டச்சு செய்யவும்...' :
-                'Type your question...'
-              }
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={1}
-              disabled={isLoading}
-            />
-            <button 
-              className="gc-send-btn" 
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-            >
-              ➤
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-// ============================================================
-// MOUNT CHAT BOT
-// ============================================================
-
-function gcMountChatBot() {
-  const mountId = 'aroma-chat-bot-mount';
-  if (document.getElementById(mountId)) return;
-
-  const mount = document.createElement('div');
-  mount.id = mountId;
-  document.body.appendChild(mount);
-
-  const root = ReactDOM.createRoot(mount);
-  root.render(<AromaChatBot />);
-
-  console.log('✅ AROMA LAB Chat Bot loaded (via Edge Function)');
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(gcMountChatBot, 1500));
-} else {
-  setTimeout(gcMountChatBot, 1500);
-            }
