@@ -1,11 +1,14 @@
 /*************************************************************
  * AROMA LAB — Admin Orders & PnL System
- * File: admin-orders.js — v3
+ * File: admin-orders.js — v4 (Dynamic)
  * 
  * Features:
- * - Pending Orders with Complete modal (Items edit + Discount)
- * - Completed Orders with Delete
- * - Settings (Cost Entry)
+ * - Pending/Complete/Cancelled Orders
+ * - Complete Modal (Items edit + Discount)
+ * - Dynamic Payment Methods (Supabase)
+ * - Dynamic Products (Supabase)
+ * - Dynamic Costs (Supabase)
+ * - Settings tab (Costs, Delivery, Payments)
  * - Commissions
  * - PnL Report + CSV Download
  * - PnL Close = Supabase Logout + Reviews Reload
@@ -144,7 +147,7 @@ async function dbUpdateCommission(method, rate, fixedFee, notes) {
 }
 
 // ============================================================
-// DATABASE — PRODUCTS
+// DATABASE — PRODUCTS (Dynamic)
 // ============================================================
 
 async function dbGetProducts() {
@@ -153,26 +156,33 @@ async function dbGetProducts() {
   return data || [];
 }
 
-async function dbUpdateProductCost(productId, costData) {
-  const totalCost = (Number(costData.bottle_cost) || 0) + 
-                    (Number(costData.label_cost) || 0) + 
-                    (Number(costData.oil_cost) || 0) + 
-                    (Number(costData.packaging_cost) || 0);
+async function dbUpdateProductCost(productId, costData, costTypes) {
+  let totalCost = 0;
+  const updates = { cost_type: costData.cost_type || 'Breakdown' };
+  
+  // Dynamic costs — Supabase cost_types වලට අනුව
+  if (costTypes && costTypes.length > 0) {
+    const customCosts = {};
+    costTypes.forEach(ct => {
+      const key = ct.name.toLowerCase().replace(/\s+/g, '_');
+      const value = Number(costData[key]) || 0;
+      updates[key] = value;
+      customCosts[ct.name] = value;
+      totalCost += value;
+    });
+    updates.custom_costs = customCosts;
+  }
+  
   const sellingPrice = Number(costData.selling_price) || 0;
   const profitPerUnit = sellingPrice - totalCost;
   
+  updates.full_cost = totalCost;
+  updates.total_cost = totalCost;
+  updates.selling_price = sellingPrice;
+  updates.profit_per_unit = profitPerUnit;
+  
   const { data, error } = await sb.from('products')
-    .update({
-      cost_type: costData.cost_type || 'Breakdown',
-      bottle_cost: Number(costData.bottle_cost) || 0,
-      label_cost: Number(costData.label_cost) || 0,
-      oil_cost: Number(costData.oil_cost) || 0,
-      packaging_cost: Number(costData.packaging_cost) || 0,
-      full_cost: totalCost,
-      total_cost: totalCost,
-      selling_price: sellingPrice,
-      profit_per_unit: profitPerUnit
-    })
+    .update(updates)
     .eq('id', productId)
     .select()
     .single();
@@ -191,10 +201,44 @@ async function dbGetExpenses() {
 }
 
 // ============================================================
+// DATABASE — DYNAMIC SETTINGS (Categories, Types, Costs, Payments)
+// ============================================================
+
+async function dbGetCategories() {
+  const { data, error } = await sb.from('categories').select('*').order('display_order', { ascending: true });
+  if (error) return [];
+  return data || [];
+}
+
+async function dbGetProductTypes() {
+  const { data, error } = await sb.from('product_types').select('*').order('display_order', { ascending: true });
+  if (error) return [];
+  return data || [];
+}
+
+async function dbGetCostTypes() {
+  const { data, error } = await sb.from('cost_types').select('*').order('display_order', { ascending: true });
+  if (error) return [];
+  return data || [];
+}
+
+async function dbGetPaymentMethods() {
+  const { data, error } = await sb.from('payment_methods').select('*').order('display_order', { ascending: true });
+  if (error) return [];
+  return data || [];
+}
+
+async function dbGetDeliverySettings() {
+  const { data, error } = await sb.from('delivery_settings').select('*').eq('id', 1).single();
+  if (error) return { base_charge: 350, free_delivery_threshold: 3 };
+  return data || { base_charge: 350, free_delivery_threshold: 3 };
+}
+
+// ============================================================
 // ORDER LOGIC — Complete with Items + Discount
 // ============================================================
 
-async function completeOrder(orderId, completionData) {
+async function completeOrder(orderId, completionData, costTypes) {
   const { 
     order_type, 
     payment_method, 
@@ -212,12 +256,12 @@ async function completeOrder(orderId, completionData) {
     productMap[String(p.name || '').trim().toLowerCase()] = p;
   });
   
-  // ---- Step 1: Delete existing items ----
+  // Delete existing items
   for (const item of existingItems) {
     await sb.from('order_items').delete().eq('id', item.id);
   }
   
-  // ---- Step 2: Insert updated items ----
+  // Insert updated items
   let totalAmount = 0;
   let totalCost = 0;
   const itemsSummaryParts = [];
@@ -247,10 +291,10 @@ async function completeOrder(orderId, completionData) {
     }]);
   }
   
-  // ---- Step 3: Calculate final numbers ----
   const deliveryCharge = Number(delivery_charge) || 0;
   const discountAmount = Number(discount) || 0;
   
+  // Commission — dynamic payment method
   let commission = Number(commission_override) || 0;
   if (!commission_override && payment_method) {
     const commissions = await dbGetCommissions();
@@ -265,7 +309,6 @@ async function completeOrder(orderId, completionData) {
   const netProfit = netTotal - totalCost - commission;
   const profitMargin = netTotal > 0 ? (netProfit / netTotal) * 100 : 0;
   
-  // ---- Step 4: Update order ----
   const updatedOrder = await dbUpdateOrder(orderId, {
     order_type: order_type || '',
     payment_method: payment_method || '',
@@ -313,7 +356,7 @@ window.saveOrderToSupabase = async function(orderData, cartItems) {
     
     const itemsToInsert = cartItems.map(item => {
       const qty = Number(item.quantity) || 1;
-      const unitPrice = 1500;
+      const unitPrice = Number(item.price) || Number(item.selling_price) || 1500;
       const product = productMap[String(item.name || '').trim().toLowerCase()];
       const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
       const totalIncome = unitPrice * qty;
@@ -417,7 +460,6 @@ function AdminOrdersLogin({ onSuccess, onClose }) {
     </div>
   );
 }
-
 // ============================================================
 // UI — ADMIN ORDERS PANEL
 // ============================================================
@@ -430,6 +472,11 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
   const [loading, setLoading] = aoUseState(true);
   const [message, setMessage] = aoUseState('');
   const [selectedOrder, setSelectedOrder] = aoUseState(null);
+
+  // Dynamic settings
+  const [costTypes, setCostTypes] = aoUseState([]);
+  const [paymentMethods, setPaymentMethods] = aoUseState([]);
+  const [deliverySettings, setDeliverySettings] = aoUseState({ base_charge: 350, free_delivery_threshold: 3 });
   
   async function loadOrders() {
     setLoading(true);
@@ -447,10 +494,26 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
     }
     setLoading(false);
   }
+
+  async function loadDynamicSettings() {
+    try {
+      const [costs, payments, delivery] = await Promise.all([
+        dbGetCostTypes(),
+        dbGetPaymentMethods(),
+        dbGetDeliverySettings()
+      ]);
+      setCostTypes(costs);
+      setPaymentMethods(payments);
+      setDeliverySettings(delivery);
+    } catch (err) {
+      console.error('Settings load error:', err);
+    }
+  }
   
   aoUseEffect(() => {
     if (isAuthenticated) {
       loadOrders();
+      loadDynamicSettings();
       
       const channel = sb.channel('orders-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
@@ -471,7 +534,6 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
   async function handleCloseAndSignOut() {
     console.log('🔄 Closing PnL Panel — signing out Supabase + reloading reviews...');
     
-    // 1. Supabase Logout
     try {
       await window.supabaseClient.auth.signOut();
       console.log('✅ Supabase signed out');
@@ -479,10 +541,8 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
       console.error('Supabase signout error:', err);
     }
     
-    // 2. Panel Close
     if (onClose) onClose();
     
-    // 3. Reviews Reload — anon user විදිහට
     try {
       const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
       if (reviewsData && window.__setReviews) {
@@ -557,7 +617,16 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
               {activeTab === 'cancelled' && (
                 <OrdersList orders={cancelledOrders} status="cancelled" onRefresh={loadOrders} showMsg={showMsg} onSelectOrder={setSelectedOrder} />
               )}
-              {activeTab === 'settings' && <SettingsTab showMsg={showMsg} />}
+              {activeTab === 'settings' && (
+                <SettingsTab 
+                  showMsg={showMsg} 
+                  costTypes={costTypes} 
+                  setCostTypes={setCostTypes} 
+                  deliverySettings={deliverySettings} 
+                  setDeliverySettings={setDeliverySettings}
+                  paymentMethods={paymentMethods}
+                />
+              )}
               {activeTab === 'commissions' && <CommissionsTab showMsg={showMsg} />}
               {activeTab === 'pnl' && <PnLReportTab showMsg={showMsg} />}
             </>
@@ -568,6 +637,7 @@ function AdminOrdersPanel({ onClose, isAuthenticated, onNeedAuth }) {
       {selectedOrder && (
         <OrderCompleteModal 
           order={selectedOrder}
+          paymentMethods={paymentMethods}
           onClose={() => setSelectedOrder(null)}
           onComplete={async () => {
             await loadOrders();
@@ -709,12 +779,12 @@ function OrdersList({ orders, status, onRefresh, showMsg, onSelectOrder }) {
 }
 
 // ============================================================
-// UI — ORDER COMPLETE MODAL
+// UI — ORDER COMPLETE MODAL (Dynamic)
 // ============================================================
 
-function OrderCompleteModal({ order, onClose, onComplete }) {
+function OrderCompleteModal({ order, onClose, onComplete, paymentMethods }) {
   const [orderType, setOrderType] = aoUseState('Deliver');
-  const [paymentMethod, setPaymentMethod] = aoUseState('Cash');
+  const [paymentMethod, setPaymentMethod] = aoUseState('');
   const [deliveryCharge, setDeliveryCharge] = aoUseState(order.delivery_charge || 0);
   const [discount, setDiscount] = aoUseState(order.discount || 0);
   const [commission, setCommission] = aoUseState(0);
@@ -727,7 +797,9 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
   const [newItem, setNewItem] = aoUseState({ product_name: '', quantity: 1 });
   
   const orderTypes = ['Deliver', 'In-Store'];
-  const paymentMethods = ['Cash', 'Card', 'Online', 'KOKO', 'Bank', 'Daraz COD'];
+  const availablePayments = paymentMethods && paymentMethods.length > 0 
+    ? paymentMethods.map(p => p.name) 
+    : ['Cash', 'Card', 'Online', 'KOKO', 'Bank', 'Daraz COD'];
   
   aoUseEffect(() => {
     async function load() {
@@ -743,6 +815,10 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
         
         const prods = await dbGetProducts();
         setProducts(prods);
+        
+        if (availablePayments.length > 0) {
+          setPaymentMethod(availablePayments[0]);
+        }
       } catch (e) { console.error(e); }
     }
     load();
@@ -765,12 +841,13 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     }
     const product = products.find(p => p.name === newItem.product_name);
     const unitCost = product ? (Number(product.total_cost) || Number(product.full_cost) || 0) : 0;
+    const unitPrice = product ? (Number(product.selling_price) || Number(product.price) || 1500) : 1500;
     
     setItems([...items, {
       id: null,
       product_name: newItem.product_name,
       quantity: Number(newItem.quantity) || 1,
-      unit_price: 1500,
+      unit_price: unitPrice,
       unit_cost: unitCost
     }]);
     
@@ -805,6 +882,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
     setLoading(true);
     setError('');
     try {
+      const costTypes = await dbGetCostTypes();
       await completeOrder(order.order_id, {
         order_type: orderType,
         payment_method: paymentMethod,
@@ -812,7 +890,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
         discount: Number(discount) || 0,
         commission_override: Number(commission) || 0,
         updated_items: items
-      });
+      }, costTypes);
       onComplete();
     } catch (e) {
       setError(e.message);
@@ -854,14 +932,14 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
                   <div key={idx} className="ao-item-edit-row">
                     <div className="ao-item-edit-name">
                       <div className="ao-item-edit-title">{it.product_name}</div>
-                      <div className="ao-item-edit-price">Rs. {it.unit_price} each</div>
+                      <div className="ao-item-edit-price">{fmtRs(it.unit_price)} each</div>
                     </div>
                     <div className="ao-item-edit-qty">
                       <button onClick={() => updateItemQty(idx, it.quantity - 1)}>−</button>
                       <span>{it.quantity}</span>
                       <button onClick={() => updateItemQty(idx, it.quantity + 1)}>+</button>
                     </div>
-                    <div className="ao-item-edit-total">Rs. {(it.unit_price * it.quantity).toLocaleString()}</div>
+                    <div className="ao-item-edit-total">{fmtRs(it.unit_price * it.quantity)}</div>
                     <button className="ao-item-edit-remove" onClick={() => removeItem(idx)}>✕</button>
                   </div>
                 ))
@@ -910,7 +988,7 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
           <div className="ao-modal-section">
             <label className="ao-modal-label">Payment Method</label>
             <select className="ao-modal-input" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-              {paymentMethods.map(p => <option key={p} value={p}>{p}</option>)}
+              {availablePayments.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           
@@ -962,23 +1040,24 @@ function OrderCompleteModal({ order, onClose, onComplete }) {
 }
 
 // ============================================================
-// UI — SETTINGS TAB
+// UI — SETTINGS TAB (Dynamic Costs)
 // ============================================================
 
-function SettingsTab({ showMsg }) {
+function SettingsTab({ showMsg, costTypes, setCostTypes, deliverySettings, setDeliverySettings, paymentMethods }) {
   const [products, setProducts] = aoUseState([]);
   const [selectedProduct, setSelectedProduct] = aoUseState(null);
-  const [form, setForm] = aoUseState({
-    cost_type: 'Breakdown',
-    bottle_cost: 0,
-    label_cost: 0,
-    oil_cost: 0,
-    packaging_cost: 0,
-    selling_price: 1500
-  });
+  const [form, setForm] = aoUseState({ cost_type: 'Breakdown', selling_price: 1500 });
   const [loading, setLoading] = aoUseState(true);
   const [refreshing, setRefreshing] = aoUseState(false);
   const [lastRefresh, setLastRefresh] = aoUseState(null);
+  const [subTab, setSubTab] = aoUseState('products');
+  
+  // New cost type
+  const [newCostName, setNewCostName] = aoUseState('');
+  
+  // New delivery
+  const [deliveryBase, setDeliveryBase] = aoUseState(deliverySettings.base_charge);
+  const [deliveryThreshold, setDeliveryThreshold] = aoUseState(deliverySettings.free_delivery_threshold);
   
   aoUseEffect(() => {
     loadProducts();
@@ -987,17 +1066,8 @@ function SettingsTab({ showMsg }) {
   aoUseEffect(() => {
     const interval = setInterval(() => {
       loadProducts(true);
-    }, 10000);
+    }, 15000);
     return () => clearInterval(interval);
-  }, []);
-  
-  aoUseEffect(() => {
-    const channel = sb.channel('products-settings-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-        loadProducts(true);
-      })
-      .subscribe();
-    return () => { sb.removeChannel(channel); };
   }, []);
   
   async function loadProducts(silent = false) {
@@ -1028,20 +1098,18 @@ function SettingsTab({ showMsg }) {
   
   function selectProduct(p) {
     setSelectedProduct(p);
-    setForm({
-      cost_type: p.cost_type || 'Breakdown',
-      bottle_cost: p.bottle_cost || 0,
-      label_cost: p.label_cost || 0,
-      oil_cost: p.oil_cost || 0,
-      packaging_cost: p.packaging_cost || 0,
-      selling_price: p.selling_price || p.price || 1500
+    const costForm = { cost_type: p.cost_type || 'Breakdown', selling_price: p.selling_price || 1500 };
+    costTypes.forEach(ct => {
+      const key = ct.name.toLowerCase().replace(/\s+/g, '_');
+      costForm[key] = p[key] || 0;
     });
+    setForm(costForm);
   }
   
   async function handleSave() {
     if (!selectedProduct) return;
     try {
-      await dbUpdateProductCost(selectedProduct.id, form);
+      await dbUpdateProductCost(selectedProduct.id, form, costTypes);
       showMsg('✅ Product cost updated!');
       await loadProducts(true);
     } catch (e) {
@@ -1049,120 +1117,216 @@ function SettingsTab({ showMsg }) {
     }
   }
   
-  const totalCost = (Number(form.bottle_cost) || 0) + (Number(form.label_cost) || 0) + 
-                   (Number(form.oil_cost) || 0) + (Number(form.packaging_cost) || 0);
+  // ---- Cost Type Add/Delete ----
+  async function handleAddCostType() {
+    if (!newCostName.trim()) return;
+    try {
+      const { error } = await window.supabaseClient.from('cost_types').insert([{ 
+        name: newCostName.trim(), 
+        display_order: 999 
+      }]);
+      if (error) throw error;
+      const fresh = await dbGetCostTypes();
+      setCostTypes(fresh);
+      setNewCostName('');
+      showMsg('✅ Cost type added');
+    } catch (e) {
+      showMsg('❌ Error: ' + e.message);
+    }
+  }
+  
+  async function handleDeleteCostType(id) {
+    if (!window.confirm('Delete this cost type?')) return;
+    try {
+      const { error } = await window.supabaseClient.from('cost_types').delete().eq('id', id);
+      if (error) throw error;
+      const fresh = await dbGetCostTypes();
+      setCostTypes(fresh);
+      showMsg('✅ Cost type deleted');
+    } catch (e) {
+      showMsg('❌ Error: ' + e.message);
+    }
+  }
+  
+  // ---- Delivery ----
+  async function handleSaveDelivery() {
+    try {
+      await window.supabaseClient.from('delivery_settings').update({
+        base_charge: Number(deliveryBase),
+        free_delivery_threshold: Number(deliveryThreshold),
+        updated_at: new Date().toISOString()
+      }).eq('id', 1);
+      setDeliverySettings({ base_charge: Number(deliveryBase), free_delivery_threshold: Number(deliveryThreshold) });
+      showMsg('✅ Delivery settings updated');
+    } catch (e) {
+      showMsg('❌ Error: ' + e.message);
+    }
+  }
+  
+  // ---- Calculations ----
+  let totalCost = 0;
+  costTypes.forEach(ct => {
+    const key = ct.name.toLowerCase().replace(/\s+/g, '_');
+    totalCost += Number(form[key]) || 0;
+  });
   const profitPerUnit = (Number(form.selling_price) || 0) - totalCost;
   
   const productsWithoutCost = products.filter(p => !p.total_cost || Number(p.total_cost) === 0).length;
   
   return (
     <div className="ao-settings">
-      <div className="ao-settings-layout">
-        <div className="ao-settings-sidebar">
-          <div className="ao-settings-header">
-            <h4 className="ao-section-title">Products ({products.length})</h4>
-            <button 
-              className="ao-refresh-btn" 
-              onClick={handleManualRefresh}
-              disabled={refreshing}
-              title="Refresh products"
-            >
-              {refreshing ? '⏳' : '🔄'}
-            </button>
+      <div style={{display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px'}}>
+        <button className={'ao-tab ' + (subTab === 'products' ? 'active' : '')} onClick={() => setSubTab('products')}>Product Costs</button>
+        <button className={'ao-tab ' + (subTab === 'costTypes' ? 'active' : '')} onClick={() => setSubTab('costTypes')}>Cost Types</button>
+        <button className={'ao-tab ' + (subTab === 'delivery' ? 'active' : '')} onClick={() => setSubTab('delivery')}>Delivery</button>
+      </div>
+      
+      {subTab === 'products' && (
+        <div className="ao-settings-layout">
+          <div className="ao-settings-sidebar">
+            <div className="ao-settings-header">
+              <h4 className="ao-section-title">Products ({products.length})</h4>
+              <button className="ao-refresh-btn" onClick={handleManualRefresh} disabled={refreshing} title="Refresh">
+                {refreshing ? '⏳' : '🔄'}
+              </button>
+            </div>
+            
+            {lastRefresh && (
+              <p className="ao-last-refresh">Last: {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
+            )}
+            
+            {productsWithoutCost > 0 && (
+              <div className="ao-warning-box">
+                ⚠️ {productsWithoutCost} product{productsWithoutCost > 1 ? 's' : ''} without cost
+              </div>
+            )}
+            
+            {loading ? (
+              <p className="ao-loading-small">Loading...</p>
+            ) : products.length === 0 ? (
+              <div className="ao-empty-small">
+                <p>No products yet</p>
+              </div>
+            ) : (
+              products.map(p => (
+                <button 
+                  key={p.id} 
+                  className={'ao-product-btn ' + (selectedProduct && selectedProduct.id === p.id ? 'active' : '')}
+                  onClick={() => selectProduct(p)}
+                >
+                  <span className="ao-product-name">{p.name}</span>
+                  <span className="ao-product-cost">
+                    {p.total_cost > 0 ? 'Cost: ' + fmtRs(p.total_cost) : '⚠️ No cost'}
+                  </span>
+                </button>
+              ))
+            )}
           </div>
           
-          {lastRefresh && (
-            <p className="ao-last-refresh">
-              Last: {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </p>
-          )}
-          
-          {productsWithoutCost > 0 && (
-            <div className="ao-warning-box">
-              ⚠️ {productsWithoutCost} product{productsWithoutCost > 1 ? 's' : ''} without cost
-            </div>
-          )}
-          
-          {loading ? (
-            <p className="ao-loading-small">Loading...</p>
-          ) : products.length === 0 ? (
-            <div className="ao-empty-small">
-              <p>No products yet</p>
-              <p style={{fontSize: '11px', opacity: 0.6}}>Add products from Admin Panel → Products tab</p>
-            </div>
-          ) : (
-            products.map(p => (
-              <button 
-                key={p.id} 
-                className={'ao-product-btn ' + (selectedProduct && selectedProduct.id === p.id ? 'active' : '')}
-                onClick={() => selectProduct(p)}
-              >
-                <span className="ao-product-name">{p.name}</span>
-                <span className="ao-product-cost">
-                  {p.total_cost > 0 ? 'Cost: ' + fmtRs(p.total_cost) : '⚠️ No cost yet'}
-                </span>
-              </button>
-            ))
-          )}
+          <div className="ao-settings-main">
+            {!selectedProduct ? (
+              <div className="ao-empty">
+                <p>👈 Select a product to edit costs</p>
+              </div>
+            ) : (
+              <>
+                <h3 className="ao-section-title">{selectedProduct.name}</h3>
+                <p className="ao-hint">Enter cost breakdown. Costs auto-load from Cost Types tab.</p>
+                
+                <div className="ao-form-grid">
+                  <div className="ao-form-field">
+                    <label>Cost Type</label>
+                    <select value={form.cost_type} onChange={(e) => setForm({...form, cost_type: e.target.value})}>
+                      <option value="Breakdown">Breakdown</option>
+                      <option value="Fixed">Fixed</option>
+                    </select>
+                  </div>
+                  
+                  {costTypes.map(ct => {
+                    const key = ct.name.toLowerCase().replace(/\s+/g, '_');
+                    return (
+                      <div key={ct.id} className="ao-form-field">
+                        <label>{ct.name} (Rs.)</label>
+                        <input 
+                          type="number" 
+                          value={form[key] || 0} 
+                          onChange={(e) => setForm({...form, [key]: e.target.value})} 
+                        />
+                      </div>
+                    );
+                  })}
+                  
+                  <div className="ao-form-field">
+                    <label>Selling Price (Rs.)</label>
+                    <input type="number" value={form.selling_price} onChange={(e) => setForm({...form, selling_price: e.target.value})} />
+                  </div>
+                </div>
+                
+                <div className="ao-summary-box">
+                  <div className="ao-summary-row"><span>Total Cost:</span><span>{fmtRs(totalCost)}</span></div>
+                  <div className="ao-summary-row"><span>Profit per Unit:</span><span className="ao-profit">{fmtRs(profitPerUnit)}</span></div>
+                </div>
+                
+                <button className="ao-btn ao-btn-primary" onClick={handleSave}>💾 Save Cost</button>
+              </>
+            )}
+          </div>
         </div>
-        
-        <div className="ao-settings-main">
-          {!selectedProduct ? (
-            <div className="ao-empty">
-              <p>👈 Select a product to edit costs</p>
-            </div>
-          ) : (
-            <>
-              <h3 className="ao-section-title">{selectedProduct.name}</h3>
-              <p className="ao-hint">Enter cost breakdown for this product. Auto-refresh every 10s.</p>
-              
-              <div className="ao-form-grid">
-                <div className="ao-form-field">
-                  <label>Cost Type</label>
-                  <select value={form.cost_type} onChange={(e) => setForm({...form, cost_type: e.target.value})}>
-                    <option value="Breakdown">Breakdown</option>
-                    <option value="Fixed">Fixed</option>
-                  </select>
-                </div>
-                <div className="ao-form-field">
-                  <label>Bottle Cost (Rs.)</label>
-                  <input type="number" value={form.bottle_cost} 
-                    onChange={(e) => setForm({...form, bottle_cost: e.target.value})} />
-                </div>
-                <div className="ao-form-field">
-                  <label>Label Cost (Rs.)</label>
-                  <input type="number" value={form.label_cost} 
-                    onChange={(e) => setForm({...form, label_cost: e.target.value})} />
-                </div>
-                <div className="ao-form-field">
-                  <label>Oil Cost (Rs.)</label>
-                  <input type="number" value={form.oil_cost} 
-                    onChange={(e) => setForm({...form, oil_cost: e.target.value})} />
-                </div>
-                <div className="ao-form-field">
-                  <label>Packaging Cost (Rs.)</label>
-                  <input type="number" value={form.packaging_cost} 
-                    onChange={(e) => setForm({...form, packaging_cost: e.target.value})} />
-                </div>
-                <div className="ao-form-field">
-                  <label>Selling Price (Rs.)</label>
-                  <input type="number" value={form.selling_price} 
-                    onChange={(e) => setForm({...form, selling_price: e.target.value})} />
+      )}
+      
+      {subTab === 'costTypes' && (
+        <div>
+          <h3 className="ao-section-title">Cost Types ({costTypes.length})</h3>
+          <p className="ao-hint">මේවා Product Costs tab එකේ auto-load වෙනවා.</p>
+          
+          <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
+            <input 
+              type="text" 
+              placeholder="New cost type (e.g., Cap Cost)" 
+              value={newCostName} 
+              onChange={(e) => setNewCostName(e.target.value)} 
+              className="ao-modal-input" 
+              style={{flex: 1}} 
+            />
+            <button onClick={handleAddCostType} className="ao-btn ao-btn-primary" style={{flex: '0 0 auto', minWidth: '100px'}}>+ Add</button>
+          </div>
+          
+          <div className="ao-orders-list">
+            {costTypes.map(ct => (
+              <div key={ct.id} className="ao-order-card" style={{padding: '15px'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                  <span style={{fontWeight: 600}}>{ct.name}</span>
+                  <button onClick={() => handleDeleteCostType(ct.id)} className="ao-btn ao-btn-delete" style={{flex: '0 0 auto', minWidth: 'auto', padding: '8px 12px'}}>🗑️ Delete</button>
                 </div>
               </div>
-              
-              <div className="ao-summary-box">
-                <div className="ao-summary-row"><span>Total Cost:</span><span>{fmtRs(totalCost)}</span></div>
-                <div className="ao-summary-row"><span>Profit per Unit:</span><span className="ao-profit">{fmtRs(profitPerUnit)}</span></div>
-              </div>
-              
-              <button className="ao-btn ao-btn-primary" onClick={handleSave}>
-                💾 Save Cost
-              </button>
-            </>
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+      
+      {subTab === 'delivery' && (
+        <div>
+          <h3 className="ao-section-title">🚚 Delivery Settings</h3>
+          <p className="ao-hint">Delivery charges edit කරන්න. Cart එකට auto apply වෙනවා.</p>
+          
+          <div className="ao-form-grid" style={{maxWidth: '500px'}}>
+            <div className="ao-form-field">
+              <label>Base Delivery Charge (Rs.)</label>
+              <input type="number" value={deliveryBase} onChange={(e) => setDeliveryBase(e.target.value)} />
+            </div>
+            <div className="ao-form-field">
+              <label>Free Delivery Threshold (items)</label>
+              <input type="number" value={deliveryThreshold} onChange={(e) => setDeliveryThreshold(e.target.value)} />
+            </div>
+          </div>
+          
+          <p style={{fontSize: '13px', color: '#666', marginBottom: '15px'}}>
+            ⚠️ {deliveryThreshold}+ items ගත්තොත් delivery FREE.
+          </p>
+          
+          <button onClick={handleSaveDelivery} className="ao-btn ao-btn-primary">💾 Save Delivery Settings</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1223,30 +1387,19 @@ function CommissionsTab({ showMsg }) {
             <div className="ao-form-field">
               <label>Rate (%)</label>
               <input type="number" step="0.01" value={editData[c.method]?.rate || 0}
-                onChange={(e) => setEditData({
-                  ...editData,
-                  [c.method]: { ...editData[c.method], rate: e.target.value }
-                })} />
+                onChange={(e) => setEditData({...editData, [c.method]: { ...editData[c.method], rate: e.target.value }})} />
             </div>
             <div className="ao-form-field">
               <label>Fixed Fee (Rs.)</label>
               <input type="number" value={editData[c.method]?.fixed_fee || 0}
-                onChange={(e) => setEditData({
-                  ...editData,
-                  [c.method]: { ...editData[c.method], fixed_fee: e.target.value }
-                })} />
+                onChange={(e) => setEditData({...editData, [c.method]: { ...editData[c.method], fixed_fee: e.target.value }})} />
             </div>
             <div className="ao-form-field">
               <label>Notes</label>
               <input type="text" value={editData[c.method]?.notes || ''}
-                onChange={(e) => setEditData({
-                  ...editData,
-                  [c.method]: { ...editData[c.method], notes: e.target.value }
-                })} />
+                onChange={(e) => setEditData({...editData, [c.method]: { ...editData[c.method], notes: e.target.value }})} />
             </div>
-            <button className="ao-btn ao-btn-primary" onClick={() => saveCommission(c.method)}>
-              💾 Save
-            </button>
+            <button className="ao-btn ao-btn-primary" onClick={() => saveCommission(c.method)}>💾 Save</button>
           </div>
         ))}
       </div>
@@ -1566,4 +1719,4 @@ if (document.readyState === 'loading') {
   injectOrdersButton();
 }
 
-console.log('✅ AROMA LAB Admin Orders System v3 loaded');
+console.log('✅ AROMA LAB Admin Orders System v4 loaded');
