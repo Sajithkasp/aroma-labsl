@@ -1,5 +1,5 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot (FINAL FIXED VERSION)
+ * AROMA LAB — AI Chat Bot (FINAL VERSION with Rate Limit Fix)
  * File: gemini-chat.js
  * Pure JavaScript — No React, No Babel
  *************************************************************/
@@ -17,68 +17,59 @@ var GC_STATE = {
   messages: [],
   products: [],
   botSettings: null,
-  isLoading: false
+  isLoading: false,
+  lastMessageTime: 0
 };
 
+// Minimum time between messages (milliseconds)
+var GC_MIN_INTERVAL = 3000; // 3 seconds
+
 // ============================================================
-// SAFE SUPABASE CLIENT GETTER
+// SUPABASE CLIENT
 // ============================================================
 
 function gcGetSupabaseClient() {
   if (window.supabaseClient) return window.supabaseClient;
   if (window.supabase && typeof window.supabase.from === 'function') return window.supabase;
-  if (typeof window.supabase !== 'undefined' && window.supabase.from) return window.supabase;
   return null;
 }
 
 // ============================================================
-// LOAD DATA FROM SUPABASE (SAFE)
+// LOAD DATA
 // ============================================================
 
 async function gcLoadProducts() {
   try {
     var sb = gcGetSupabaseClient();
-    if (!sb) {
-      console.warn('⚠️ Supabase client not found — skipping products');
-      return [];
-    }
+    if (!sb) return [];
     var res = await sb
       .from('products')
       .select('*')
       .order('created_at', { ascending: true });
-    if (res.error) {
-      console.warn('Products load error:', res.error);
-      return [];
-    }
+    if (res.error) return [];
     return res.data || [];
   } catch (e) {
-    console.warn('Products fetch failed:', e);
     return [];
   }
 }
 
 async function gcLoadBotSettings() {
-  var defaultSettings = {
+  var defaults = {
     system_prompt: '',
     welcome_message: "Hi! I'm AROMA Assistant. How can I help you today? 🌸"
   };
   try {
     var sb = gcGetSupabaseClient();
-    if (!sb) {
-      console.warn('⚠️ Supabase client not found — using defaults');
-      return defaultSettings;
-    }
+    if (!sb) return defaults;
     var res = await sb
       .from('bot_settings')
       .select('*')
       .eq('id', 1)
       .single();
-    if (res.error) {
-      return defaultSettings;
-    }
-    return res.data || defaultSettings;
+    if (res.error) return defaults;
+    return res.data || defaults;
   } catch (e) {
-    return defaultSettings;
+    return defaults;
   }
 }
 
@@ -153,17 +144,11 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
 }
 
 // ============================================================
-// CALL EDGE FUNCTION (FIXED)
+// CALL EDGE FUNCTION
 // ============================================================
 
 async function gcCallEdge(systemPrompt, chatHistory) {
-  // Keep only last 10 messages to avoid token limits
   var recentHistory = chatHistory.slice(-10);
-
-  console.log('📤 Sending to edge:', {
-    url: GC_EDGE_URL,
-    historyLength: recentHistory.length
-  });
 
   var response = await fetch(GC_EDGE_URL, {
     method: 'POST',
@@ -177,18 +162,14 @@ async function gcCallEdge(systemPrompt, chatHistory) {
     })
   });
 
-  console.log('📥 Edge response status:', response.status);
-
   if (!response.ok) {
     var errText = await response.text();
-    console.error('❌ Edge error body:', errText);
-    throw new Error('API error ' + response.status + ': ' + errText.substring(0, 200));
+    console.error('Edge error:', response.status, errText);
+    throw new Error('API error ' + response.status);
   }
 
   var data = await response.json();
-  console.log('✅ Edge data:', data);
-
-  if (!data.reply) throw new Error('No reply from AI');
+  if (!data.reply) throw new Error('No reply');
   return data.reply;
 }
 
@@ -224,7 +205,7 @@ var GC_QUICK_Q = {
 };
 
 // ============================================================
-// RENDER CHAT BOT
+// RENDER
 // ============================================================
 
 function gcRender() {
@@ -249,7 +230,6 @@ function gcRender() {
 
   if (!GC_STATE.isOpen) return;
 
-  // CHAT WINDOW
   var win = document.createElement('div');
   win.className = 'gc-window';
 
@@ -417,11 +397,19 @@ function gcRender() {
 }
 
 // ============================================================
-// SEND MESSAGE
+// SEND MESSAGE (with rate limit)
 // ============================================================
 
 async function gcSendMessage(text) {
   if (GC_STATE.isLoading) return;
+
+  // Rate limit check
+  var now = Date.now();
+  if (GC_STATE.lastMessageTime && (now - GC_STATE.lastMessageTime) < GC_MIN_INTERVAL) {
+    console.warn('⏱️ Please wait before sending another message');
+    return;
+  }
+  GC_STATE.lastMessageTime = now;
 
   GC_STATE.messages.push({ role: 'user', text: text });
   GC_STATE.isLoading = true;
@@ -436,8 +424,7 @@ async function gcSendMessage(text) {
     var reply = await gcCallEdge(systemPrompt, GC_STATE.messages);
     GC_STATE.messages.push({ role: 'model', text: reply });
   } catch (err) {
-    console.error('❌ Chat error:', err);
-    console.error('❌ Error message:', err.message);
+    console.error('Chat error:', err);
 
     var errMsg = GC_STATE.language === 'sinhala'
       ? "❌ කණගාටුයි, දැන් ප්‍රතිචාර දක්වන්න බැහැ. කරුණාකර WhatsApp 0777 804 705 අමතන්න."
@@ -481,4 +468,4 @@ if (document.readyState === 'loading') {
   });
 } else {
   setTimeout(gcInit, 1500);
-        }
+}
