@@ -1,15 +1,12 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot
+ * AROMA LAB — AI Chat Bot (via Supabase Edge Function)
  * File: gemini-chat.js
- * 
- * ✅ API Key Supabase Edge Function එකේ — 100% secure
- * ✅ හැම error එකක්ම fix කරලා
  *************************************************************/
 
 const EDGE_FUNCTION_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co/functions/v1/gemini-chat';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM';
 
-const GC_LANGUAGES = [
+const LANGUAGES = [
   { code: 'english', label: 'English', flag: '🇬🇧' },
   { code: 'sinhala', label: 'සිංහල', flag: '🇱🇰' },
   { code: 'tamil', label: 'தமிழ்', flag: '🇱🇰' }
@@ -57,7 +54,6 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
       if (p.base_notes) productsList += '   Base Notes: ' + p.base_notes + '\n';
       const price = Number(p.selling_price) || Number(p.price) || 1500;
       productsList += '   Price: Rs. ' + price + '\n';
-      if (p.stock !== undefined && p.stock !== null) productsList += '   Stock: ' + p.stock + '\n';
       productsList += '\n';
     });
   } else {
@@ -75,7 +71,7 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
   
   const basePrompt = customPrompt || 'You are AROMA Assistant, the official AI assistant for AROMA LAB Fine Fragrances (Sri Lanka).';
 
-  return basePrompt + '\n\n=== COMPANY INFO ===\n- Brand: AROMA LAB Fine Fragrances\n- Location: Colombo, Sri Lanka\n- Products: Premium Eau De Parfum 15ml\n- Long lasting: 12+ hours\n- WhatsApp: 0777 804 705\n' + productsList + '\n=== DELIVERY & DISCOUNTS ===\n- 3+ items → FREE Delivery 🎉\n- 1-2 items → Rs. 350 delivery charge\n- FREE delivery applies to ALL order methods (WhatsApp, Daraz, Bank Deposit, KOKO, Cash)\n\n=== ORDER METHODS ===\n1. WhatsApp (BEST) — https://wa.me/94777804705\n2. Daraz — Cash on Delivery / KOKO Pay Later\n3. Bank Deposit — Sampath Bank\n   - Account Holder: K.A.S.P. Wijerathne\n   - Account No: 100252479872\n   - Branch: Pettah\n\n=== YOUR ROLE ===\n- Answer customer questions about products, smells, prices, delivery, payment\n- When asked about a product smell, describe using Top/Heart/Base notes\n- Recommend products based on customer preferences\n- PUSH customers to buy 3+ items (FREE Delivery)\n- Guide customers to order via WhatsApp (best method)\n- Explain Bank Deposit option\n- Be friendly, warm, and helpful\n\n=== RULES ===\n- ' + languageInstruction + '\n- Keep replies SHORT (2-3 sentences max)\n- Be FRIENDLY and CASUAL\n- Use emojis occasionally (🌸, ✨, 🎉, 💬)\n- If unsure, say "Please contact us on WhatsApp 0777 804 705"\n- NEVER make up products or prices\n- If customer asks about order status, say "Please check WhatsApp 0777 804 705"';
+  return basePrompt + '\n\n=== COMPANY INFO ===\n- Brand: AROMA LAB Fine Fragrances\n- Location: Colombo, Sri Lanka\n- Products: Premium Eau De Parfum 15ml\n- Long lasting: 12+ hours\n- WhatsApp: 0777 804 705\n' + productsList + '\n=== DELIVERY ===\n- 3+ items → FREE Delivery 🎉\n- 1-2 items → Rs. 350 delivery charge\n\n=== ORDER METHODS ===\n1. WhatsApp (BEST) — https://wa.me/94777804705\n2. Daraz — Cash on Delivery / KOKO Pay Later\n3. Bank Deposit — Sampath Bank\n\n=== RULES ===\n- ' + languageInstruction + '\n- Keep replies SHORT (2-3 sentences max)\n- Be FRIENDLY and CASUAL\n- Use emojis occasionally\n- If unsure, say "Please contact us on WhatsApp 0777 804 705"';
 }
 
 async function gcCallEdgeFunction(systemPrompt, chatHistory) {
@@ -91,19 +87,13 @@ async function gcCallEdgeFunction(systemPrompt, chatHistory) {
     })
   });
 
-  const responseText = await response.text();
-
   if (!response.ok) {
-    throw new Error('API error ' + response.status + ': ' + responseText.substring(0, 100));
+    const errorText = await response.text();
+    throw new Error('API error ' + response.status + ': ' + errorText.substring(0, 100));
   }
 
-  let data;
-  try {
-    data = JSON.parse(responseText);
-  } catch (e) {
-    throw new Error('Invalid response: ' + responseText.substring(0, 100));
-  }
-
+  const data = await response.json();
+  
   if (!data.reply) {
     throw new Error('No reply from AI');
   }
@@ -115,22 +105,18 @@ async function gcCallEdgeFunction(systemPrompt, chatHistory) {
 // CHAT COMPONENT
 // ============================================================
 
-const gcUseState = React.useState;
-const gcUseEffect = React.useEffect;
-const gcUseRef = React.useRef;
-
 function AromaChatBot() {
-  const [isOpen, setIsOpen] = gcUseState(false);
-  const [language, setLanguage] = gcUseState('english');
-  const [messages, setMessages] = gcUseState([]);
-  const [input, setInput] = gcUseState('');
-  const [isLoading, setIsLoading] = gcUseState(false);
-  const [products, setProducts] = gcUseState([]);
-  const [botSettings, setBotSettings] = gcUseState(null);
-  const [isInitialized, setIsInitialized] = gcUseState(false);
-  const messagesEndRef = gcUseRef(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [language, setLanguage] = React.useState('english');
+  const [messages, setMessages] = React.useState([]);
+  const [input, setInput] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [products, setProducts] = React.useState([]);
+  const [botSettings, setBotSettings] = React.useState(null);
+  const [isInitialized, setIsInitialized] = React.useState(false);
+  const messagesEndRef = React.useRef(null);
 
-  gcUseEffect(() => {
+  React.useEffect(() => {
     if (!isOpen || isInitialized) return;
     let mounted = true;
     (async () => {
@@ -145,21 +131,21 @@ function AromaChatBot() {
     return () => { mounted = false; };
   }, [isOpen, isInitialized]);
 
-  gcUseEffect(() => {
+  React.useEffect(() => {
     if (!isOpen) return;
     let mounted = true;
     gcLoadProducts().then(p => { if (mounted) setProducts(p); });
     return () => { mounted = false; };
   }, [isOpen]);
 
-  gcUseEffect(() => {
+  React.useEffect(() => {
     if (isOpen && messages.length === 0 && botSettings) {
       const welcome = botSettings.welcome_message || "Hi! I'm AROMA Assistant. How can I help you today? 🌸";
       setMessages([{ role: 'model', text: welcome }]);
     }
   }, [isOpen, botSettings, messages.length]);
 
-  gcUseEffect(() => {
+  React.useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -257,7 +243,7 @@ function AromaChatBot() {
       
       e('div', { className: 'gc-lang-selector' },
         e('span', { className: 'gc-lang-label' }, 'Language:'),
-        GC_LANGUAGES.map(function(lang) {
+        LANGUAGES.map(function(lang) {
           return e('button', {
             key: lang.code,
             className: 'gc-lang-btn' + (language === lang.code ? ' active' : ''),
@@ -330,57 +316,6 @@ function gcMountChatBot() {
   root.render(React.createElement(AromaChatBot));
 
   console.log('✅ AROMA LAB Chat Bot loaded');
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(gcMountChatBot, 1500);
-  });
-} else {
-  setTimeout(gcMountChatBot, 1500);
-}
-// ============================================================
-// SIMPLE TEST — Button එක විතරක්
-// ============================================================
-
-console.log('🔥 gemini-chat.js loaded!');
-
-function gcMountChatBot() {
-  console.log('🔥 gcMountChatBot called');
-  
-  const mountId = 'aroma-chat-bot-mount';
-  if (document.getElementById(mountId)) {
-    console.log('🔥 Mount already exists');
-    return;
-  }
-
-  const mount = document.createElement('div');
-  mount.id = mountId;
-  document.body.appendChild(mount);
-
-  const root = ReactDOM.createRoot(mount);
-  root.render(
-    React.createElement('button', {
-      className: 'gc-float-btn',
-      onClick: function() { alert('Button clicked!'); },
-      style: {
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        width: '60px',
-        height: '60px',
-        borderRadius: '50%',
-        background: '#0A2E1F',
-        color: '#FFFBF5',
-        border: '3px solid #B8963E',
-        fontSize: '24px',
-        zIndex: 999999,
-        cursor: 'pointer'
-      }
-    }, '✨')
-  );
-  
-  console.log('🔥 Button mounted!');
 }
 
 if (document.readyState === 'loading') {
