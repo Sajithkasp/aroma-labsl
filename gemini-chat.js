@@ -1,5 +1,5 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot
+ * AROMA LAB — AI Chat Bot (FIXED)
  * File: gemini-chat.js
  * Pure JavaScript — React නැහැ, Babel නැහැ
  *************************************************************/
@@ -59,7 +59,7 @@ async function gcLoadBotSettings() {
 
 function gcBuildSystemPrompt(products, customPrompt, language) {
   var productsList = '\n=== AROMA LAB PRODUCTS ===\n\n';
-  
+
   if (products && products.length > 0) {
     products.forEach(function(p, i) {
       productsList += (i + 1) + '. ' + (p.name || 'Unknown') + '\n';
@@ -75,7 +75,7 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
   } else {
     productsList += 'No products available currently.\n';
   }
-  
+
   var langInstr = '';
   if (language === 'sinhala') {
     langInstr = 'You MUST reply in Sinhala language only. Use friendly Sinhala tone.';
@@ -84,9 +84,9 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
   } else {
     langInstr = 'Reply in English. If customer speaks Sinhala or Singlish, reply in Singlish.';
   }
-  
+
   var base = customPrompt || 'You are AROMA Assistant, the official AI assistant for AROMA LAB Fine Fragrances (Sri Lanka).';
-  
+
   return base +
     '\n\n=== COMPANY INFO ===\n' +
     '- Brand: AROMA LAB Fine Fragrances\n' +
@@ -124,10 +124,13 @@ function gcBuildSystemPrompt(products, customPrompt, language) {
 }
 
 // ============================================================
-// CALL EDGE FUNCTION
+// CALL EDGE FUNCTION (FIXED)
 // ============================================================
 
 async function gcCallEdge(systemPrompt, chatHistory) {
+  // 👇 History එකේ අන්තිම messages 10 විතරක් යවන්න (token limit නිසා)
+  var recentHistory = chatHistory.slice(-10);
+
   var response = await fetch(GC_EDGE_URL, {
     method: 'POST',
     headers: {
@@ -136,15 +139,16 @@ async function gcCallEdge(systemPrompt, chatHistory) {
     },
     body: JSON.stringify({
       systemPrompt: systemPrompt,
-      chatHistory: chatHistory
+      chatHistory: recentHistory
     })
   });
-  
+
   if (!response.ok) {
     var errText = await response.text();
-    throw new Error('API error ' + response.status + ': ' + errText.substring(0, 100));
+    console.error('❌ Edge function error:', response.status, errText);
+    throw new Error('API error ' + response.status + ': ' + errText.substring(0, 200));
   }
-  
+
   var data = await response.json();
   if (!data.reply) throw new Error('No reply from AI');
   return data.reply;
@@ -188,10 +192,9 @@ var GC_QUICK_Q = {
 function gcRender() {
   var mount = document.getElementById('aroma-chat-bot-mount');
   if (!mount) return;
-  
-  // Clear everything
+
   mount.innerHTML = '';
-  
+
   // ---- FLOATING BUTTON ----
   var btn = document.createElement('button');
   btn.className = 'gc-float-btn' + (GC_STATE.isOpen ? ' gc-open' : '');
@@ -205,40 +208,40 @@ function gcRender() {
     gcRender();
   };
   mount.appendChild(btn);
-  
-  // ---- CHAT WINDOW ----
+
   if (!GC_STATE.isOpen) return;
-  
+
+  // ---- CHAT WINDOW ----
   var win = document.createElement('div');
   win.className = 'gc-window';
-  
-  // ============ HEADER ============
+
+  // HEADER
   var header = document.createElement('div');
   header.className = 'gc-header';
-  
+
   var headerInfo = document.createElement('div');
   headerInfo.className = 'gc-header-info';
-  
+
   var avatar = document.createElement('div');
   avatar.className = 'gc-header-avatar';
   avatar.textContent = '🌸';
-  
+
   var headerText = document.createElement('div');
   headerText.className = 'gc-header-text';
-  
+
   var hTitle = document.createElement('h3');
   hTitle.className = 'gc-header-title';
   hTitle.textContent = 'AROMA Assistant';
-  
+
   var hSub = document.createElement('p');
   hSub.className = 'gc-header-subtitle';
   hSub.innerHTML = '<span class="gc-status-dot"></span>Online';
-  
+
   headerText.appendChild(hTitle);
   headerText.appendChild(hSub);
   headerInfo.appendChild(avatar);
   headerInfo.appendChild(headerText);
-  
+
   var closeBtn = document.createElement('button');
   closeBtn.className = 'gc-close-btn';
   closeBtn.textContent = '×';
@@ -246,20 +249,20 @@ function gcRender() {
     GC_STATE.isOpen = false;
     gcRender();
   };
-  
+
   header.appendChild(headerInfo);
   header.appendChild(closeBtn);
   win.appendChild(header);
-  
-  // ============ LANGUAGE SELECTOR ============
+
+  // LANGUAGE SELECTOR
   var langSel = document.createElement('div');
   langSel.className = 'gc-lang-selector';
-  
+
   var langLabel = document.createElement('span');
   langLabel.className = 'gc-lang-label';
   langLabel.textContent = 'Language:';
   langSel.appendChild(langLabel);
-  
+
   GC_LANGS.forEach(function(lang) {
     var lb = document.createElement('button');
     lb.className = 'gc-lang-btn' + (GC_STATE.language === lang.code ? ' active' : '');
@@ -270,33 +273,32 @@ function gcRender() {
     };
     langSel.appendChild(lb);
   });
-  
+
   win.appendChild(langSel);
-  
-  // ============ MESSAGES ============
+
+  // MESSAGES
   var msgsArea = document.createElement('div');
   msgsArea.className = 'gc-messages';
-  
-  // Welcome (if empty)
+
   if (GC_STATE.messages.length === 0) {
     var welcome = document.createElement('div');
     welcome.className = 'gc-welcome';
-    
+
     var wIcon = document.createElement('div');
     wIcon.className = 'gc-welcome-icon';
     wIcon.textContent = '🌸';
-    
+
     var wTitle = document.createElement('div');
     wTitle.className = 'gc-welcome-title';
     wTitle.textContent = 'Welcome to AROMA LAB';
-    
+
     var wDesc = document.createElement('p');
     wDesc.className = 'gc-welcome-desc';
     wDesc.textContent = 'Ask me about our perfumes, prices, delivery, or how to order!';
-    
+
     var quickWrap = document.createElement('div');
     quickWrap.className = 'gc-quick-questions';
-    
+
     var qs = GC_QUICK_Q[GC_STATE.language] || GC_QUICK_Q.english;
     qs.forEach(function(q) {
       var qb = document.createElement('button');
@@ -307,36 +309,34 @@ function gcRender() {
       };
       quickWrap.appendChild(qb);
     });
-    
+
     welcome.appendChild(wIcon);
     welcome.appendChild(wTitle);
     welcome.appendChild(wDesc);
     welcome.appendChild(quickWrap);
     msgsArea.appendChild(welcome);
   }
-  
-  // Messages list
+
   GC_STATE.messages.forEach(function(msg) {
     var m = document.createElement('div');
     m.className = 'gc-msg ' + (msg.role === 'user' ? 'gc-msg-user' : 'gc-msg-bot') + (msg.isError ? ' gc-msg-error' : '');
     m.textContent = msg.text;
     msgsArea.appendChild(m);
   });
-  
-  // Loading dots
+
   if (GC_STATE.isLoading) {
     var typing = document.createElement('div');
     typing.className = 'gc-typing';
     typing.innerHTML = '<div class="gc-typing-dot"></div><div class="gc-typing-dot"></div><div class="gc-typing-dot"></div>';
     msgsArea.appendChild(typing);
   }
-  
+
   win.appendChild(msgsArea);
-  
-  // ============ INPUT AREA ============
+
+  // INPUT AREA
   var inputArea = document.createElement('div');
   inputArea.className = 'gc-input-area';
-  
+
   var input = document.createElement('textarea');
   input.className = 'gc-input';
   input.rows = 1;
@@ -355,7 +355,7 @@ function gcRender() {
       }
     }
   };
-  
+
   var sendBtn = document.createElement('button');
   sendBtn.className = 'gc-send-btn';
   sendBtn.innerHTML = '➤';
@@ -366,45 +366,48 @@ function gcRender() {
       gcSendMessage(val);
     }
   };
-  
+
   inputArea.appendChild(input);
   inputArea.appendChild(sendBtn);
   win.appendChild(inputArea);
-  
+
   mount.appendChild(win);
-  
-  // Auto scroll to bottom
+
   setTimeout(function() {
     msgsArea.scrollTop = msgsArea.scrollHeight;
   }, 50);
 }
 
 // ============================================================
-// SEND MESSAGE
+// SEND MESSAGE (FIXED with better error logging)
 // ============================================================
 
 async function gcSendMessage(text) {
   if (GC_STATE.isLoading) return;
-  
-  // Add user message
+
   GC_STATE.messages.push({ role: 'user', text: text });
   GC_STATE.isLoading = true;
   gcRender();
-  
+
   try {
-    var systemPrompt = gcBuildSystemPrompt(GC_STATE.products, GC_STATE.botSettings && GC_STATE.botSettings.system_prompt, GC_STATE.language);
+    var systemPrompt = gcBuildSystemPrompt(
+      GC_STATE.products,
+      GC_STATE.botSettings && GC_STATE.botSettings.system_prompt,
+      GC_STATE.language
+    );
     var reply = await gcCallEdge(systemPrompt, GC_STATE.messages);
     GC_STATE.messages.push({ role: 'model', text: reply });
   } catch (err) {
-    console.error('Chat error:', err);
+    console.error('❌ Chat error:', err);
+    console.error('❌ Error message:', err.message);
     var errMsg = GC_STATE.language === 'sinhala'
-      ? "❌ කණගාටුයි. WhatsApp 0777 804 705 අමතන්න."
+      ? "❌ කණගාටුයි, දැන් ප්‍රතිචාර දක්වන්න බැහැ. කරුණාකර WhatsApp 0777 804 705 අමතන්න."
       : GC_STATE.language === 'tamil'
-      ? "❌ மன்னிக்கவும். WhatsApp 0777 804 705."
-      : "❌ Sorry, please WhatsApp 0777 804 705.";
+      ? "❌ மன்னிக்கவும், இப்போது பதிலளிக்க முடியவில்லை. WhatsApp 0777 804 705."
+      : "❌ Sorry, I couldn't respond right now. Please WhatsApp 0777 804 705.";
     GC_STATE.messages.push({ role: 'model', text: errMsg, isError: true });
   }
-  
+
   GC_STATE.isLoading = false;
   gcRender();
 }
@@ -417,27 +420,25 @@ async function gcInit() {
   try {
     GC_STATE.products = await gcLoadProducts();
     GC_STATE.botSettings = await gcLoadBotSettings();
-    
-    // Create mount if not exists
+
     var mount = document.getElementById('aroma-chat-bot-mount');
     if (!mount) {
       mount = document.createElement('div');
       mount.id = 'aroma-chat-bot-mount';
       document.body.appendChild(mount);
     }
-    
+
     gcRender();
-    console.log('✅ AROMA LAB Chat Bot loaded (Pure JS)');
+    console.log('✅ AROMA LAB Chat Bot loaded');
   } catch (e) {
     console.error('❌ Chat Bot init failed:', e);
   }
 }
 
-// Start when DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(gcInit, 1500);
   });
 } else {
   setTimeout(gcInit, 1500);
-      }
+}
