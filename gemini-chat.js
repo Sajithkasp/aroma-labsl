@@ -1,23 +1,23 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot (Gemini)
+ * AROMA LAB — AI Chat Bot (via Supabase Edge Function)
  * File: gemini-chat.js
+ * 
+ * ⚠️ API Key එක මෙතන නැහැ — Supabase Edge Function එකේ
+ *    (GEMINI_API_KEY Secret එකේ) තියෙනවා.
  * 
  * Features:
  * - "Ask AI" floating button
  * - Language selector (English, Sinhala, Tamil)
  * - Auto-loads products from Supabase
  * - Loads system prompt from Supabase
- * - Friendly chat about products, smells, prices, ordering
- * - Pushes 3+ items for FREE delivery
+ * - Calls Gemini API through Supabase Edge Function
  *************************************************************/
 
 // ============================================================
 // CONFIG
 // ============================================================
 
-const GEMINI_API_KEY = 'AIzaSyBfHjNzAzUwCxM2JiYmNGASTg00KwnLPkk';
-const GEMINI_MODEL = 'gemini-3.8-flash';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_API_KEY;
+const EDGE_FUNCTION_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co/functions/v1/gemini-chat';
 
 // ============================================================
 // LANGUAGES
@@ -150,46 +150,37 @@ ${productsList}
 }
 
 // ============================================================
-// CALL GEMINI API
+// CALL SUPABASE EDGE FUNCTION
 // ============================================================
 
-async function gcCallGemini(systemPrompt, chatHistory) {
+async function gcCallEdgeFunction(systemPrompt, chatHistory) {
   try {
-    const contents = chatHistory.map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.text }]
-    }));
-
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM'
+      },
       body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        contents: contents,
-        generationConfig: {
-          temperature: 0.8,
-          maxOutputTokens: 500,
-          topP: 0.95,
-          topK: 40
-        }
+        systemPrompt: systemPrompt,
+        chatHistory: chatHistory
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Gemini error:', data);
-      throw new Error(data.error?.message || 'API error');
+      console.error('Edge function error:', data);
+      throw new Error(data.error || 'API error');
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('No response from AI');
+    if (!data.reply) {
+      throw new Error('No response from AI');
+    }
 
-    return text.trim();
+    return data.reply;
   } catch (err) {
-    console.error('Gemini call failed:', err);
+    console.error('Edge function call failed:', err);
     throw err;
   }
 }
@@ -254,7 +245,7 @@ function AromaChatBot() {
 
     try {
       const systemPrompt = gcBuildSystemPrompt(products, botSettings?.system_prompt, language);
-      const reply = await gcCallGemini(systemPrompt, newHistory);
+      const reply = await gcCallEdgeFunction(systemPrompt, newHistory);
       
       setMessages([...newHistory, { role: 'model', text: reply }]);
     } catch (err) {
@@ -430,7 +421,7 @@ function gcMountChatBot() {
   const root = ReactDOM.createRoot(mount);
   root.render(<AromaChatBot />);
 
-  console.log('✅ AROMA LAB Chat Bot loaded');
+  console.log('✅ AROMA LAB Chat Bot loaded (via Edge Function)');
 }
 
 // Wait for React + Supabase to be ready
@@ -438,4 +429,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => setTimeout(gcMountChatBot, 1500));
 } else {
   setTimeout(gcMountChatBot, 1500);
-      }
+                    }
