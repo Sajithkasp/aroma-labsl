@@ -1,5 +1,5 @@
 /*************************************************************
- * AROMA LAB — AI Chat Bot (FINAL VERSION with Rate Limit Fix)
+ * AROMA LAB — AI Chat Bot (Groq + Ask AI Button)
  * File: gemini-chat.js
  * Pure JavaScript — No React, No Babel
  *************************************************************/
@@ -214,11 +214,11 @@ function gcRender() {
 
   mount.innerHTML = '';
 
-  // FLOATING BUTTON
+  // FLOATING BUTTON — "✨ Ask AI"
   var btn = document.createElement('button');
   btn.className = 'gc-float-btn' + (GC_STATE.isOpen ? ' gc-open' : '');
   btn.title = 'Ask AI';
-  btn.innerHTML = GC_STATE.isOpen ? '×' : '✨';
+  btn.innerHTML = GC_STATE.isOpen ? '×' : '✨ Ask AI';
   btn.onclick = function() {
     GC_STATE.isOpen = !GC_STATE.isOpen;
     if (GC_STATE.isOpen && GC_STATE.messages.length === 0 && GC_STATE.botSettings) {
@@ -397,13 +397,13 @@ function gcRender() {
 }
 
 // ============================================================
-// SEND MESSAGE (with rate limit)
+// SEND MESSAGE
 // ============================================================
 
 async function gcSendMessage(text) {
   if (GC_STATE.isLoading) return;
 
-  // Rate limit check
+  // Rate limit
   var now = Date.now();
   if (GC_STATE.lastMessageTime && (now - GC_STATE.lastMessageTime) < GC_MIN_INTERVAL) {
     console.warn('⏱️ Please wait before sending another message');
