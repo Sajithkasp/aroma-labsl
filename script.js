@@ -27,53 +27,18 @@ const defaultProducts = [
 // SVG ICONS
 // ============================================================
 
-const SearchIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-);
-
-const UserIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-);
-
-const LogoutIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-);
-
-const CartIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-);
-
-const AdminIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-);
-
-const ChevronLeft = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-);
-
-const ChevronRight = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-);
-
-const FacebookIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-);
-
-const WhatsappIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-);
-
-const DarazIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-);
-
-const PhoneIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-);
-
-const MapPinIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-);
+const SearchIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>);
+const UserIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>);
+const LogoutIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>);
+const CartIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>);
+const AdminIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>);
+const ChevronLeft = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>);
+const ChevronRight = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>);
+const FacebookIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>);
+const WhatsappIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>);
+const DarazIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>);
+const PhoneIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>);
+const MapPinIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>);
 
 // ============================================================
 // HELPERS
@@ -84,193 +49,104 @@ function fmtRs(num) {
   return 'Rs. ' + n.toLocaleString('en-LK', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
-function todayStr() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return yyyy + '-' + mm + '-' + dd;
-}
-
 // ============================================================
-// DATABASE — CATEGORIES
+// DATABASE
 // ============================================================
 
 async function dbGetCategories() {
-  const { data, error } = await window.supabaseClient
-    .from('categories')
-    .select('*')
-    .order('display_order', { ascending: true });
+  const { data, error } = await window.supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
   if (error) return [];
   return data || [];
 }
-
 async function dbAddCategory(name) {
-  const { data, error } = await window.supabaseClient
-    .from('categories')
-    .insert([{ name: name.trim(), display_order: 999 }])
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('categories').insert([{ name: name.trim(), display_order: 999 }]).select().single();
   if (error) throw error;
   return data;
 }
-
 async function dbDeleteCategory(id) {
   const { error } = await window.supabaseClient.from('categories').delete().eq('id', id);
   if (error) throw error;
   return true;
 }
 
-// ============================================================
-// DATABASE — PRODUCT TYPES
-// ============================================================
-
 async function dbGetProductTypes() {
-  const { data, error } = await window.supabaseClient
-    .from('product_types')
-    .select('*')
-    .order('display_order', { ascending: true });
+  const { data, error } = await window.supabaseClient.from('product_types').select('*').order('display_order', { ascending: true });
   if (error) return [];
   return data || [];
 }
-
 async function dbAddProductType(name) {
-  const { data, error } = await window.supabaseClient
-    .from('product_types')
-    .insert([{ name: name.trim(), display_order: 999 }])
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('product_types').insert([{ name: name.trim(), display_order: 999 }]).select().single();
   if (error) throw error;
   return data;
 }
-
 async function dbDeleteProductType(id) {
   const { error } = await window.supabaseClient.from('product_types').delete().eq('id', id);
   if (error) throw error;
   return true;
 }
 
-// ============================================================
-// DATABASE — COST TYPES
-// ============================================================
-
 async function dbGetCostTypes() {
-  const { data, error } = await window.supabaseClient
-    .from('cost_types')
-    .select('*')
-    .order('display_order', { ascending: true });
+  const { data, error } = await window.supabaseClient.from('cost_types').select('*').order('display_order', { ascending: true });
   if (error) return [];
   return data || [];
 }
-
 async function dbAddCostType(name) {
-  const { data, error } = await window.supabaseClient
-    .from('cost_types')
-    .insert([{ name: name.trim(), display_order: 999 }])
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('cost_types').insert([{ name: name.trim(), display_order: 999 }]).select().single();
   if (error) throw error;
   return data;
 }
-
 async function dbDeleteCostType(id) {
   const { error } = await window.supabaseClient.from('cost_types').delete().eq('id', id);
   if (error) throw error;
   return true;
 }
 
-// ============================================================
-// DATABASE — PAYMENT METHODS
-// ============================================================
-
 async function dbGetPaymentMethods() {
-  const { data, error } = await window.supabaseClient
-    .from('payment_methods')
-    .select('*')
-    .order('display_order', { ascending: true });
+  const { data, error } = await window.supabaseClient.from('payment_methods').select('*').order('display_order', { ascending: true });
   if (error) return [];
   return data || [];
 }
-
 async function dbAddPaymentMethod(name) {
-  const { data, error } = await window.supabaseClient
-    .from('payment_methods')
-    .insert([{ name: name.trim(), display_order: 999 }])
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('payment_methods').insert([{ name: name.trim(), display_order: 999 }]).select().single();
   if (error) throw error;
   return data;
 }
-
 async function dbDeletePaymentMethod(id) {
   const { error } = await window.supabaseClient.from('payment_methods').delete().eq('id', id);
   if (error) throw error;
   return true;
 }
 
-// ============================================================
-// DATABASE — DELIVERY SETTINGS
-// ============================================================
-
 async function dbGetDeliverySettings() {
-  const { data, error } = await window.supabaseClient
-    .from('delivery_settings')
-    .select('*')
-    .eq('id', 1)
-    .single();
+  const { data, error } = await window.supabaseClient.from('delivery_settings').select('*').eq('id', 1).single();
   if (error) return { base_charge: 350, free_delivery_threshold: 3 };
   return data || { base_charge: 350, free_delivery_threshold: 3 };
 }
-
 async function dbUpdateDeliverySettings(baseCharge, threshold) {
-  const { data, error } = await window.supabaseClient
-    .from('delivery_settings')
-    .update({
-      base_charge: Number(baseCharge),
-      free_delivery_threshold: Number(threshold),
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', 1)
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('delivery_settings').update({
+    base_charge: Number(baseCharge),
+    free_delivery_threshold: Number(threshold),
+    updated_at: new Date().toISOString()
+  }).eq('id', 1).select().single();
   if (error) throw error;
   return data;
 }
 
-// ============================================================
-// DATABASE — PRODUCTS
-// ============================================================
-
 async function dbGetProducts() {
-  const { data, error } = await window.supabaseClient
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: true });
+  const { data, error } = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
   if (error) return [];
   return data || [];
 }
-
 async function dbAddProduct(productData) {
-  const { data, error } = await window.supabaseClient
-    .from('products')
-    .insert([productData])
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('products').insert([productData]).select().single();
   if (error) throw error;
   return data;
 }
-
 async function dbUpdateProduct(id, updates) {
-  const { data, error } = await window.supabaseClient
-    .from('products')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
+  const { data, error } = await window.supabaseClient.from('products').update(updates).eq('id', id).select().single();
   if (error) throw error;
   return data;
 }
-
 async function dbDeleteProduct(id) {
   const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
   if (error) throw error;
@@ -288,9 +164,10 @@ async function signInAdmin(password) {
   });
   if (error) throw error;
   return data;
-  }
+}
+
 // ============================================================
-// ORDER SAVE (Direct Supabase)
+// ORDER SAVE
 // ============================================================
 
 async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
@@ -362,7 +239,6 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     const { error: itemsErr } = await sb.from('order_items').insert(itemsToInsert);
     if (itemsErr) throw new Error('order_items insert failed: ' + itemsErr.message);
 
-    console.log('✅ Order saved to Supabase:', orderId);
     return { success: true, orderId: orderId };
   } catch (err) {
     console.error('❌ Order save failed:', err.message);
@@ -374,26 +250,17 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
 // CART MODAL
 // ============================================================
 
-function CartModal({ 
-  isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, 
-  getSubtotal, getDeliveryCharge, getTotal, getCartCount,
-  customerName, setCustomerName, customerPhone, setCustomerPhone,
-  customerAddress, setCustomerAddress, customerDistrict, setCustomerDistrict,
-  districts, isLoggedIn, sendWhatsAppOrder, sendBankDepositOrder, DARAZ_LINK
-}) {
+function CartModal({ isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, getSubtotal, getDeliveryCharge, getTotal, getCartCount, customerName, setCustomerName, customerPhone, setCustomerPhone, customerAddress, setCustomerAddress, customerDistrict, setCustomerDistrict, districts, isLoggedIn, sendWhatsAppOrder, sendBankDepositOrder, DARAZ_LINK }) {
   if (!isCartOpen) return null;
-
   return (
     <div className="cart-modal-overlay">
       <div className="cart-modal-box">
         <button className="cart-modal-close" onClick={() => setIsCartOpen(false)}>×</button>
         <h2 className="cart-modal-title">Your Cart</h2>
-
         <div className="cart-daraz-banner">
           <p className="cart-daraz-title">🏆 Best Option: Order on Daraz</p>
           <p className="cart-daraz-desc">Cash on Delivery & KOKO Pay Later available • Safe returns</p>
         </div>
-
         {cartItems.length === 0 ? (
           <p className="cart-empty">Your cart is empty.</p>
         ) : (
@@ -416,16 +283,11 @@ function CartModal({
             ))}
           </div>
         )}
-
         <div className="cart-totals">
           <div className="cart-total-row"><span>Subtotal</span><span>{fmtRs(getSubtotal())}</span></div>
           <div className="cart-total-row"><span>Delivery</span><span>{getDeliveryCharge() === 0 ? 'FREE 🎉' : fmtRs(getDeliveryCharge())}</span></div>
-          {getDeliveryCharge() > 0 && (
-            <p className="cart-delivery-hint">Add more items for FREE delivery!</p>
-          )}
           <div className="cart-total-row cart-total-final"><span>Total</span><span>{fmtRs(getTotal())}</span></div>
         </div>
-
         {isLoggedIn ? (
           <div className="cart-customer-form">
             <h3 className="cart-form-title">Customer Details</h3>
@@ -438,14 +300,10 @@ function CartModal({
             </select>
           </div>
         ) : (
-          <div className="cart-login-warning">
-            <p>Please sign in with Google to place an order.</p>
-          </div>
+          <div className="cart-login-warning"><p>Please sign in with Google to place an order.</p></div>
         )}
-
         <div className="cart-payment-options">
           <a href={DARAZ_LINK} target="_blank" rel="noopener" className="cart-btn cart-btn-daraz">🛒 Order on Daraz (COD / KOKO)</a>
-
           {isLoggedIn && (
             <div className="cart-bank-deposit">
               <p className="cart-bank-title">🏦 Bank Deposit Details:</p>
@@ -456,10 +314,7 @@ function CartModal({
               <button onClick={sendBankDepositOrder} className="cart-btn cart-btn-bank">📤 Send Slip via WhatsApp</button>
             </div>
           )}
-
-          {isLoggedIn && (
-            <button onClick={sendWhatsAppOrder} className="cart-btn cart-btn-whatsapp">💬 Order via WhatsApp</button>
-          )}
+          {isLoggedIn && (<button onClick={sendWhatsAppOrder} className="cart-btn cart-btn-whatsapp">💬 Order via WhatsApp</button>)}
         </div>
       </div>
     </div>
@@ -470,18 +325,13 @@ function CartModal({
 // REVIEW SECTION
 // ============================================================
 
-function ReviewSection({ 
-  isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, 
-  reviewRating, setReviewRating, reviewComment, setReviewComment,
-  handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex
-}) {
+function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex }) {
   return (
     <section className="review-section">
       <div className="review-header">
         <div className="review-eyebrow">WHAT OUR CUSTOMERS SAY</div>
         <h2 className="review-title">Loved by Fragrance Enthusiasts</h2>
       </div>
-
       {isLoggedIn ? (
         <form className="review-form" onSubmit={handleReviewSubmit}>
           <input type="text" placeholder="Your Name" value={reviewName} onChange={(e) => setReviewName(e.target.value)} required className="review-input" />
@@ -498,16 +348,11 @@ function ReviewSection({
           <button type="submit" className="review-submit">Submit Review</button>
         </form>
       ) : (
-        <div className="review-login-message">
-          <p>Please sign in with Google to write a review.</p>
-        </div>
+        <div className="review-login-message"><p>Please sign in with Google to write a review.</p></div>
       )}
-
       {reviews.length > 0 && (
         <div className="reviews-slider">
-          <button className="reviews-nav reviews-nav-prev" onClick={() => setCurrentReviewIndex(prev => (prev - 1 + reviews.length) % reviews.length)}>
-            <ChevronLeft />
-          </button>
+          <button className="reviews-nav reviews-nav-prev" onClick={() => setCurrentReviewIndex(prev => (prev - 1 + reviews.length) % reviews.length)}><ChevronLeft /></button>
           <div className="reviews-slider-inner">
             {reviews.map((rev, i) => (
               <div key={rev.id} className={`review-card ${i === currentReviewIndex ? 'active' : ''}`}>
@@ -523,9 +368,7 @@ function ReviewSection({
               </div>
             ))}
           </div>
-          <button className="reviews-nav reviews-nav-next" onClick={() => setCurrentReviewIndex(prev => (prev + 1) % reviews.length)}>
-            <ChevronRight />
-          </button>
+          <button className="reviews-nav reviews-nav-next" onClick={() => setCurrentReviewIndex(prev => (prev + 1) % reviews.length)}><ChevronRight /></button>
         </div>
       )}
     </section>
@@ -533,7 +376,7 @@ function ReviewSection({
 }
 
 // ============================================================
-// ADMIN AUTH (FIXED)
+// ADMIN AUTH
 // ============================================================
 
 function AdminAuth({ onSuccess, onClose }) {
@@ -561,15 +404,7 @@ function AdminAuth({ onSuccess, onClose }) {
         <h2 className="admin-title">Admin Access</h2>
         <p className="admin-auth-desc">Enter your admin password to access the panel.</p>
         <form onSubmit={handleLogin}>
-          <input
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="admin-input admin-input-full"
-            autoFocus
-            required
-          />
+          <input type="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} className="admin-input admin-input-full" autoFocus required />
           {error && <p className="admin-auth-error">{error}</p>}
           <button type="submit" className="admin-btn-primary" style={{ width: '100%', marginTop: '10px' }} disabled={loading}>
             {loading ? 'Checking...' : 'Unlock Admin Panel'}
@@ -578,59 +413,30 @@ function AdminAuth({ onSuccess, onClose }) {
       </div>
     </div>
   );
-          }
+}
+
 // ============================================================
-// ADMIN PANEL MODAL — Tabs 10ක්
+// ADMIN PANEL MODAL
 // ============================================================
 
-function AdminPanelModal({ 
-  isAdminOpen, setIsAdminOpen, products, setProducts, 
-  heroImages, setHeroImages, lifestyleImages, setLifestyleImages, 
-  lifestyleDetails, setLifestyleDetails, pages, setPages,
-  categories, setCategories, productTypes, setProductTypes,
-  costTypes, setCostTypes, paymentMethods, setPaymentMethods,
-  deliverySettings, setDeliverySettings,
-  onCloseAndSignOut
-}) {
+function AdminPanelModal({ isAdminOpen, setIsAdminOpen, products, setProducts, heroImages, setHeroImages, lifestyleImages, setLifestyleImages, lifestyleDetails, setLifestyleDetails, pages, setPages, categories, setCategories, productTypes, setProductTypes, costTypes, setCostTypes, paymentMethods, setPaymentMethods, deliverySettings, setDeliverySettings, onCloseAndSignOut }) {
   const [activeTab, setActiveTab] = useState('products');
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
-
-  // Product form
-  const [newProduct, setNewProduct] = useState({
-    name: '', category: '', product_type: 'Perfume', tagline: '',
-    top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0
-  });
+  const [newProduct, setNewProduct] = useState({ name: '', category: '', product_type: 'Perfume', tagline: '', top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0 });
   const [editingProduct, setEditingProduct] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
-
-  // Category
   const [newCategory, setNewCategory] = useState('');
-  
-  // Product Type
   const [newProductType, setNewProductType] = useState('');
-  
-  // Cost Type
   const [newCostType, setNewCostType] = useState('');
-  
-  // Payment Method
   const [newPaymentMethod, setNewPaymentMethod] = useState('');
-
-  // Hero
   const [newHeroUploading, setNewHeroUploading] = useState(false);
-
-  // Lifestyle
   const [newLifestyleUploading, setNewLifestyleUploading] = useState(false);
-
-  // Pages
   const [newPage, setNewPage] = useState({ title: '', content: '' });
   const [editingPageId, setEditingPageId] = useState(null);
-
-  // Chat Bot
   const [botSystemPrompt, setBotSystemPrompt] = useState('');
   const [botWelcomeMessage, setBotWelcomeMessage] = useState('');
 
-  // Chat Bot Settings Load
   useEffect(() => {
     async function loadBotSettings() {
       try {
@@ -651,7 +457,6 @@ function AdminPanelModal({
     setTimeout(() => setMessage(''), 3000);
   }
 
-  // ---- Image Upload ----
   const handleImageUpload = async (file, callback) => {
     if (!file) return;
     setUploading(true);
@@ -668,7 +473,6 @@ function AdminPanelModal({
     setUploading(false);
   };
 
-  // ---- Site Settings ----
   const saveSiteSettings = async (newHeroImages, newLifestyleImages, newLifestyleDetails) => {
     try {
       const { error } = await window.supabaseClient.from('site_settings').update({
@@ -684,13 +488,11 @@ function AdminPanelModal({
     }
   };
 
-  // ---- PRODUCTS ----
   async function handleAddOrUpdateProduct() {
     if (!newProduct.name || !newProduct.image) {
       showMsg('❌ Name and image required');
       return;
     }
-
     try {
       const productData = {
         name: newProduct.name,
@@ -705,7 +507,6 @@ function AdminPanelModal({
         selling_price: Number(newProduct.selling_price || newProduct.price || 1500),
         stock: Number(newProduct.stock) || 0
       };
-
       if (editingProduct) {
         await dbUpdateProduct(editingProduct.id, productData);
         showMsg('✅ Product updated!');
@@ -713,14 +514,9 @@ function AdminPanelModal({
         await dbAddProduct(productData);
         showMsg('✅ Product added!');
       }
-
       const fresh = await dbGetProducts();
       setProducts(fresh.map(mapProduct));
-
-      setNewProduct({
-        name: '', category: '', product_type: 'Perfume', tagline: '',
-        top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0
-      });
+      setNewProduct({ name: '', category: '', product_type: 'Perfume', tagline: '', top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0 });
       setEditingProduct(null);
       setShowProductForm(false);
     } catch (err) {
@@ -730,17 +526,9 @@ function AdminPanelModal({
 
   function editProduct(p) {
     setNewProduct({
-      name: p.name,
-      category: p.category || '',
-      product_type: p.product_type || 'Perfume',
-      tagline: p.description || '',
-      top: p.top_notes || '',
-      heart: p.heart_notes || '',
-      base: p.base_notes || '',
-      image: p.image_url || '',
-      price: p.selling_price || 1500,
-      selling_price: p.selling_price || 1500,
-      stock: p.stock || 0
+      name: p.name, category: p.category || '', product_type: p.product_type || 'Perfume',
+      tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
+      image: p.image_url || '', price: p.selling_price || 1500, selling_price: p.selling_price || 1500, stock: p.stock || 0
     });
     setEditingProduct(p);
     setShowProductForm(true);
@@ -760,25 +548,17 @@ function AdminPanelModal({
 
   function mapProduct(p) {
     return {
-      id: p.id,
-      name: p.name,
+      id: p.id, name: p.name,
       for: p.category ? 'FOR ' + p.category.toUpperCase() : '',
-      filter: p.category,
-      category: p.category,
-      product_type: p.product_type || 'Perfume',
-      tagline: p.description || '',
-      top: p.top_notes || '',
-      heart: p.heart_notes || '',
-      base: p.base_notes || '',
+      filter: p.category, category: p.category, product_type: p.product_type || 'Perfume',
+      tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
       image: p.image_url || '',
       price: Number(p.selling_price) || Number(p.price) || 1500,
       selling_price: Number(p.selling_price) || Number(p.price) || 1500,
-      stock: p.stock || 0,
-      accent: '#B8963E'
+      stock: p.stock || 0, accent: '#B8963E'
     };
   }
 
-  // ---- CATEGORIES ----
   async function handleAddCategory() {
     if (!newCategory.trim()) return;
     try {
@@ -787,9 +567,7 @@ function AdminPanelModal({
       setCategories(fresh);
       setNewCategory('');
       showMsg('✅ Category added');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
   async function handleDeleteCategory(id) {
@@ -799,12 +577,9 @@ function AdminPanelModal({
       const fresh = await dbGetCategories();
       setCategories(fresh);
       showMsg('✅ Category deleted');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
-  // ---- PRODUCT TYPES ----
   async function handleAddProductType() {
     if (!newProductType.trim()) return;
     try {
@@ -813,9 +588,7 @@ function AdminPanelModal({
       setProductTypes(fresh);
       setNewProductType('');
       showMsg('✅ Product Type added');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
   async function handleDeleteProductType(id) {
@@ -825,12 +598,9 @@ function AdminPanelModal({
       const fresh = await dbGetProductTypes();
       setProductTypes(fresh);
       showMsg('✅ Product Type deleted');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
-  // ---- COST TYPES ----
   async function handleAddCostType() {
     if (!newCostType.trim()) return;
     try {
@@ -839,9 +609,7 @@ function AdminPanelModal({
       setCostTypes(fresh);
       setNewCostType('');
       showMsg('✅ Cost Type added');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
   async function handleDeleteCostType(id) {
@@ -851,12 +619,9 @@ function AdminPanelModal({
       const fresh = await dbGetCostTypes();
       setCostTypes(fresh);
       showMsg('✅ Cost Type deleted');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
-  // ---- PAYMENT METHODS ----
   async function handleAddPaymentMethod() {
     if (!newPaymentMethod.trim()) return;
     try {
@@ -865,9 +630,7 @@ function AdminPanelModal({
       setPaymentMethods(fresh);
       setNewPaymentMethod('');
       showMsg('✅ Payment Method added');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
   async function handleDeletePaymentMethod(id) {
@@ -877,24 +640,18 @@ function AdminPanelModal({
       const fresh = await dbGetPaymentMethods();
       setPaymentMethods(fresh);
       showMsg('✅ Payment Method deleted');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
-  // ---- DELIVERY ----
   async function handleSaveDelivery() {
     try {
       await dbUpdateDeliverySettings(deliverySettings.base_charge, deliverySettings.free_delivery_threshold);
       const fresh = await dbGetDeliverySettings();
       setDeliverySettings(fresh);
       showMsg('✅ Delivery settings updated');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
-  // ---- HERO ----
   async function handleAddHeroImage(file) {
     if (!file) return;
     setNewHeroUploading(true);
@@ -906,9 +663,7 @@ function AdminPanelModal({
       const updated = [...heroImages, urlData.publicUrl];
       setHeroImages(updated);
       await saveSiteSettings(updated, lifestyleImages, lifestyleDetails);
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
     setNewHeroUploading(false);
   }
 
@@ -919,7 +674,6 @@ function AdminPanelModal({
     await saveSiteSettings(updated, lifestyleImages, lifestyleDetails);
   }
 
-  // ---- LIFESTYLE ----
   async function handleAddLifestyleImage(file) {
     if (!file) return;
     setNewLifestyleUploading(true);
@@ -929,20 +683,12 @@ function AdminPanelModal({
       if (error) throw error;
       const { data: urlData } = window.supabaseClient.storage.from('product-images').getPublicUrl(fileName);
       const updated = [...lifestyleImages, urlData.publicUrl];
-      const newDetail = { 
-        eyebrow: "NEW COLLECTION", 
-        title: "New Fragrance,", 
-        titleAccent: "& elegant.", 
-        description: "Discover our latest addition.", 
-        image: urlData.publicUrl 
-      };
+      const newDetail = { eyebrow: "NEW COLLECTION", title: "New Fragrance,", titleAccent: "& elegant.", description: "Discover our latest addition.", image: urlData.publicUrl };
       const updatedDetails = [...lifestyleDetails, newDetail];
       setLifestyleImages(updated);
       setLifestyleDetails(updatedDetails);
       await saveSiteSettings(heroImages, updated, updatedDetails);
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
     setNewLifestyleUploading(false);
   }
 
@@ -964,22 +710,15 @@ function AdminPanelModal({
     await saveSiteSettings(heroImages, lifestyleImages, lifestyleDetails);
   };
 
-  // ---- PAGES ----
   async function handleAddPage() {
     if (!newPage.title) { showMsg('❌ Title is required.'); return; }
     try {
       if (editingPageId) {
-        const { error } = await window.supabaseClient.from('pages').update({ 
-          title: newPage.title, 
-          content: newPage.content 
-        }).eq('id', editingPageId);
+        const { error } = await window.supabaseClient.from('pages').update({ title: newPage.title, content: newPage.content }).eq('id', editingPageId);
         if (error) throw error;
         showMsg('✅ Page updated!');
       } else {
-        const { error } = await window.supabaseClient.from('pages').insert([{ 
-          title: newPage.title, 
-          content: newPage.content 
-        }]);
+        const { error } = await window.supabaseClient.from('pages').insert([{ title: newPage.title, content: newPage.content }]);
         if (error) throw error;
         showMsg('✅ Page added!');
       }
@@ -987,9 +726,7 @@ function AdminPanelModal({
       setPages(fresh.data || []);
       setNewPage({ title: '', content: '' });
       setEditingPageId(null);
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
   async function handleDeletePage(id) {
@@ -1000,12 +737,9 @@ function AdminPanelModal({
       const fresh = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
       setPages(fresh.data || []);
       showMsg('✅ Page deleted.');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
 
-  // ---- CHAT BOT ----
   async function handleSaveBotSettings() {
     try {
       const { error } = await window.supabaseClient.from('bot_settings').update({
@@ -1015,21 +749,14 @@ function AdminPanelModal({
       }).eq('id', 1);
       if (error) throw error;
       showMsg('✅ Chat Bot settings saved');
-    } catch (err) {
-      showMsg('❌ Error: ' + err.message);
-    }
+    } catch (err) { showMsg('❌ Error: ' + err.message); }
   }
-
-  // ============================================================
-  // RENDER
-  // ============================================================
 
   return (
     <div className="admin-overlay">
       <div className="admin-box">
         <button className="admin-close" onClick={onCloseAndSignOut}>×</button>
         <h2 className="admin-title">Admin Panel</h2>
-
         <div className="admin-tabs">
           <button className={`admin-tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>📦 Products</button>
           <button className={`admin-tab ${activeTab === 'categories' ? 'active' : ''}`} onClick={() => setActiveTab('categories')}>🏷️ Categories</button>
@@ -1049,21 +776,10 @@ function AdminPanelModal({
           <div>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
               <h3 className="admin-subtitle" style={{margin: 0}}>Products ({products.length})</h3>
-              <button 
-                className="admin-btn-primary" 
-                onClick={() => { 
-                  setShowProductForm(!showProductForm); 
-                  setEditingProduct(null);
-                  setNewProduct({
-                    name: '', category: categories[0]?.name || '', product_type: 'Perfume', tagline: '',
-                    top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0
-                  });
-                }}
-              >
+              <button className="admin-btn-primary" onClick={() => { setShowProductForm(!showProductForm); setEditingProduct(null); setNewProduct({ name: '', category: categories[0]?.name || '', product_type: 'Perfume', tagline: '', top: '', heart: '', base: '', image: '', price: 1500, selling_price: 1500, stock: 0 }); }}>
                 {showProductForm ? '✕ Cancel' : '+ Add Product'}
               </button>
             </div>
-
             {showProductForm && (
               <div style={{background: '#f9f9f9', padding: '20px', borderRadius: '10px', marginBottom: '20px'}}>
                 <h4 style={{marginBottom: '15px'}}>{editingProduct ? 'Edit Product' : 'Add New Product'}</h4>
@@ -1079,7 +795,6 @@ function AdminPanelModal({
                   <input type="number" placeholder="Price (Rs.)" value={newProduct.selling_price} onChange={(e) => setNewProduct({ ...newProduct, selling_price: e.target.value })} className="admin-input" />
                   <input type="number" placeholder="Stock" value={newProduct.stock} onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })} className="admin-input" />
                   <input type="text" placeholder="Tagline" value={newProduct.tagline} onChange={(e) => setNewProduct({ ...newProduct, tagline: e.target.value })} className="admin-input admin-input-full" />
-                  
                   {newProduct.product_type === 'Perfume' && (
                     <>
                       <input type="text" placeholder="Top Notes" value={newProduct.top} onChange={(e) => setNewProduct({ ...newProduct, top: e.target.value })} className="admin-input" />
@@ -1088,7 +803,6 @@ function AdminPanelModal({
                     </>
                   )}
                 </div>
-                
                 <div className="admin-upload-section">
                   <label className="admin-upload-label">
                     {uploading ? 'Uploading...' : '📤 Upload Product Image *'}
@@ -1096,13 +810,9 @@ function AdminPanelModal({
                   </label>
                   {newProduct.image && <img src={newProduct.image} alt="Preview" className="admin-preview-img" />}
                 </div>
-
-                <button onClick={handleAddOrUpdateProduct} className="admin-btn-primary">
-                  {editingProduct ? '💾 Update Product' : '+ Add Product'}
-                </button>
+                <button onClick={handleAddOrUpdateProduct} className="admin-btn-primary">{editingProduct ? '💾 Update Product' : '+ Add Product'}</button>
               </div>
             )}
-
             <div className="admin-product-list">
               {products.map(p => (
                 <div key={p.id} className="admin-product-row">
@@ -1129,9 +839,7 @@ function AdminPanelModal({
             <div className="admin-product-list">
               {categories.map(c => (
                 <div key={c.id} className="admin-product-row">
-                  <div className="admin-product-info">
-                    <div className="admin-product-name">{c.name}</div>
-                  </div>
+                  <div className="admin-product-info"><div className="admin-product-name">{c.name}</div></div>
                   <button onClick={() => handleDeleteCategory(c.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
               ))}
@@ -1149,9 +857,7 @@ function AdminPanelModal({
             <div className="admin-product-list">
               {productTypes.map(t => (
                 <div key={t.id} className="admin-product-row">
-                  <div className="admin-product-info">
-                    <div className="admin-product-name">{t.name}</div>
-                  </div>
+                  <div className="admin-product-info"><div className="admin-product-name">{t.name}</div></div>
                   <button onClick={() => handleDeleteProductType(t.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
               ))}
@@ -1162,7 +868,6 @@ function AdminPanelModal({
         {activeTab === 'costs' && (
           <div>
             <h3 className="admin-subtitle">Cost Types ({costTypes.length})</h3>
-            <p className="admin-hint" style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>මේවා Settings tab එකේ PnL costs විදිහට පේනවා.</p>
             <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
               <input type="text" placeholder="New cost type" value={newCostType} onChange={(e) => setNewCostType(e.target.value)} className="admin-input" style={{flex: 1}} />
               <button onClick={handleAddCostType} className="admin-btn-primary">+ Add</button>
@@ -1170,9 +875,7 @@ function AdminPanelModal({
             <div className="admin-product-list">
               {costTypes.map(t => (
                 <div key={t.id} className="admin-product-row">
-                  <div className="admin-product-info">
-                    <div className="admin-product-name">{t.name}</div>
-                  </div>
+                  <div className="admin-product-info"><div className="admin-product-name">{t.name}</div></div>
                   <button onClick={() => handleDeleteCostType(t.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
               ))}
@@ -1190,9 +893,7 @@ function AdminPanelModal({
             <div className="admin-product-list">
               {paymentMethods.map(p => (
                 <div key={p.id} className="admin-product-row">
-                  <div className="admin-product-info">
-                    <div className="admin-product-name">{p.name}</div>
-                  </div>
+                  <div className="admin-product-info"><div className="admin-product-name">{p.name}</div></div>
                   <button onClick={() => handleDeletePaymentMethod(p.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
               ))}
@@ -1213,9 +914,7 @@ function AdminPanelModal({
                 <input type="number" value={deliverySettings.free_delivery_threshold} onChange={(e) => setDeliverySettings({...deliverySettings, free_delivery_threshold: e.target.value})} className="admin-input" />
               </div>
             </div>
-            <p style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>
-              ⚠️ {deliverySettings.free_delivery_threshold}+ items ගත්තොත් delivery FREE.
-            </p>
+            <p style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>⚠️ {deliverySettings.free_delivery_threshold}+ items ගත්තොත් delivery FREE.</p>
             <button onClick={handleSaveDelivery} className="admin-btn-primary">💾 Save Delivery Settings</button>
           </div>
         )}
@@ -1274,14 +973,11 @@ function AdminPanelModal({
             </div>
             <button onClick={handleAddPage} className="admin-btn-primary">{editingPageId ? '💾 Update Page' : '+ Add Page'}</button>
             {editingPageId && <button onClick={() => { setEditingPageId(null); setNewPage({ title: '', content: '' }); }} className="admin-btn-delete" style={{ marginLeft: '10px' }}>Cancel Edit</button>}
-
             <h3 className="admin-subtitle" style={{ marginTop: '30px' }}>Existing Pages</h3>
             <div className="admin-product-list">
               {pages.map(p => (
                 <div key={p.id} className="admin-product-row">
-                  <div className="admin-product-info">
-                    <div className="admin-product-name">{p.title}</div>
-                  </div>
+                  <div className="admin-product-info"><div className="admin-product-name">{p.title}</div></div>
                   <button onClick={() => { setEditingPageId(p.id); setNewPage({ title: p.title, content: p.content || '' }); }} className="admin-btn-primary" style={{ padding: '8px 14px', fontSize: '12px', marginRight: '5px' }}>✏️ Edit</button>
                   <button onClick={() => handleDeletePage(p.id)} className="admin-btn-delete">🗑️ Delete</button>
                 </div>
@@ -1293,39 +989,22 @@ function AdminPanelModal({
         {activeTab === 'bot' && (
           <div>
             <h3 className="admin-subtitle">🤖 Chat Bot Settings</h3>
-            <p style={{fontSize: '12px', color: '#666', marginBottom: '15px'}}>
-              Chat Bot එකේ system prompt එක මෙතනින් edit කරන්න. Products auto-load වෙනවා Supabase එකෙන්.
-            </p>
-            
             <div style={{marginBottom: '20px'}}>
               <label style={{fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px'}}>Welcome Message</label>
-              <input 
-                type="text" 
-                value={botWelcomeMessage} 
-                onChange={(e) => setBotWelcomeMessage(e.target.value)} 
-                className="admin-input" 
-                placeholder="Hi! How can I help you today?"
-              />
+              <input type="text" value={botWelcomeMessage} onChange={(e) => setBotWelcomeMessage(e.target.value)} className="admin-input" placeholder="Hi! How can I help you today?" />
             </div>
-
             <div style={{marginBottom: '20px'}}>
               <label style={{fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px'}}>System Prompt</label>
-              <textarea 
-                value={botSystemPrompt} 
-                onChange={(e) => setBotSystemPrompt(e.target.value)} 
-                className="admin-input" 
-                style={{minHeight: '250px', fontFamily: 'monospace', fontSize: '12px'}}
-                placeholder="You are AROMA Assistant..."
-              />
+              <textarea value={botSystemPrompt} onChange={(e) => setBotSystemPrompt(e.target.value)} className="admin-input" style={{minHeight: '250px', fontFamily: 'monospace', fontSize: '12px'}} placeholder="You are AROMA Assistant..." />
             </div>
-
             <button onClick={handleSaveBotSettings} className="admin-btn-primary">💾 Save Chat Bot Settings</button>
           </div>
         )}
       </div>
     </div>
   );
-    }
+}
+
 // ============================================================
 // PAGE POPUP
 // ============================================================
@@ -1344,29 +1023,25 @@ function PagePopup({ page, onClose }) {
 }
 
 // ============================================================
-// APP COMPONENT
+// APP
 // ============================================================
 
 function App() {
-  // ---- State ----
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [costTypes, setCostTypes] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [deliverySettings, setDeliverySettings] = useState({ base_charge: 350, free_delivery_threshold: 3 });
-  
   const [activeFilter, setActiveFilter] = useState("All");
   const [renderCount, setRenderCount] = useState(0);
   const collectionRef = useRef(null);
-
   const [heroImages, setHeroImages] = useState([DEFAULT_HERO]);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [lifestyleImages, setLifestyleImages] = useState([DEFAULT_LIFESTYLE_1, DEFAULT_LIFESTYLE_2]);
   const [lifestyleDetails, setLifestyleDetails] = useState(defaultLifestyleDetails);
   const [pages, setPages] = useState([]);
   const [activePage, setActivePage] = useState(null);
-
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
@@ -1376,12 +1051,10 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [showAddedPopup, setShowAddedPopup] = useState(false);
-
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentLifestyleIndex, setCurrentLifestyleIndex] = useState(0);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [adminAuthOpen, setAdminAuthOpen] = useState(false);
-
   const [reviews, setReviews] = useState([]);
   const [reviewName, setReviewName] = useState('');
   const [reviewEmail, setReviewEmail] = useState('');
@@ -1389,51 +1062,32 @@ function App() {
   const [reviewComment, setReviewComment] = useState('');
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
-  const districts = [
-    "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
-    "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
-    "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
-  ];
-
-  // ============================================================
-  // LOAD DATA
-  // ============================================================
+  const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
   useEffect(() => {
     async function loadData() {
       try {
         const prodData = await dbGetProducts();
-        if (prodData && prodData.length > 0) {
-          setProducts(prodData.map(mapProductForSite));
-        } else {
-          setProducts(defaultProducts);
-        }
-
+        if (prodData && prodData.length > 0) setProducts(prodData.map(mapProductForSite));
+        else setProducts(defaultProducts);
         const cats = await dbGetCategories();
         setCategories(cats);
-
         const types = await dbGetProductTypes();
         setProductTypes(types);
-
         const costs = await dbGetCostTypes();
         setCostTypes(costs);
-
         const payments = await dbGetPaymentMethods();
         setPaymentMethods(payments);
-
         const delivery = await dbGetDeliverySettings();
         setDeliverySettings(delivery);
-
         const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
         if (siteData) {
           if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImages(siteData.hero_images);
           if (siteData.lifestyle_images && siteData.lifestyle_images.length > 0) setLifestyleImages(siteData.lifestyle_images);
           if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) setLifestyleDetails(siteData.lifestyle_details);
         }
-
         const { data: pagesData } = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
         if (pagesData) setPages(pagesData);
-
       } catch (e) {
         console.error('Load data error:', e);
         setProducts(defaultProducts);
@@ -1444,70 +1098,45 @@ function App() {
 
   function mapProductForSite(p) {
     return {
-      id: p.id,
-      name: p.name,
+      id: p.id, name: p.name,
       for: p.category ? 'FOR ' + p.category.toUpperCase() : '',
-      filter: p.category,
-      category: p.category,
-      product_type: p.product_type || 'Perfume',
-      tagline: p.description || '',
-      top: p.top_notes || '',
-      heart: p.heart_notes || '',
-      base: p.base_notes || '',
+      filter: p.category, category: p.category, product_type: p.product_type || 'Perfume',
+      tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
       image: p.image_url || '',
       price: Number(p.selling_price) || Number(p.price) || 1500,
       selling_price: Number(p.selling_price) || Number(p.price) || 1500,
-      stock: p.stock || 0,
-      accent: '#B8963E'
+      stock: p.stock || 0, accent: '#B8963E'
     };
   }
 
-  // ---- Reviews ----
   useEffect(() => {
     async function loadReviews() {
       try {
         const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
         if (reviewsData) setReviews(reviewsData);
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) { console.error(e); }
     }
     loadReviews();
-
-    // Reviews setter එක global ව expose කරන්න
     window.__setReviews = setReviews;
   }, []);
 
-  // ---- Hero Auto Slide ----
   useEffect(() => {
     if (heroImages.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentHeroIndex(prev => (prev + 1) % heroImages.length);
-    }, 5000);
+    const interval = setInterval(() => { setCurrentHeroIndex(prev => (prev + 1) % heroImages.length); }, 5000);
     return () => clearInterval(interval);
   }, [heroImages]);
 
-  // ---- Review Auto Slide ----
   useEffect(() => {
     if (reviews.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentReviewIndex(prev => (prev + 1) % reviews.length);
-    }, 5000);
+    const interval = setInterval(() => { setCurrentReviewIndex(prev => (prev + 1) % reviews.length); }, 5000);
     return () => clearInterval(interval);
   }, [reviews]);
 
-  // ---- Lifestyle Auto Slide ----
   useEffect(() => {
     if (lifestyleDetails.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length);
-    }, 5000);
+    const interval = setInterval(() => { setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length); }, 5000);
     return () => clearInterval(interval);
   }, [lifestyleDetails]);
-
-  // ============================================================
-  // CART FUNCTIONS
-  // ============================================================
 
   const addToCart = (product) => {
     setCartItems(prev => {
@@ -1526,138 +1155,65 @@ function App() {
   };
 
   const getSubtotal = () => cartItems.reduce((sum, item) => sum + ((item.price || item.selling_price || 1500) * item.quantity), 0);
-  
   const getDeliveryCharge = () => {
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const threshold = Number(deliverySettings.free_delivery_threshold) || 3;
     const base = Number(deliverySettings.base_charge) || 350;
     return totalItems >= threshold ? 0 : base;
   };
-  
   const getTotal = () => getSubtotal() + getDeliveryCharge();
   const getCartCount = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // ============================================================
-  // ORDER FUNCTIONS
-  // ============================================================
-
   const sendWhatsAppOrder = async () => {
-    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { 
-      alert("Please fill all customer details."); 
-      return; 
-    }
-    if (cartItems.length === 0) { 
-      alert("Your cart is empty."); 
-      return; 
-    }
-
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
+    if (cartItems.length === 0) { alert("Your cart is empty."); return; }
     try {
-      await saveOrderToSupabaseDirect({
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        district: customerDistrict,
-        platform: 'WhatsApp'
-      }, cartItems, getDeliveryCharge());
-    } catch (err) {
-      console.error('Order save error:', err);
-    }
-
+      await saveOrderToSupabaseDirect({ customer_name: customerName, customer_phone: customerPhone, customer_address: customerAddress, district: customerDistrict, platform: 'WhatsApp' }, cartItems, getDeliveryCharge());
+    } catch (err) { console.error('Order save error:', err); }
     let message = "Hi Aroma Lab! I want to order:\n\n";
-    cartItems.forEach(item => { 
-      const price = item.price || item.selling_price || 1500;
-      message += `- ${item.name} x ${item.quantity} = Rs. ${price * item.quantity}\n`; 
-    });
+    cartItems.forEach(item => { const price = item.price || item.selling_price || 1500; message += `- ${item.name} x ${item.quantity} = Rs. ${price * item.quantity}\n`; });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
     message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}`;
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const sendBankDepositOrder = async () => {
-    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { 
-      alert("Please fill all customer details."); 
-      return; 
-    }
-    if (cartItems.length === 0) { 
-      alert("Your cart is empty."); 
-      return; 
-    }
-
+    if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
+    if (cartItems.length === 0) { alert("Your cart is empty."); return; }
     try {
-      await saveOrderToSupabaseDirect({
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        district: customerDistrict,
-        platform: 'Bank Deposit'
-      }, cartItems, getDeliveryCharge());
-    } catch (err) {
-      console.error('Order save error:', err);
-    }
-
+      await saveOrderToSupabaseDirect({ customer_name: customerName, customer_phone: customerPhone, customer_address: customerAddress, district: customerDistrict, platform: 'Bank Deposit' }, cartItems, getDeliveryCharge());
+    } catch (err) { console.error('Order save error:', err); }
     let message = "Hi Aroma Lab! I want to order (Bank Deposit):\n\n";
-    cartItems.forEach(item => { 
-      const price = item.price || item.selling_price || 1500;
-      message += `- ${item.name} x ${item.quantity} = Rs. ${price * item.quantity}\n`; 
-    });
+    cartItems.forEach(item => { const price = item.price || item.selling_price || 1500; message += `- ${item.name} x ${item.quantity} = Rs. ${price * item.quantity}\n`; });
     message += `\nSubtotal: Rs. ${getSubtotal()}\nDelivery: ${getDeliveryCharge() === 0 ? 'FREE' : 'Rs. ' + getDeliveryCharge()}\nTotal: Rs. ${getTotal()}`;
-    message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}`;
-    message += `\n\nI will send the bank deposit slip shortly.`;
+    message += `\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\nDistrict: ${customerDistrict}\n\nI will send the bank deposit slip shortly.`;
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
-
-  // ============================================================
-  // REVIEWS
-  // ============================================================
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!reviewName || !reviewEmail || !reviewRating || !reviewComment) return;
     try {
       const userImage = loggedInUser?.photoURL || '';
-      const { error } = await window.supabaseClient.from('reviews').insert([{
-        name: reviewName, email: reviewEmail, rating: parseInt(reviewRating), comment: reviewComment, user_image: userImage
-      }]);
+      const { error } = await window.supabaseClient.from('reviews').insert([{ name: reviewName, email: reviewEmail, rating: parseInt(reviewRating), comment: reviewComment, user_image: userImage }]);
       if (error) throw error;
       setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
       const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
       if (reviewsData) setReviews(reviewsData);
       alert('✅ Review submitted successfully!');
-    } catch (err) {
-      alert('❌ Error: ' + err.message);
-    }
+    } catch (err) { alert('❌ Error: ' + err.message); }
   };
-
-  // ============================================================
-  // ADMIN CLOSE + SIGN OUT
-  // ============================================================
 
   const handleCloseAdminAndSignOut = async () => {
-    console.log('🔄 Closing Admin Panel — signing out Supabase + reloading reviews...');
-    
     try {
       await window.supabaseClient.auth.signOut();
-      console.log('✅ Supabase signed out');
-    } catch (err) {
-      console.error('Supabase signout error:', err);
-    }
-    
+    } catch (err) { console.error('Supabase signout error:', err); }
     setIsAdminOpen(false);
-    
     try {
       const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-      if (reviewsData) {
-        setReviews(reviewsData);
-        console.log('✅ Reviews reloaded:', reviewsData.length);
-      }
-    } catch (err) {
-      console.error('Reviews reload error:', err);
-    }
+      if (reviewsData) setReviews(reviewsData);
+    } catch (err) { console.error('Reviews reload error:', err); }
   };
-
-  // ============================================================
-  // GLOBAL HOOKS
-  // ============================================================
 
   window.setAppUser = function(user) {
     if (user) {
@@ -1677,72 +1233,27 @@ function App() {
     else setIsAdmin(false);
   };
 
-  // ============================================================
-  // FILTERS
-  // ============================================================
-
   const handleFilter = (filter) => {
     setActiveFilter(filter);
     setRenderCount(c => c + 1);
     setTimeout(() => { collectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
   };
 
-  const filteredProducts = activeFilter === "All" 
-    ? products 
-    : products.filter(p => p.filter === activeFilter || p.category === activeFilter);
-
+  const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.filter === activeFilter || p.category === activeFilter);
   const filterLabels = ['All', ...categories.map(c => c.name)];
-
-  // ============================================================
-  // RENDER
-  // ============================================================
 
   return (
     <div className="app-root">
-      <CartModal 
-        isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen}
-        cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity}
-        getSubtotal={getSubtotal} getDeliveryCharge={getDeliveryCharge} getTotal={getTotal} getCartCount={getCartCount}
-        customerName={customerName} setCustomerName={setCustomerName}
-        customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
-        customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
-        customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
-        districts={districts} isLoggedIn={isLoggedIn}
-        sendWhatsAppOrder={sendWhatsAppOrder} sendBankDepositOrder={sendBankDepositOrder}
-        DARAZ_LINK={DARAZ_LINK}
-      />
+      <CartModal isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} getSubtotal={getSubtotal} getDeliveryCharge={getDeliveryCharge} getTotal={getTotal} getCartCount={getCartCount} customerName={customerName} setCustomerName={setCustomerName} customerPhone={customerPhone} setCustomerPhone={setCustomerPhone} customerAddress={customerAddress} setCustomerAddress={setCustomerAddress} customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict} districts={districts} isLoggedIn={isLoggedIn} sendWhatsAppOrder={sendWhatsAppOrder} sendBankDepositOrder={sendBankDepositOrder} DARAZ_LINK={DARAZ_LINK} />
 
-      {adminAuthOpen && (
-        <AdminAuth 
-          onSuccess={() => { 
-            setAdminAuthOpen(false); 
-            setIsAdminOpen(true); 
-          }}
-          onClose={() => setAdminAuthOpen(false)}
-        />
-      )}
+      {adminAuthOpen && (<AdminAuth onSuccess={() => { setAdminAuthOpen(false); setIsAdminOpen(true); }} onClose={() => setAdminAuthOpen(false)} />)}
 
-      <AdminPanelModal 
-        isAdminOpen={isAdminOpen} 
-        setIsAdminOpen={setIsAdminOpen}
-        products={products} setProducts={setProducts}
-        heroImages={heroImages} setHeroImages={setHeroImages}
-        lifestyleImages={lifestyleImages} setLifestyleImages={setLifestyleImages}
-        lifestyleDetails={lifestyleDetails} setLifestyleDetails={setLifestyleDetails}
-        pages={pages} setPages={setPages}
-        categories={categories} setCategories={setCategories}
-        productTypes={productTypes} setProductTypes={setProductTypes}
-        costTypes={costTypes} setCostTypes={setCostTypes}
-        paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods}
-        deliverySettings={deliverySettings} setDeliverySettings={setDeliverySettings}
-        onCloseAndSignOut={handleCloseAdminAndSignOut}
-      />
+      <AdminPanelModal isAdminOpen={isAdminOpen} setIsAdminOpen={setIsAdminOpen} products={products} setProducts={setProducts} heroImages={heroImages} setHeroImages={setHeroImages} lifestyleImages={lifestyleImages} setLifestyleImages={setLifestyleImages} lifestyleDetails={lifestyleDetails} setLifestyleDetails={setLifestyleDetails} pages={pages} setPages={setPages} categories={categories} setCategories={setCategories} productTypes={productTypes} setProductTypes={setProductTypes} costTypes={costTypes} setCostTypes={setCostTypes} paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods} deliverySettings={deliverySettings} setDeliverySettings={setDeliverySettings} onCloseAndSignOut={handleCloseAdminAndSignOut} />
 
       <PagePopup page={activePage} onClose={() => setActivePage(null)} />
 
       {showAddedPopup && <div className="added-popup">✅ Added to Cart!</div>}
 
-      {/* TOP BAR */}
       <div className="top-bar">
         <div className="top-bar-inner">
           <span>🚚 FREE DELIVERY ON {deliverySettings.free_delivery_threshold}+ ITEMS</span>
@@ -1753,7 +1264,6 @@ function App() {
         </div>
       </div>
 
-      {/* HEADER */}
       <header className="site-header">
         <div className="header-inner">
           <div className="header-logo">
@@ -1763,21 +1273,17 @@ function App() {
               <div className="subtitle">FINE FRAGRANCES</div>
             </div>
           </div>
-
           <nav className="header-nav">
             <a href="#" className="active">Home</a>
             <a href="#collection">Shop</a>
             <a href="#" onClick={(e) => { e.preventDefault(); const aboutPage = pages.find(p => p.title.toLowerCase().includes('about')); if (aboutPage) setActivePage(aboutPage); }}>About Us</a>
             <a href="#" onClick={(e) => { e.preventDefault(); const contactPage = pages.find(p => p.title.toLowerCase().includes('contact')); if (contactPage) setActivePage(contactPage); }}>Contact</a>
           </nav>
-
           <div className="header-icons">
             <button className="icon-btn" title="Search"><SearchIcon /></button>
             <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in"><UserIcon /></button>
             <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout"><LogoutIcon /></button>
-            {isAdmin && (
-              <button onClick={() => setAdminAuthOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel"><AdminIcon /></button>
-            )}
+            {isAdmin && (<button onClick={() => setAdminAuthOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel"><AdminIcon /></button>)}
             <button onClick={() => setIsCartOpen(true)} className="icon-btn" title="Cart">
               <CartIcon />
               {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
@@ -1786,14 +1292,8 @@ function App() {
         </div>
       </header>
 
-      {/* HERO */}
       <section className="hero-section">
-        <img 
-          key={currentHeroIndex} 
-          src={heroImages[currentHeroIndex]} 
-          alt="Aroma Lab" 
-          className="hero-img" 
-        />
+        <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="hero-content-inner">
@@ -1807,45 +1307,29 @@ function App() {
         </div>
         {heroImages.length > 1 && (
           <div className="hero-dots">
-            {heroImages.map((_, i) => (
-              <button key={i} className={`hero-dot ${i === currentHeroIndex ? 'active' : ''}`} onClick={() => setCurrentHeroIndex(i)}></button>
-            ))}
+            {heroImages.map((_, i) => (<button key={i} className={`hero-dot ${i === currentHeroIndex ? 'active' : ''}`} onClick={() => setCurrentHeroIndex(i)}></button>))}
           </div>
         )}
       </section>
 
-      {/* TRUST BADGES */}
       <section className="trust-badges">
         <div className="trust-grid">
-          {[
-            { icon: "🌿", title: "PREMIUM QUALITY", desc: "Finest ingredients, long lasting scents" },
-            { icon: "🛡️", title: "TRUSTED BRAND", desc: "Authentic & original products" },
-            { icon: "🚚", title: "FAST DELIVERY", desc: "Islandwide delivery" },
-            { icon: "⭐", title: "CUSTOMER SATISFACTION", desc: "Your happiness, our priority" }
-          ].map((item, i) => (
+          {[{ icon: "🌿", title: "PREMIUM QUALITY", desc: "Finest ingredients, long lasting scents" }, { icon: "🛡️", title: "TRUSTED BRAND", desc: "Authentic & original products" }, { icon: "🚚", title: "FAST DELIVERY", desc: "Islandwide delivery" }, { icon: "⭐", title: "CUSTOMER SATISFACTION", desc: "Your happiness, our priority" }].map((item, i) => (
             <div key={i} className="trust-item">
               <div className="trust-icon">{item.icon}</div>
-              <div>
-                <div className="trust-title">{item.title}</div>
-                <div className="trust-desc">{item.desc}</div>
-              </div>
+              <div><div className="trust-title">{item.title}</div><div className="trust-desc">{item.desc}</div></div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* COLLECTION */}
       <section ref={collectionRef} id="collection" className="collection-section">
         <div className="collection-header">
           <div className="collection-eyebrow">OUR COLLECTION</div>
           <h2 className="collection-title">Explore Our <span className="accent">Signature Scents</span></h2>
         </div>
         <div className="filter-buttons">
-          {filterLabels.map((label) => (
-            <button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>
-              {label === 'All' ? 'All' : label}
-            </button>
-          ))}
+          {filterLabels.map((label) => (<button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>{label === 'All' ? 'All' : label}</button>))}
         </div>
         <div className="product-grid">
           {filteredProducts.map((product) => (
@@ -1873,18 +1357,13 @@ function App() {
         </div>
       </section>
 
-      {/* LIFESTYLE */}
       <section className="lifestyle-section">
         <div className="lifestyle-slider">
-          <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}>
-            <ChevronLeft />
-          </button>
+          <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}><ChevronLeft /></button>
           <div className="lifestyle-slider-inner">
             {lifestyleDetails.map((detail, index) => (
               <div key={index} className={`lifestyle-slide ${index === currentLifestyleIndex ? 'active' : ''}`}>
-                <div className="lifestyle-slide-img">
-                  <img src={detail.image} alt={detail.title} />
-                </div>
+                <div className="lifestyle-slide-img"><img src={detail.image} alt={detail.title} /></div>
                 <div className="lifestyle-slide-content">
                   <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
                   <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
@@ -1897,60 +1376,36 @@ function App() {
               </div>
             ))}
           </div>
-          <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)}>
-            <ChevronRight />
-          </button>
+          <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)}><ChevronRight /></button>
         </div>
         {lifestyleDetails.length > 1 && (
           <div className="lifestyle-dots">
-            {lifestyleDetails.map((_, i) => (
-              <button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)}></button>
-            ))}
+            {lifestyleDetails.map((_, i) => (<button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)}></button>))}
           </div>
         )}
       </section>
 
-      {/* KOKO */}
       <section className="koko-section">
         <div className="koko-box">
           <div className="koko-info">
             <div className="koko-logo">KOKO</div>
-            <div>
-              <div className="koko-title">Buy Now, Pay Later</div>
-              <div className="koko-desc">Pay in 3 installments with any debit / credit card • 0% interest</div>
-            </div>
+            <div><div className="koko-title">Buy Now, Pay Later</div><div className="koko-desc">Pay in 3 installments with any debit / credit card • 0% interest</div></div>
           </div>
           <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-koko-order">ORDER ON DARAZ</a>
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <ReviewSection 
-        isLoggedIn={isLoggedIn}
-        reviewName={reviewName} setReviewName={setReviewName}
-        reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
-        reviewRating={reviewRating} setReviewRating={setReviewRating}
-        reviewComment={reviewComment} setReviewComment={setReviewComment}
-        handleReviewSubmit={handleReviewSubmit}
-        reviews={reviews}
-        currentReviewIndex={currentReviewIndex}
-        setCurrentReviewIndex={setCurrentReviewIndex}
-      />
+      <ReviewSection isLoggedIn={isLoggedIn} reviewName={reviewName} setReviewName={setReviewName} reviewEmail={reviewEmail} setReviewEmail={setReviewEmail} reviewRating={reviewRating} setReviewRating={setReviewRating} reviewComment={reviewComment} setReviewComment={setReviewComment} handleReviewSubmit={handleReviewSubmit} reviews={reviews} currentReviewIndex={currentReviewIndex} setCurrentReviewIndex={setCurrentReviewIndex} />
 
-      {/* FOOTER */}
       <footer className="site-footer">
         <div className="footer-grid">
           <div className="footer-col-1">
             <div className="footer-logo">
               <img src={LOGO_URL} alt="Aroma Lab" />
-              <div className="footer-logo-text">
-                <div className="title">AROMA LAB</div>
-                <div className="subtitle">FINE FRAGRANCES</div>
-              </div>
+              <div className="footer-logo-text"><div className="title">AROMA LAB</div><div className="subtitle">FINE FRAGRANCES</div></div>
             </div>
             <p className="footer-desc">Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.</p>
           </div>
-
           <div className="footer-col-2">
             <div className="footer-heading">QUICK LINKS</div>
             <div className="footer-links">
@@ -1966,16 +1421,14 @@ function App() {
               <a href="#" onClick={(e) => { e.preventDefault(); const p = pages.find(p => p.title.toLowerCase().includes('return')); if (p) setActivePage(p); }}>Return Policy</a>
             </div>
           </div>
-
           <div className="footer-col-3">
             <div className="footer-heading">CONNECT WITH US</div>
             <div className="footer-socials">
-              <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="footer-social-btn facebook" title="Facebook"><FacebookIcon /></a>
-              <a href="https://wa.me/94777804705" target="_blank" rel="noopener" className="footer-social-btn whatsapp" title="WhatsApp"><WhatsappIcon /></a>
-              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="footer-social-btn daraz" title="Daraz"><DarazIcon /></a>
+              <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="footer-social-btn facebook"><FacebookIcon /></a>
+              <a href="https://wa.me/94777804705" target="_blank" rel="noopener" className="footer-social-btn whatsapp"><WhatsappIcon /></a>
+              <a href={DARAZ_LINK} target="_blank" rel="noopener" className="footer-social-btn daraz"><DarazIcon /></a>
             </div>
           </div>
-
           <div className="footer-col-4">
             <div className="footer-heading">CONTACT US</div>
             <div className="footer-links footer-contact">
@@ -1984,24 +1437,12 @@ function App() {
             </div>
           </div>
         </div>
-
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} AROMA LAB FINE FRAGRANCES • ALL RIGHTS RESERVED</span>
-        </div>
+        <div className="footer-bottom"><span>© {new Date().getFullYear()} AROMA LAB FINE FRAGRANCES • ALL RIGHTS RESERVED</span></div>
       </footer>
-
       <div style={{ height: '40px' }}></div>
     </div>
   );
 }
 
-// ============================================================
-// RENDER
-// ============================================================
-
 const root = createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+root.render(<React.StrictMode><App /></React.StrictMode>);
