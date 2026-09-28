@@ -74,7 +74,6 @@
   </div>
 
   <script>
-    // Get slug from URL parameter
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('slug');
 
@@ -82,14 +81,13 @@
       document.getElementById('page-content').innerHTML = 
         '<div class="error">Page not found. Please use a valid link.</div>';
     } else {
-      // Initialize Supabase
       const supabase = window.supabase.createClient(
         'https://vibfavfsutpkqfoxpcyz.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM'
       );
 
-      // Load page content
       async function loadPage() {
+        // Search by title (with the original case/spaces)
         const { data, error } = await supabase
           .from('pages')
           .select('title, content')
@@ -98,7 +96,7 @@
 
         if (error || !data) {
           document.getElementById('page-content').innerHTML = 
-            '<div class="error">Page not found.</div>';
+            '<div class="error">Page not found: "' + slug + '"</div>';
           return;
         }
 
