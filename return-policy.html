@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Return Policy - AROMA LAB</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #FFFBF5;
+      color: #0A2E1F;
+      line-height: 1.8;
+    }
+    h1 {
+      color: #0A2E1F;
+      border-bottom: 3px solid #B8963E;
+      padding-bottom: 10px;
+    }
+    a {
+      color: #B8963E;
+    }
+    .back-link {
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="back-link">← Back to Home</a>
+  <div id="policy-content">Loading...</div>
+  
+  <script>
+    const supabase = supabase.createClient(
+      'https://vibfavfsutpkqfoxpcyz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM'
+    );
+    
+    async function loadPolicy() {
+      const { data } = await supabase
+        .from('bot_settings')
+        .select('return_policy')
+        .eq('id', 1)
+        .single();
+      
+      document.getElementById('policy-content').innerHTML = 
+        data?.return_policy || '<h1>Return Policy</h1><p>Content not available.</p>';
+    }
+    
+    loadPolicy();
+  </script>
+</body>
+</html>
