@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AROMA LAB</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #FFFBF5;
+      color: #0A2E1F;
+      line-height: 1.8;
+    }
+    h1 {
+      color: #0A2E1F;
+      border-bottom: 3px solid #B8963E;
+      padding-bottom: 10px;
+      font-size: 28px;
+    }
+    a {
+      color: #B8963E;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .back-link {
+      margin-bottom: 30px;
+      display: inline-block;
+      font-size: 14px;
+    }
+    .content {
+      white-space: pre-wrap;
+      font-size: 15px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #B8963E;
+      font-style: italic;
+    }
+    .error {
+      text-align: center;
+      padding: 40px;
+      color: #dc2626;
+    }
+    .header-bar {
+      background: #0A2E1F;
+      color: #FFFBF5;
+      padding: 15px 20px;
+      margin: -40px -20px 30px -20px;
+      text-align: center;
+    }
+    .header-bar h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-bar">
+    <h2>AROMA LAB FINE FRAGRANCES</h2>
+  </div>
+
+  <a href="/" class="back-link">← Back to Home</a>
+
+  <div id="page-content">
+    <div class="loading">Loading...</div>
+  </div>
+
+  <script>
+    // Get slug from URL parameter
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug');
+
+    if (!slug) {
+      document.getElementById('page-content').innerHTML = 
+        '<div class="error">Page not found. Please use a valid link.</div>';
+    } else {
+      // Initialize Supabase
+      const supabase = window.supabase.createClient(
+        'https://vibfavfsutpkqfoxpcyz.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM'
+      );
+
+      // Load page content
+      async function loadPage() {
+        const { data, error } = await supabase
+          .from('pages')
+          .select('title, content')
+          .eq('title', slug)
+          .single();
+
+        if (error || !data) {
+          document.getElementById('page-content').innerHTML = 
+            '<div class="error">Page not found.</div>';
+          return;
+        }
+
+        document.title = data.title + ' - AROMA LAB';
+        document.getElementById('page-content').innerHTML = 
+          '<h1>' + data.title + '</h1>' +
+          '<div class="content">' + data.content + '</div>';
+      }
+
+      loadPage();
+    }
+  </script>
+</body>
+</html>
