@@ -1110,16 +1110,40 @@ function App() {
   }
 
   useEffect(() => {
-    async function loadReviews() {
-      try {
-        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-        if (reviewsData) setReviews(reviewsData);
-      } catch (e) { console.error(e); }
+  async function loadReviews() {
+    try {
+      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+      if (reviewsData) setReviews(reviewsData);
+    } catch (e) { console.error(e); }
+  }
+  
+  // Initial load
+  loadReviews();
+  window.__setReviews = setReviews;
+  
+  // Listen for Supabase auth state changes (login/logout from admin subdomain)
+  const { data: authListener } = window.supabaseClient.auth.onAuthStateChange((event, session) => {
+    console.log('Supabase auth event:', event);
+    // Reload reviews whenever auth state changes
+    setTimeout(() => { loadReviews(); }, 100);
+  });
+  
+  // Reload reviews when tab becomes visible again (coming back from admin)
+  function handleVisibilityChange() {
+    if (document.visibilityState === 'visible') {
+      loadReviews();
     }
-    loadReviews();
-    window.__setReviews = setReviews;
-  }, []);
-
+  }
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  
+  // Cleanup
+  return () => {
+    if (authListener && authListener.subscription) {
+      authListener.subscription.unsubscribe();
+    }
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, []);
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => { setCurrentHeroIndex(prev => (prev + 1) % heroImages.length); }, 5000);
