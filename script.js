@@ -1283,7 +1283,7 @@ function App() {
             <button className="icon-btn" title="Search"><SearchIcon /></button>
             <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in"><UserIcon /></button>
             <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout"><LogoutIcon /></button>
-            {isAdmin && (<button onClick={() => setAdminAuthOpen(true)} className="icon-btn admin-btn-highlight" title="Admin Panel"><AdminIcon /></button>)}
+            {/* Admin button moved to admin.aromalabsl.lk */}
             <button onClick={() => setIsCartOpen(true)} className="icon-btn" title="Cart">
               <CartIcon />
               {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
