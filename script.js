@@ -1323,7 +1323,7 @@ function App() {
           <div className="hero-content-inner">
             <div className="hero-text">
               <div className="hero-eyebrow">PREMIUM EAU DE PARFUM</div>
-              <h1 className="hero-title">Crafted for Every<br /><span className="accent">Mood & Moment</span></h1>
+              <h1 className="hero-title">AROMA LAB - Fine Fragrances<br /><span className="accent">Crafted for Every Mood & Moment</span></h1>
               <p className="hero-desc">From bold and mysterious to fresh and elegant — find your perfect scent.</p>
               <button onClick={() => handleFilter("All")} className="hero-btn">SHOP NOW →</button>
             </div>
