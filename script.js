@@ -1,10 +1,11 @@
 const { useState, useEffect, useRef } = React;
 const { createRoot } = ReactDOM;
-const { HashRouter, Switch, Route, Link, useHistory, useLocation } = ReactRouterDOM;
+const { BrowserRouter, Switch, Route, Link, useHistory, useLocation } = ReactRouterDOM;
 const useNavigate = () => {
   const history = useHistory();
   return (path) => history.push(path);
 };
+
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
 const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
@@ -43,7 +44,6 @@ const PhoneIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="n
 const MapPinIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>);
 const MenuIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>);
 const CloseIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
-const ChatIcon = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>);
 
 // ============================================================
 // HELPERS
@@ -54,7 +54,7 @@ function fmtRs(num) {
 }
 
 // ============================================================
-// DATABASE — Supabase (UNCHANGED)
+// DATABASE — Supabase
 // ============================================================
 async function dbGetCategories() {
   const { data, error } = await window.supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
@@ -66,13 +66,8 @@ async function dbGetProductTypes() {
   if (error) return [];
   return data || [];
 }
-async function dbGetCostTypes() {
-  const { data, error } = await window.supabaseClient.from('cost_types').select('*').order('display_order', { ascending: true });
-  if (error) return [];
-  return data || [];
-}
-async function dbGetPaymentMethods() {
-  const { data, error } = await window.supabaseClient.from('payment_methods').select('*').order('display_order', { ascending: true });
+async function dbGetProducts() {
+  const { data, error } = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
   if (error) return [];
   return data || [];
 }
@@ -81,37 +76,9 @@ async function dbGetDeliverySettings() {
   if (error) return { base_charge: 350, free_delivery_threshold: 3 };
   return data || { base_charge: 350, free_delivery_threshold: 3 };
 }
-async function dbGetProducts() {
-  const { data, error } = await window.supabaseClient.from('products').select('*').order('created_at', { ascending: true });
-  if (error) return [];
-  return data || [];
-}
-async function dbAddProduct(productData) {
-  const { data, error } = await window.supabaseClient.from('products').insert([productData]).select().single();
-  if (error) throw error;
-  return data;
-}
-async function dbUpdateProduct(id, updates) {
-  const { data, error } = await window.supabaseClient.from('products').update(updates).eq('id', id).select().single();
-  if (error) throw error;
-  return data;
-}
-async function dbDeleteProduct(id) {
-  const { error } = await window.supabaseClient.from('products').delete().eq('id', id);
-  if (error) throw error;
-  return true;
-}
-async function signInAdmin(password) {
-  const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-    email: 'sajith.kasp@gmail.com',
-    password: password
-  });
-  if (error) throw error;
-  return data;
-}
 
 // ============================================================
-// ORDER SAVE — (UNCHANGED)
+// ORDER SAVE — UNCHANGED
 // ============================================================
 async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
   try {
@@ -187,15 +154,15 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     console.error('❌ Order save failed:', err.message);
     return { success: false, error: err.message };
   }
-  }
+}
+
 // ============================================================
-// MENU DRAWER — Left Slide-in
+// MENU DRAWER
 // ============================================================
-function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNavigate }) {
+function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Body scroll lock when open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
@@ -217,27 +184,10 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNav
     }, 200);
   };
 
-  const handleTypeClick = (typeName) => {
-    onClose();
-    navigate('/');
-    setTimeout(() => {
-      if (onFilter) onFilter(typeName);
-      const el = document.getElementById('collection');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
-  };
-
   return (
     <>
-      {/* Overlay */}
-      <div
-        className={`menu-overlay ${isOpen ? 'open' : ''}`}
-        onClick={onClose}
-      ></div>
-
-      {/* Drawer */}
+      <div className={`menu-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}></div>
       <aside className={`menu-drawer ${isOpen ? 'open' : ''}`}>
-        {/* Header */}
         <div className="menu-drawer-header">
           <div className="menu-drawer-logo">
             <img src={LOGO_URL} alt="Aroma Lab" />
@@ -251,54 +201,35 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNav
           </button>
         </div>
 
-        {/* Scrollable content */}
         <div className="menu-drawer-body">
-          {/* Main Nav */}
           <div className="menu-section">
             <div className="menu-section-label">MENU</div>
             <nav className="menu-nav">
-              <button
-                className={`menu-link ${location.pathname === '/' ? 'active' : ''}`}
-                onClick={() => handleNavClick('/')}
-              >
+              <button className={`menu-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => handleNavClick('/')}>
                 <span className="menu-link-icon">🏠</span>
                 <span>Home</span>
               </button>
-              <button
-                className="menu-link"
-                onClick={() => { onClose(); setTimeout(() => document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }), 200); }}
-              >
+              <button className="menu-link" onClick={() => { onClose(); setTimeout(() => document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }), 200); }}>
                 <span className="menu-link-icon">🛍️</span>
                 <span>Shop</span>
               </button>
-              <button
-                className={`menu-link ${location.pathname === '/about' ? 'active' : ''}`}
-                onClick={() => handleNavClick('/about')}
-              >
+              <button className={`menu-link ${location.pathname === '/about' ? 'active' : ''}`} onClick={() => handleNavClick('/about')}>
                 <span className="menu-link-icon">ℹ️</span>
                 <span>About Us</span>
               </button>
-              <button
-                className={`menu-link ${location.pathname === '/contact' ? 'active' : ''}`}
-                onClick={() => handleNavClick('/contact')}
-              >
+              <button className={`menu-link ${location.pathname === '/contact' ? 'active' : ''}`} onClick={() => handleNavClick('/contact')}>
                 <span className="menu-link-icon">📞</span>
                 <span>Contact</span>
               </button>
             </nav>
           </div>
 
-          {/* Categories */}
           {categories.length > 0 && (
             <div className="menu-section">
               <div className="menu-section-label">SHOP BY CATEGORY</div>
               <nav className="menu-nav">
                 {categories.map(cat => (
-                  <button
-                    key={cat.id}
-                    className="menu-link menu-link-category"
-                    onClick={() => handleCategoryClick(cat.name)}
-                  >
+                  <button key={cat.id} className="menu-link menu-link-category" onClick={() => handleCategoryClick(cat.name)}>
                     <span className="menu-bullet"></span>
                     <span>{cat.name}</span>
                     <span className="menu-arrow">→</span>
@@ -308,17 +239,12 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNav
             </div>
           )}
 
-          {/* Product Types */}
           {productTypes.length > 0 && (
             <div className="menu-section">
               <div className="menu-section-label">PRODUCT TYPES</div>
               <nav className="menu-nav">
                 {productTypes.map(type => (
-                  <button
-                    key={type.id}
-                    className="menu-link menu-link-category"
-                    onClick={() => handleTypeClick(type.name)}
-                  >
+                  <button key={type.id} className="menu-link menu-link-category" onClick={() => handleCategoryClick(type.name)}>
                     <span className="menu-bullet"></span>
                     <span>{type.name}</span>
                     <span className="menu-arrow">→</span>
@@ -328,7 +254,6 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNav
             </div>
           )}
 
-          {/* Contact CTAs */}
           <div className="menu-section">
             <div className="menu-section-label">GET IN TOUCH</div>
             <a href={WHATSAPP_LINK} target="_blank" rel="noopener" className="menu-cta menu-cta-whatsapp">
@@ -342,7 +267,6 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNav
           </div>
         </div>
 
-        {/* Footer */}
         <div className="menu-drawer-footer">
           <span>© {new Date().getFullYear()} AROMA LAB</span>
         </div>
@@ -352,9 +276,9 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter, onNav
 }
 
 // ============================================================
-// DYNAMIC PAGE — Loads content from Supabase by slug
+// DYNAMIC PAGE
 // ============================================================
-function DynamicPage({ slug, pageTitle }) {
+function DynamicPage({ slug }) {
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -504,9 +428,10 @@ function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getD
       </div>
     </div>
   );
-          }
+}
+
 // ============================================================
-// REVIEW SECTION — (UNCHANGED)
+// REVIEW SECTION — UNCHANGED
 // ============================================================
 function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex }) {
   return (
@@ -561,7 +486,7 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
 // ============================================================
 // HOME PAGE
 // ============================================================
-function HomePage({ products, categories, activeFilter, setActiveFilter, heroImages, setCurrentHeroIndex, currentHeroIndex, lifestyleDetails, lifestyleImages, currentLifestyleIndex, setCurrentLifestyleIndex, collectionRef, handleFilter, addToCart, deliverySettings, isLoggedIn, reviews, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, currentReviewIndex, setCurrentReviewIndex }) {
+function HomePage({ products, categories, activeFilter, heroImages, currentHeroIndex, setCurrentHeroIndex, lifestyleDetails, currentLifestyleIndex, setCurrentLifestyleIndex, collectionRef, handleFilter, addToCart, deliverySettings, isLoggedIn, reviews, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, currentReviewIndex, setCurrentReviewIndex }) {
   const filteredProducts = activeFilter === "All"
     ? products
     : products.filter(p => p.filter === activeFilter || p.category === activeFilter || p.product_type === activeFilter);
@@ -570,7 +495,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
 
   return (
     <>
-      {/* HERO */}
       <section className="hero-section">
         <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
@@ -578,7 +502,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
           <div className="hero-content-inner">
             <div className="hero-text">
               <div className="hero-eyebrow">PREMIUM EAU DE PARFUM</div>
-              {/* ✅ SEO: Single H1 per page */}
               <h1 className="hero-title">AROMA LAB - Fine Fragrances<br /><span className="accent">Crafted for Every Mood & Moment</span></h1>
               <p className="hero-desc">From bold and mysterious to fresh and elegant — find your perfect scent.</p>
               <button onClick={() => handleFilter("All")} className="hero-btn">SHOP NOW →</button>
@@ -592,7 +515,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
         )}
       </section>
 
-      {/* TRUST BADGES */}
       <section className="trust-badges">
         <div className="trust-grid">
           {[{ icon: "🌿", title: "PREMIUM QUALITY", desc: "Finest ingredients, long lasting scents" }, { icon: "🛡️", title: "TRUSTED BRAND", desc: "Authentic & original products" }, { icon: "🚚", title: "FAST DELIVERY", desc: "Islandwide delivery" }, { icon: "⭐", title: "CUSTOMER SATISFACTION", desc: "Your happiness, our priority" }].map((item, i) => (
@@ -604,7 +526,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
         </div>
       </section>
 
-      {/* COLLECTION */}
       <section ref={collectionRef} id="collection" className="collection-section">
         <div className="collection-header">
           <div className="collection-eyebrow">OUR COLLECTION</div>
@@ -639,7 +560,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
         </div>
       </section>
 
-      {/* LIFESTYLE */}
       <section className="lifestyle-section">
         <div className="lifestyle-slider">
           <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}><ChevronLeft /></button>
@@ -668,7 +588,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
         )}
       </section>
 
-      {/* KOKO */}
       <section className="koko-section">
         <div className="koko-box">
           <div className="koko-info">
@@ -679,7 +598,6 @@ function HomePage({ products, categories, activeFilter, setActiveFilter, heroIma
         </div>
       </section>
 
-      {/* REVIEWS — UNCHANGED */}
       <ReviewSection
         isLoggedIn={isLoggedIn}
         reviewName={reviewName} setReviewName={setReviewName}
@@ -702,16 +620,12 @@ function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
-  const [costTypes, setCostTypes] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
   const [deliverySettings, setDeliverySettings] = useState({ base_charge: 350, free_delivery_threshold: 3 });
   const [activeFilter, setActiveFilter] = useState("All");
   const collectionRef = useRef(null);
   const [heroImages, setHeroImages] = useState([DEFAULT_HERO]);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
-  const [lifestyleImages, setLifestyleImages] = useState([DEFAULT_LIFESTYLE_1, DEFAULT_LIFESTYLE_2]);
   const [lifestyleDetails, setLifestyleDetails] = useState(defaultLifestyleDetails);
-  const [pages, setPages] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -720,7 +634,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [showAddedPopup, setShowAddedPopup] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [currentLifestyleIndex, setCurrentLifestyleIndex] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [reviewName, setReviewName] = useState('');
@@ -732,7 +645,6 @@ function App() {
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
-  // Load all data (UNCHANGED logic)
   useEffect(() => {
     async function loadData() {
       try {
@@ -743,20 +655,13 @@ function App() {
         setCategories(cats);
         const types = await dbGetProductTypes();
         setProductTypes(types);
-        const costs = await dbGetCostTypes();
-        setCostTypes(costs);
-        const payments = await dbGetPaymentMethods();
-        setPaymentMethods(payments);
         const delivery = await dbGetDeliverySettings();
         setDeliverySettings(delivery);
         const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
         if (siteData) {
           if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImages(siteData.hero_images);
-          if (siteData.lifestyle_images && siteData.lifestyle_images.length > 0) setLifestyleImages(siteData.lifestyle_images);
           if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) setLifestyleDetails(siteData.lifestyle_details);
         }
-        const { data: pagesData } = await window.supabaseClient.from('pages').select('*').order('created_at', { ascending: true });
-        if (pagesData) setPages(pagesData);
       } catch (e) {
         console.error('Load data error:', e);
         setProducts(defaultProducts);
@@ -778,7 +683,6 @@ function App() {
     };
   }
 
-  // Reviews load (UNCHANGED)
   useEffect(() => {
     async function loadReviews() {
       try {
@@ -801,28 +705,24 @@ function App() {
     };
   }, []);
 
-  // Hero auto-slide
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => { setCurrentHeroIndex(prev => (prev + 1) % heroImages.length); }, 5000);
     return () => clearInterval(interval);
   }, [heroImages]);
 
-  // Reviews auto-slide
   useEffect(() => {
     if (reviews.length <= 1) return;
     const interval = setInterval(() => { setCurrentReviewIndex(prev => (prev + 1) % reviews.length); }, 5000);
     return () => clearInterval(interval);
   }, [reviews]);
 
-  // Lifestyle auto-slide
   useEffect(() => {
     if (lifestyleDetails.length <= 1) return;
     const interval = setInterval(() => { setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length); }, 5000);
     return () => clearInterval(interval);
   }, [lifestyleDetails]);
 
-  // Cart functions (UNCHANGED)
   const addToCart = (product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
@@ -849,7 +749,6 @@ function App() {
   const getTotal = () => getSubtotal() + getDeliveryCharge();
   const getCartCount = () => cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Orders (UNCHANGED)
   const sendWhatsAppOrder = async () => {
     if (!customerName || !customerPhone || !customerAddress || !customerDistrict) { alert("Please fill all customer details."); return; }
     if (cartItems.length === 0) { alert("Your cart is empty."); return; }
@@ -876,7 +775,6 @@ function App() {
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  // Reviews (UNCHANGED)
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!reviewName || !reviewEmail || !reviewRating || !reviewComment) return;
@@ -905,8 +803,7 @@ function App() {
   };
 
   window.checkAdmin = function(email) {
-    if (email === ADMIN_EMAIL) setIsAdmin(true);
-    else setIsAdmin(false);
+    // Admin moved to separate subdomain
   };
 
   const handleFilter = (filter) => {
@@ -915,9 +812,8 @@ function App() {
   };
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <div className="app-root">
-        {/* ✅ MENU DRAWER */}
         <MenuDrawer
           isOpen={isMenuOpen}
           onClose={() => setIsMenuOpen(false)}
@@ -928,7 +824,6 @@ function App() {
 
         {showAddedPopup && <div className="added-popup">✅ Added to Cart!</div>}
 
-        {/* TOP BAR */}
         <div className="top-bar">
           <div className="top-bar-inner">
             <span>🚚 FREE DELIVERY ON {deliverySettings.free_delivery_threshold}+ ITEMS</span>
@@ -939,7 +834,6 @@ function App() {
           </div>
         </div>
 
-        {/* HEADER */}
         <header className="site-header">
           <div className="header-inner">
             <button className="header-menu-btn" onClick={() => setIsMenuOpen(true)} aria-label="Open menu">
@@ -973,62 +867,58 @@ function App() {
           </div>
         </header>
 
-        {/* ROUTES */}
         <Switch>
-  <Route exact path="/" render={() => (
-    <HomePage
-      products={products}
-      categories={categories}
-      activeFilter={activeFilter}
-      setActiveFilter={setActiveFilter}
-      heroImages={heroImages}
-      currentHeroIndex={currentHeroIndex}
-      setCurrentHeroIndex={setCurrentHeroIndex}
-      lifestyleDetails={lifestyleDetails}
-      lifestyleImages={lifestyleImages}
-      currentLifestyleIndex={currentLifestyleIndex}
-      setCurrentLifestyleIndex={setCurrentLifestyleIndex}
-      collectionRef={collectionRef}
-      handleFilter={handleFilter}
-      addToCart={addToCart}
-      deliverySettings={deliverySettings}
-      isLoggedIn={isLoggedIn}
-      reviews={reviews}
-      reviewName={reviewName} setReviewName={setReviewName}
-      reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
-      reviewRating={reviewRating} setReviewRating={setReviewRating}
-      reviewComment={reviewComment} setReviewComment={setReviewComment}
-      handleReviewSubmit={handleReviewSubmit}
-      currentReviewIndex={currentReviewIndex}
-      setCurrentReviewIndex={setCurrentReviewIndex}
-    />
-  )} />
-  <Route path="/about" render={() => <DynamicPage slug="about" />} />
-  <Route path="/contact" render={() => <DynamicPage slug="contact" />} />
-  <Route path="/privacy" render={() => <DynamicPage slug="privacy" />} />
-  <Route path="/terms" render={() => <DynamicPage slug="terms" />} />
-  <Route path="/return-policy" render={() => <DynamicPage slug="return-policy" />} />
-  <Route path="/cart" render={() => (
-    <CartPage
-      cartItems={cartItems}
-      removeFromCart={removeFromCart}
-      updateQuantity={updateQuantity}
-      getSubtotal={getSubtotal}
-      getDeliveryCharge={getDeliveryCharge}
-      getTotal={getTotal}
-      customerName={customerName} setCustomerName={setCustomerName}
-      customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
-      customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
-      customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
-      districts={districts}
-      isLoggedIn={isLoggedIn}
-      sendWhatsAppOrder={sendWhatsAppOrder}
-      sendBankDepositOrder={sendBankDepositOrder}
-    />
-  )} />
-</Switch>
+          <Route exact path="/" render={() => (
+            <HomePage
+              products={products}
+              categories={categories}
+              activeFilter={activeFilter}
+              heroImages={heroImages}
+              currentHeroIndex={currentHeroIndex}
+              setCurrentHeroIndex={setCurrentHeroIndex}
+              lifestyleDetails={lifestyleDetails}
+              currentLifestyleIndex={currentLifestyleIndex}
+              setCurrentLifestyleIndex={setCurrentLifestyleIndex}
+              collectionRef={collectionRef}
+              handleFilter={handleFilter}
+              addToCart={addToCart}
+              deliverySettings={deliverySettings}
+              isLoggedIn={isLoggedIn}
+              reviews={reviews}
+              reviewName={reviewName} setReviewName={setReviewName}
+              reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
+              reviewRating={reviewRating} setReviewRating={setReviewRating}
+              reviewComment={reviewComment} setReviewComment={setReviewComment}
+              handleReviewSubmit={handleReviewSubmit}
+              currentReviewIndex={currentReviewIndex}
+              setCurrentReviewIndex={setCurrentReviewIndex}
+            />
+          )} />
+          <Route path="/about" render={() => <DynamicPage slug="about" />} />
+          <Route path="/contact" render={() => <DynamicPage slug="contact" />} />
+          <Route path="/privacy" render={() => <DynamicPage slug="privacy" />} />
+          <Route path="/terms" render={() => <DynamicPage slug="terms" />} />
+          <Route path="/return-policy" render={() => <DynamicPage slug="return-policy" />} />
+          <Route path="/cart" render={() => (
+            <CartPage
+              cartItems={cartItems}
+              removeFromCart={removeFromCart}
+              updateQuantity={updateQuantity}
+              getSubtotal={getSubtotal}
+              getDeliveryCharge={getDeliveryCharge}
+              getTotal={getTotal}
+              customerName={customerName} setCustomerName={setCustomerName}
+              customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
+              customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
+              customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
+              districts={districts}
+              isLoggedIn={isLoggedIn}
+              sendWhatsAppOrder={sendWhatsAppOrder}
+              sendBankDepositOrder={sendBankDepositOrder}
+            />
+          )} />
+        </Switch>
 
-        {/* FOOTER */}
         <footer className="site-footer">
           <div className="footer-grid">
             <div className="footer-col-1">
@@ -1073,7 +963,7 @@ function App() {
         </footer>
         <div style={{ height: '40px' }}></div>
       </div>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 
