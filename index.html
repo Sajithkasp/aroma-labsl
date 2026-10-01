@@ -6,7 +6,6 @@
   
   <title>AROMA LAB - Fine Fragrances Sri Lanka | EAU The Perfume | Aroma Lab SL</title>
   
-  <!-- ✅ SEO - Meta Description -->
   <meta name="description" content="AROMA LAB - Buy AROMA LAB Fine Fragrances in Sri Lanka. Luxury Scents - Eau De Parfum. Long Lasting 12+ Hours. Island Wide Delivery. KOKO Pay Later. Order on Daraz or WhatsApp.">
   
   <meta name="keywords" content="aroma lab, aroma lab sl, aroma lab sri lanka, aroma lab perfume, aroma lab fine fragrances, aroma sri lanka, aroma perfume sri lanka, aroma lab colombo, perfume sri lanka, buy perfume online sri lanka, eau de parfum sri lanka, edp sri lanka, 15ml perfume sri lanka, rs 1500 perfume sri lanka, good girl perfume sri lanka, black temptation perfume, hunters dusk perfume, million gold perfume, vanilla perfume sri lanka, ladies perfume sri lanka, mens perfume sri lanka, unisex perfume sri lanka, long lasting perfume sri lanka, island wide delivery perfume, koko pay later perfume, daraz perfume sri lanka, online perfume shop sri lanka, best perfume sri lanka, luxury perfume sri lanka, cheap perfume sri lanka, perfume gift sri lanka, perfume for women sri lanka, perfume for men sri lanka, perfume colombo, perfume kandy, perfume galle, perfume sri lanka price, aroma lab products, aroma lab scents, aroma lab 5 scents, aroma lab rs 1500">
@@ -15,7 +14,6 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://aromalabsl.lk/">
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://aromalabsl.lk/">
   <meta property="og:title" content="AROMA LAB - Fine Fragrances | Starting from Rs.1500 | Sri Lanka">
@@ -24,36 +22,37 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AROMA LAB - Fine Fragrances Sri Lanka">
   <meta name="twitter:description" content="Luxury Scents - Long Lasting 12+ Hours - Premium EDP - Island Wide Delivery.">
   <meta name="twitter:image" content="https://sajithkasp.github.io/aroma-labsl/hero.jpg">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A2E1F' stroke-width='2'><path d='M9 3h6v4a6 6 0 0 1-6 6V9a3 3 0 0 0 3-3V3z'/><path d='M12 13v6'/><path d='M9 19h6'/></svg>">
 
-  <!-- Google Fonts -->
+  <!-- ✅ SPA Redirect Fix for GitHub Pages -->
+  <script>
+    (function() {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect !== location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Style -->
   <link rel="stylesheet" href="style.css">
-
-  <!-- ✅ AI Chat Bot Styles -->
   <link rel="stylesheet" href="gemini-chat.css">
 
-  <!-- React & Babel CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- ✅ React Router CDN (HashRouter - GitHub Pages Friendly) -->
   <script crossorigin src="https://unpkg.com/react-router-dom@5.3.4/umd/react-router-dom.min.js"></script>
 
-  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -75,8 +74,7 @@
     window.googleLogin = function() {
       signInWithPopup(auth, provider)
         .then((result) => {
-          const user = result.user;
-          alert("Welcome " + user.displayName + "!");
+          alert("Welcome " + result.user.displayName + "!");
         }).catch((error) => {
           console.error(error);
           alert("Login failed: " + error.message);
@@ -86,9 +84,7 @@
     window.googleLogout = function() {
       signOut(auth).then(() => {
         alert("Logged out successfully!");
-      }).catch((error) => {
-        console.error(error);
-      });
+      }).catch((error) => console.error(error));
     };
 
     onAuthStateChanged(auth, (user) => {
@@ -111,19 +107,14 @@
 <body>
   <div id="root"></div>
 
-  <!-- Supabase Client (Global) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://vibfavfsutpkqfoxpcyz.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpYmZhdmZzdXRwa3Fmb3hwY3l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzQwNDQsImV4cCI6MjEwNTY1MDA0NH0.kZ3GNZ5r7ZzJXI2doWXQSF5itHAA4JntMWEtvUIlsDM';
-    
     window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
-  <!-- React App -->
   <script type="text/babel" src="script.js"></script>
-
-  <!-- ✅ AI Chat Bot -->
   <script type="text/babel" src="gemini-chat.js"></script>
 </body>
 </html>
