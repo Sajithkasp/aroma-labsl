@@ -1,7 +1,10 @@
 const { useState, useEffect, useRef } = React;
 const { createRoot } = ReactDOM;
-const { HashRouter, Routes, Route, Link, useNavigate, useLocation, useParams } = ReactRouterDOM;
-
+const { HashRouter, Switch, Route, Link, useHistory, useLocation } = ReactRouterDOM;
+const useNavigate = () => {
+  const history = useHistory();
+  return (path) => history.push(path);
+};
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
 const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
