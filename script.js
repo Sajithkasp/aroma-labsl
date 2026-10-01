@@ -974,59 +974,59 @@ function App() {
         </header>
 
         {/* ROUTES */}
-        <Routes>
-          <Route path="/" element={
-            <HomePage
-              products={products}
-              categories={categories}
-              activeFilter={activeFilter}
-              setActiveFilter={setActiveFilter}
-              heroImages={heroImages}
-              currentHeroIndex={currentHeroIndex}
-              setCurrentHeroIndex={setCurrentHeroIndex}
-              lifestyleDetails={lifestyleDetails}
-              lifestyleImages={lifestyleImages}
-              currentLifestyleIndex={currentLifestyleIndex}
-              setCurrentLifestyleIndex={setCurrentLifestyleIndex}
-              collectionRef={collectionRef}
-              handleFilter={handleFilter}
-              addToCart={addToCart}
-              deliverySettings={deliverySettings}
-              isLoggedIn={isLoggedIn}
-              reviews={reviews}
-              reviewName={reviewName} setReviewName={setReviewName}
-              reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
-              reviewRating={reviewRating} setReviewRating={setReviewRating}
-              reviewComment={reviewComment} setReviewComment={setReviewComment}
-              handleReviewSubmit={handleReviewSubmit}
-              currentReviewIndex={currentReviewIndex}
-              setCurrentReviewIndex={setCurrentReviewIndex}
-            />
-          } />
-          <Route path="/about" element={<DynamicPage slug="about" />} />
-          <Route path="/contact" element={<DynamicPage slug="contact" />} />
-          <Route path="/privacy" element={<DynamicPage slug="privacy" />} />
-          <Route path="/terms" element={<DynamicPage slug="terms" />} />
-          <Route path="/return-policy" element={<DynamicPage slug="return-policy" />} />
-          <Route path="/cart" element={
-            <CartPage
-              cartItems={cartItems}
-              removeFromCart={removeFromCart}
-              updateQuantity={updateQuantity}
-              getSubtotal={getSubtotal}
-              getDeliveryCharge={getDeliveryCharge}
-              getTotal={getTotal}
-              customerName={customerName} setCustomerName={setCustomerName}
-              customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
-              customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
-              customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
-              districts={districts}
-              isLoggedIn={isLoggedIn}
-              sendWhatsAppOrder={sendWhatsAppOrder}
-              sendBankDepositOrder={sendBankDepositOrder}
-            />
-          } />
-        </Routes>
+        <Switch>
+  <Route exact path="/" render={() => (
+    <HomePage
+      products={products}
+      categories={categories}
+      activeFilter={activeFilter}
+      setActiveFilter={setActiveFilter}
+      heroImages={heroImages}
+      currentHeroIndex={currentHeroIndex}
+      setCurrentHeroIndex={setCurrentHeroIndex}
+      lifestyleDetails={lifestyleDetails}
+      lifestyleImages={lifestyleImages}
+      currentLifestyleIndex={currentLifestyleIndex}
+      setCurrentLifestyleIndex={setCurrentLifestyleIndex}
+      collectionRef={collectionRef}
+      handleFilter={handleFilter}
+      addToCart={addToCart}
+      deliverySettings={deliverySettings}
+      isLoggedIn={isLoggedIn}
+      reviews={reviews}
+      reviewName={reviewName} setReviewName={setReviewName}
+      reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
+      reviewRating={reviewRating} setReviewRating={setReviewRating}
+      reviewComment={reviewComment} setReviewComment={setReviewComment}
+      handleReviewSubmit={handleReviewSubmit}
+      currentReviewIndex={currentReviewIndex}
+      setCurrentReviewIndex={setCurrentReviewIndex}
+    />
+  )} />
+  <Route path="/about" render={() => <DynamicPage slug="about" />} />
+  <Route path="/contact" render={() => <DynamicPage slug="contact" />} />
+  <Route path="/privacy" render={() => <DynamicPage slug="privacy" />} />
+  <Route path="/terms" render={() => <DynamicPage slug="terms" />} />
+  <Route path="/return-policy" render={() => <DynamicPage slug="return-policy" />} />
+  <Route path="/cart" render={() => (
+    <CartPage
+      cartItems={cartItems}
+      removeFromCart={removeFromCart}
+      updateQuantity={updateQuantity}
+      getSubtotal={getSubtotal}
+      getDeliveryCharge={getDeliveryCharge}
+      getTotal={getTotal}
+      customerName={customerName} setCustomerName={setCustomerName}
+      customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
+      customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
+      customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
+      districts={districts}
+      isLoggedIn={isLoggedIn}
+      sendWhatsAppOrder={sendWhatsAppOrder}
+      sendBankDepositOrder={sendBankDepositOrder}
+    />
+  )} />
+</Switch>
 
         {/* FOOTER */}
         <footer className="site-footer">
