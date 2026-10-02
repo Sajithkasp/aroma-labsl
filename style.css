@@ -1647,3 +1647,50 @@ button,input,select,textarea{font-family:inherit;}
     transition-duration:.01ms!important;
   }
 }
+/* =========================================================
+   AROMA LAB — FOOTER LEGAL LINKS VISIBILITY FIX
+   ========================================================= */
+
+.site-footer .footer-links a,
+.site-footer .footer-links span {
+    color: #F4EFE5 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-flex;
+    line-height: 1.6;
+}
+
+.site-footer .footer-links a:hover {
+    color: #D4AF37 !important;
+}
+
+/* Legal section */
+.site-footer .footer-heading {
+    color: #D4AF37 !important;
+    opacity: 1 !important;
+}
+
+/* Footer description */
+.site-footer .footer-desc {
+    color: rgba(244, 239, 229, 0.78) !important;
+}
+
+/* Bottom copyright */
+.site-footer .footer-bottom {
+    color: rgba(244, 239, 229, 0.7) !important;
+}
+
+/* Mobile — make legal links clearly readable */
+@media (max-width: 640px) {
+    .site-footer .footer-links a,
+    .site-footer .footer-links span {
+        color: #F4EFE5 !important;
+        font-size: 14px;
+        opacity: 1 !important;
+    }
+
+    .site-footer .footer-heading {
+        color: #D4AF37 !important;
+        font-size: 11px;
+    }
+}
