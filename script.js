@@ -553,7 +553,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
                   </div>
                 )}
                 <button onClick={() => addToCart(product)} className="btn-add-cart">ADD TO CART</button>
-                <a href={DARAZ_LINK} target="_blank" rel="noopener" className="btn-order-daraz">ORDER ON DARAZ</a>
+                
               </div>
             </div>
           ))}
