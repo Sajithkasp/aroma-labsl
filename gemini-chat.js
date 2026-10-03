@@ -18,11 +18,11 @@ var GC_STATE = {
   products: [],
   botSettings: null,
   isLoading: false,
-  lastMessageTime: 0
+  lastMessageTime: 0,
+  historyPushed: false  // ✅ Back button tracking
 };
 
-// Minimum time between messages (milliseconds)
-var GC_MIN_INTERVAL = 3000; // 3 seconds
+var GC_MIN_INTERVAL = 3000;
 
 // ============================================================
 // SUPABASE CLIENT
@@ -42,10 +42,7 @@ async function gcLoadProducts() {
   try {
     var sb = gcGetSupabaseClient();
     if (!sb) return [];
-    var res = await sb
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: true });
+    var res = await sb.from('products').select('*').order('created_at', { ascending: true });
     if (res.error) return [];
     return res.data || [];
   } catch (e) {
@@ -61,11 +58,7 @@ async function gcLoadBotSettings() {
   try {
     var sb = gcGetSupabaseClient();
     if (!sb) return defaults;
-    var res = await sb
-      .from('bot_settings')
-      .select('*')
-      .eq('id', 1)
-      .single();
+    var res = await sb.from('bot_settings').select('*').eq('id', 1).single();
     if (res.error) return defaults;
     return res.data || defaults;
   } catch (e) {
@@ -205,6 +198,34 @@ var GC_QUICK_Q = {
 };
 
 // ============================================================
+// BACK BUTTON HANDLING (Browser history)
+// ============================================================
+
+function gcHandleBackButton() {
+  window.addEventListener('popstate', function(event) {
+    // Chat open නම්, back ඔබාම chat close කරන්න
+    if (GC_STATE.isOpen) {
+      GC_STATE.isOpen = false;
+      GC_STATE.historyPushed = false;
+      gcRender();
+      // Note: history එකේ දැන් පෙර state එකට ගිහින්, ආයේ back ඔබාම home යනවා
+    }
+  });
+}
+
+// Chat open කරද්දී history එකට state එකක් push කරන්න
+function gcPushHistoryState() {
+  if (!GC_STATE.historyPushed && GC_STATE.isOpen) {
+    try {
+      history.pushState({ gcChatOpen: true }, '');
+      GC_STATE.historyPushed = true;
+    } catch (e) {
+      console.warn('History push failed:', e);
+    }
+  }
+}
+
+// ============================================================
 // RENDER
 // ============================================================
 
@@ -220,11 +241,20 @@ function gcRender() {
   btn.title = 'Ask AI';
   btn.innerHTML = GC_STATE.isOpen ? '×' : '👩‍🦰 Ask Aroma';
   btn.onclick = function() {
-    GC_STATE.isOpen = !GC_STATE.isOpen;
-    if (GC_STATE.isOpen && GC_STATE.messages.length === 0 && GC_STATE.botSettings) {
-      GC_STATE.messages = [{ role: 'model', text: GC_STATE.botSettings.welcome_message }];
+    if (GC_STATE.isOpen) {
+      // Manual close via button
+      GC_STATE.isOpen = false;
+      GC_STATE.historyPushed = false;
+      gcRender();
+    } else {
+      // Open chat
+      GC_STATE.isOpen = true;
+      if (GC_STATE.messages.length === 0 && GC_STATE.botSettings) {
+        GC_STATE.messages = [{ role: 'model', text: GC_STATE.botSettings.welcome_message }];
+      }
+      gcPushHistoryState();
+      gcRender();
     }
-    gcRender();
   };
   mount.appendChild(btn);
 
@@ -264,8 +294,14 @@ function gcRender() {
   closeBtn.className = 'gc-close-btn';
   closeBtn.textContent = '×';
   closeBtn.onclick = function() {
-    GC_STATE.isOpen = false;
-    gcRender();
+    // If history was pushed, use history.back() to properly clean up
+    if (GC_STATE.historyPushed) {
+      history.back();
+      // popstate event will handle closing
+    } else {
+      GC_STATE.isOpen = false;
+      gcRender();
+    }
   };
 
   header.appendChild(headerInfo);
@@ -322,9 +358,7 @@ function gcRender() {
       var qb = document.createElement('button');
       qb.className = 'gc-quick-btn';
       qb.textContent = q;
-      qb.onclick = function() {
-        gcSendMessage(q);
-      };
+      qb.onclick = function() { gcSendMessage(q); };
       quickWrap.appendChild(qb);
     });
 
@@ -403,7 +437,6 @@ function gcRender() {
 async function gcSendMessage(text) {
   if (GC_STATE.isLoading) return;
 
-  // Rate limit
   var now = Date.now();
   if (GC_STATE.lastMessageTime && (now - GC_STATE.lastMessageTime) < GC_MIN_INTERVAL) {
     console.warn('⏱️ Please wait before sending another message');
@@ -454,6 +487,9 @@ async function gcInit() {
       mount.id = 'aroma-chat-bot-mount';
       document.body.appendChild(mount);
     }
+
+    // ✅ Back button handling
+    gcHandleBackButton();
 
     gcRender();
     console.log('✅ AROMA LAB Chat Bot loaded');
