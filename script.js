@@ -54,6 +54,20 @@ function fmtRs(num) {
 }
 
 // ============================================================
+// SUPABASE IMAGE OPTIMIZATION HELPER
+// ============================================================
+function optimizeSupabaseImage(url, width = 500, quality = 75) {
+  if (!url) return url;
+  if (url.includes('supabase.co/storage/v1/object/public/')) {
+    return url.replace(
+      '/storage/v1/object/public/',
+      '/storage/v1/render/image/public/'
+    ) + `?width=${width}&quality=${quality}`;
+  }
+  return url;
+}
+
+// ============================================================
 // DATABASE — Supabase
 // ============================================================
 async function dbGetCategories() {
@@ -78,7 +92,7 @@ async function dbGetDeliverySettings() {
 }
 
 // ============================================================
-// ORDER SAVE — UNCHANGED
+// ORDER SAVE
 // ============================================================
 async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
   try {
@@ -190,7 +204,7 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
       <aside className={`menu-drawer ${isOpen ? 'open' : ''}`}>
         <div className="menu-drawer-header">
           <div className="menu-drawer-logo">
-            <img src={LOGO_URL} alt="Aroma Lab" />
+            <img src={LOGO_URL} alt="Aroma Lab" loading="lazy" />
             <div>
               <div className="menu-drawer-title">AROMA LAB</div>
               <div className="menu-drawer-subtitle">FINE FRAGRANCES</div>
@@ -375,18 +389,18 @@ function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getD
       <div className="cart-page-items">
         {cartItems.map(item => (
           <div key={item.id} className="cart-item">
-            <img src={item.image} alt={item.name} className="cart-item-img" />
+            <img src={item.image} alt={item.name} className="cart-item-img" loading="lazy" />
             <div className="cart-item-info">
               <div className="cart-item-name">{item.name}</div>
               <div className="cart-item-price">{fmtRs(item.price || item.selling_price || 1500)} each</div>
             </div>
             <div className="cart-qty-controls">
-              <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+              <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">-</button>
               <span className="cart-qty-num">{item.quantity}</span>
-              <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+              <button className="cart-qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">+</button>
             </div>
             <div className="cart-item-total">{fmtRs((item.price || item.selling_price || 1500) * item.quantity)}</div>
-            <button className="cart-item-remove" onClick={() => removeFromCart(item.id)}>✕</button>
+            <button className="cart-item-remove" onClick={() => removeFromCart(item.id)} aria-label="Remove item">✕</button>
           </div>
         ))}
       </div>
@@ -400,10 +414,10 @@ function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getD
       {isLoggedIn ? (
         <div className="cart-customer-form">
           <h3 className="cart-form-title">Customer Details</h3>
-          <input type="text" placeholder="Your Name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="cart-form-input" />
-          <input type="tel" placeholder="Phone Number" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="cart-form-input" />
-          <textarea placeholder="Address" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} className="cart-form-input cart-form-textarea"></textarea>
-          <select value={customerDistrict} onChange={(e) => setCustomerDistrict(e.target.value)} className="cart-form-input">
+          <input type="text" placeholder="Your Name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="cart-form-input" aria-label="Your Name" />
+          <input type="tel" placeholder="Phone Number" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="cart-form-input" aria-label="Phone Number" />
+          <textarea placeholder="Address" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} className="cart-form-input cart-form-textarea" aria-label="Address"></textarea>
+          <select value={customerDistrict} onChange={(e) => setCustomerDistrict(e.target.value)} className="cart-form-input" aria-label="Select District">
             <option value="">Select District</option>
             {districts.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
@@ -431,7 +445,7 @@ function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getD
 }
 
 // ============================================================
-// REVIEW SECTION — UNCHANGED
+// REVIEW SECTION
 // ============================================================
 function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex }) {
   return (
@@ -442,9 +456,9 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
       </div>
       {isLoggedIn ? (
         <form className="review-form" onSubmit={handleReviewSubmit}>
-          <input type="text" placeholder="Your Name" value={reviewName} onChange={(e) => setReviewName(e.target.value)} required className="review-input" />
-          <input type="email" placeholder="Your Email" value={reviewEmail} onChange={(e) => setReviewEmail(e.target.value)} required className="review-input" />
-          <select value={reviewRating} onChange={(e) => setReviewRating(e.target.value)} required className="review-input">
+          <input type="text" placeholder="Your Name" value={reviewName} onChange={(e) => setReviewName(e.target.value)} required className="review-input" aria-label="Your Name" />
+          <input type="email" placeholder="Your Email" value={reviewEmail} onChange={(e) => setReviewEmail(e.target.value)} required className="review-input" aria-label="Your Email" />
+          <select value={reviewRating} onChange={(e) => setReviewRating(e.target.value)} required className="review-input" aria-label="Select Rating">
             <option value="">Select Rating</option>
             <option value="5">★★★★★ (5)</option>
             <option value="4">★★★★☆ (4)</option>
@@ -452,7 +466,7 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
             <option value="2">★★☆☆☆ (2)</option>
             <option value="1">★☆☆☆☆ (1)</option>
           </select>
-          <textarea placeholder="Write your review..." value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} required className="review-input review-textarea"></textarea>
+          <textarea placeholder="Write your review..." value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} required className="review-input review-textarea" aria-label="Write your review"></textarea>
           <button type="submit" className="review-submit">Submit Review</button>
         </form>
       ) : (
@@ -460,12 +474,12 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
       )}
       {reviews.length > 0 && (
         <div className="reviews-slider">
-          <button className="reviews-nav reviews-nav-prev" onClick={() => setCurrentReviewIndex(prev => (prev - 1 + reviews.length) % reviews.length)}><ChevronLeft /></button>
+          <button className="reviews-nav reviews-nav-prev" onClick={() => setCurrentReviewIndex(prev => (prev - 1 + reviews.length) % reviews.length)} aria-label="Previous review"><ChevronLeft /></button>
           <div className="reviews-slider-inner">
             {reviews.map((rev, i) => (
               <div key={rev.id} className={`review-card ${i === currentReviewIndex ? 'active' : ''}`}>
                 <div className="review-card-header">
-                  {rev.user_image && <img src={rev.user_image} alt={rev.name} className="review-avatar" />}
+                  {rev.user_image && <img src={rev.user_image} alt={rev.name} className="review-avatar" loading="lazy" />}
                   <div>
                     <h4 className="review-name">{rev.name}</h4>
                     <p className="review-stars">{'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}</p>
@@ -476,7 +490,7 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
               </div>
             ))}
           </div>
-          <button className="reviews-nav reviews-nav-next" onClick={() => setCurrentReviewIndex(prev => (prev + 1) % reviews.length)}><ChevronRight /></button>
+          <button className="reviews-nav reviews-nav-next" onClick={() => setCurrentReviewIndex(prev => (prev + 1) % reviews.length)} aria-label="Next review"><ChevronRight /></button>
         </div>
       )}
     </section>
@@ -496,7 +510,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
   return (
     <>
       <section className="hero-section">
-        <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
+        <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" loading="eager" fetchpriority="high" />
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="hero-content-inner">
@@ -510,7 +524,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
         </div>
         {heroImages.length > 1 && (
           <div className="hero-dots">
-            {heroImages.map((_, i) => (<button key={i} className={`hero-dot ${i === currentHeroIndex ? 'active' : ''}`} onClick={() => setCurrentHeroIndex(i)}></button>))}
+            {heroImages.map((_, i) => (<button key={i} className={`hero-dot ${i === currentHeroIndex ? 'active' : ''}`} onClick={() => setCurrentHeroIndex(i)} aria-label={`Go to slide ${i + 1}`}></button>))}
           </div>
         )}
       </section>
@@ -538,7 +552,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
           {filteredProducts.map((product) => (
             <div key={product.id} className="product-card">
               <div className="product-img-wrap">
-                {product.image ? <img src={product.image} alt={product.name} /> : <div className="product-img-placeholder">{product.name}</div>}
+                {product.image ? <img src={product.image} alt={product.name} loading="lazy" /> : <div className="product-img-placeholder">{product.name}</div>}
                 <div className="product-badge-for">{product.for}</div>
                 <div className="product-badge-price">{fmtRs(product.price)}</div>
               </div>
@@ -552,8 +566,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
                     {product.base && <div><div className="note-label">Base</div><div className="note-value">{product.base}</div></div>}
                   </div>
                 )}
-                <button onClick={() => addToCart(product)} className="btn-add-cart">ADD TO CART</button>
-                
+                <button onClick={() => addToCart(product)} className="btn-add-cart" aria-label={`Add ${product.name} to cart`}>ADD TO CART</button>
               </div>
             </div>
           ))}
@@ -562,11 +575,11 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
 
       <section className="lifestyle-section">
         <div className="lifestyle-slider">
-          <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)}><ChevronLeft /></button>
+          <button className="lifestyle-nav lifestyle-nav-prev" onClick={() => setCurrentLifestyleIndex(prev => (prev - 1 + lifestyleDetails.length) % lifestyleDetails.length)} aria-label="Previous lifestyle slide"><ChevronLeft /></button>
           <div className="lifestyle-slider-inner">
             {lifestyleDetails.map((detail, index) => (
               <div key={index} className={`lifestyle-slide ${index === currentLifestyleIndex ? 'active' : ''}`}>
-                <div className="lifestyle-slide-img"><img src={detail.image} alt={detail.title} /></div>
+                <div className="lifestyle-slide-img"><img src={detail.image} alt={detail.title} loading="lazy" /></div>
                 <div className="lifestyle-slide-content">
                   <div className="lifestyle-eyebrow">{detail.eyebrow}</div>
                   <h3 className="lifestyle-title">{detail.title}<br /><span className="accent">{detail.titleAccent}</span></h3>
@@ -579,11 +592,11 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
               </div>
             ))}
           </div>
-          <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)}><ChevronRight /></button>
+          <button className="lifestyle-nav lifestyle-nav-next" onClick={() => setCurrentLifestyleIndex(prev => (prev + 1) % lifestyleDetails.length)} aria-label="Next lifestyle slide"><ChevronRight /></button>
         </div>
         {lifestyleDetails.length > 1 && (
           <div className="lifestyle-dots">
-            {lifestyleDetails.map((_, i) => (<button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)}></button>))}
+            {lifestyleDetails.map((_, i) => (<button key={i} className={`lifestyle-dot ${i === currentLifestyleIndex ? 'active' : ''}`} onClick={() => setCurrentLifestyleIndex(i)} aria-label={`Go to lifestyle slide ${i + 1}`}></button>))}
           </div>
         )}
       </section>
@@ -645,22 +658,40 @@ function App() {
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
+  // ✅ PERFORMANCE FIX: Promise.all use කරලා data parallel load කරනවා
   useEffect(() => {
     async function loadData() {
       try {
-        const prodData = await dbGetProducts();
+        const [prodData, cats, types, delivery, siteDataRes] = await Promise.all([
+          dbGetProducts(),
+          dbGetCategories(),
+          dbGetProductTypes(),
+          dbGetDeliverySettings(),
+          window.supabaseClient.from('site_settings').select('*').limit(1).single()
+        ]);
+
         if (prodData && prodData.length > 0) setProducts(prodData.map(mapProductForSite));
         else setProducts(defaultProducts);
-        const cats = await dbGetCategories();
+
         setCategories(cats);
-        const types = await dbGetProductTypes();
         setProductTypes(types);
-        const delivery = await dbGetDeliverySettings();
         setDeliverySettings(delivery);
-        const { data: siteData } = await window.supabaseClient.from('site_settings').select('*').limit(1).single();
+
+        const siteData = siteDataRes.data;
         if (siteData) {
-          if (siteData.hero_images && siteData.hero_images.length > 0) setHeroImages(siteData.hero_images);
-          if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) setLifestyleDetails(siteData.lifestyle_details);
+          // ✅ HERO IMAGES OPTIMIZE
+          if (siteData.hero_images && siteData.hero_images.length > 0) {
+            const optimizedHeroes = siteData.hero_images.map(url => optimizeSupabaseImage(url, 1200, 80));
+            setHeroImages(optimizedHeroes);
+          }
+          // ✅ LIFESTYLE IMAGES OPTIMIZE
+          if (siteData.lifestyle_details && siteData.lifestyle_details.length > 0) {
+            const optimizedLifestyle = siteData.lifestyle_details.map(item => ({
+              ...item,
+              image: optimizeSupabaseImage(item.image, 800, 80)
+            }));
+            setLifestyleDetails(optimizedLifestyle);
+          }
         }
       } catch (e) {
         console.error('Load data error:', e);
@@ -670,13 +701,14 @@ function App() {
     loadData();
   }, []);
 
+  // ✅ PRODUCT IMAGE OPTIMIZE
   function mapProductForSite(p) {
     return {
       id: p.id, name: p.name,
       for: p.category ? 'FOR ' + p.category.toUpperCase() : '',
       filter: p.category, category: p.category, product_type: p.product_type || 'Perfume',
       tagline: p.description || '', top: p.top_notes || '', heart: p.heart_notes || '', base: p.base_notes || '',
-      image: p.image_url || '',
+      image: optimizeSupabaseImage(p.image_url, 500, 75),
       price: Number(p.selling_price) || Number(p.price) || 1500,
       selling_price: Number(p.selling_price) || Number(p.price) || 1500,
       stock: p.stock || 0, accent: '#B8963E'
@@ -841,7 +873,7 @@ function App() {
             </button>
 
             <Link to="/" className="header-logo">
-              <img src={LOGO_URL} alt="Aroma Lab" />
+              <img src={LOGO_URL} alt="Aroma Lab" loading="lazy" />
               <div className="header-logo-text">
                 <div className="title">AROMA LAB</div>
                 <div className="subtitle">FINE FRAGRANCES</div>
@@ -856,10 +888,10 @@ function App() {
             </nav>
 
             <div className="header-icons">
-              <button className="icon-btn" title="Search"><SearchIcon /></button>
-              <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in"><UserIcon /></button>
-              <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout"><LogoutIcon /></button>
-              <Link to="/cart" className="icon-btn" title="Cart">
+              <button className="icon-btn" title="Search" aria-label="Search Products"><SearchIcon /></button>
+              <button id="google-login-btn" onClick={() => window.googleLogin()} className="icon-btn" title="Sign in" aria-label="Sign in with Google"><UserIcon /></button>
+              <button id="google-logout-btn" onClick={() => window.googleLogout()} style={{ display: 'none' }} className="icon-btn" title="Logout" aria-label="Logout"><LogoutIcon /></button>
+              <Link to="/cart" className="icon-btn" title="Cart" aria-label="View Shopping Cart">
                 <CartIcon />
                 {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
               </Link>
@@ -867,63 +899,66 @@ function App() {
           </div>
         </header>
 
-        <Switch>
-          <Route exact path="/" render={() => (
-            <HomePage
-              products={products}
-              categories={categories}
-              activeFilter={activeFilter}
-              heroImages={heroImages}
-              currentHeroIndex={currentHeroIndex}
-              setCurrentHeroIndex={setCurrentHeroIndex}
-              lifestyleDetails={lifestyleDetails}
-              currentLifestyleIndex={currentLifestyleIndex}
-              setCurrentLifestyleIndex={setCurrentLifestyleIndex}
-              collectionRef={collectionRef}
-              handleFilter={handleFilter}
-              addToCart={addToCart}
-              deliverySettings={deliverySettings}
-              isLoggedIn={isLoggedIn}
-              reviews={reviews}
-              reviewName={reviewName} setReviewName={setReviewName}
-              reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
-              reviewRating={reviewRating} setReviewRating={setReviewRating}
-              reviewComment={reviewComment} setReviewComment={setReviewComment}
-              handleReviewSubmit={handleReviewSubmit}
-              currentReviewIndex={currentReviewIndex}
-              setCurrentReviewIndex={setCurrentReviewIndex}
-            />
-          )} />
-          <Route path="/about" render={() => <DynamicPage slug="about" />} />
-          <Route path="/contact" render={() => <DynamicPage slug="contact" />} />
-          <Route path="/privacy" render={() => <DynamicPage slug="privacy" />} />
-          <Route path="/terms" render={() => <DynamicPage slug="terms" />} />
-          <Route path="/return-policy" render={() => <DynamicPage slug="return-policy" />} />
-          <Route path="/cart" render={() => (
-            <CartPage
-              cartItems={cartItems}
-              removeFromCart={removeFromCart}
-              updateQuantity={updateQuantity}
-              getSubtotal={getSubtotal}
-              getDeliveryCharge={getDeliveryCharge}
-              getTotal={getTotal}
-              customerName={customerName} setCustomerName={setCustomerName}
-              customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
-              customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
-              customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
-              districts={districts}
-              isLoggedIn={isLoggedIn}
-              sendWhatsAppOrder={sendWhatsAppOrder}
-              sendBankDepositOrder={sendBankDepositOrder}
-            />
-          )} />
-        </Switch>
+        {/* ✅ MAIN LANDMARK එකතු කරලා තියෙනවා */}
+        <main>
+          <Switch>
+            <Route exact path="/" render={() => (
+              <HomePage
+                products={products}
+                categories={categories}
+                activeFilter={activeFilter}
+                heroImages={heroImages}
+                currentHeroIndex={currentHeroIndex}
+                setCurrentHeroIndex={setCurrentHeroIndex}
+                lifestyleDetails={lifestyleDetails}
+                currentLifestyleIndex={currentLifestyleIndex}
+                setCurrentLifestyleIndex={setCurrentLifestyleIndex}
+                collectionRef={collectionRef}
+                handleFilter={handleFilter}
+                addToCart={addToCart}
+                deliverySettings={deliverySettings}
+                isLoggedIn={isLoggedIn}
+                reviews={reviews}
+                reviewName={reviewName} setReviewName={setReviewName}
+                reviewEmail={reviewEmail} setReviewEmail={setReviewEmail}
+                reviewRating={reviewRating} setReviewRating={setReviewRating}
+                reviewComment={reviewComment} setReviewComment={setReviewComment}
+                handleReviewSubmit={handleReviewSubmit}
+                currentReviewIndex={currentReviewIndex}
+                setCurrentReviewIndex={setCurrentReviewIndex}
+              />
+            )} />
+            <Route path="/about" render={() => <DynamicPage slug="about" />} />
+            <Route path="/contact" render={() => <DynamicPage slug="contact" />} />
+            <Route path="/privacy" render={() => <DynamicPage slug="privacy" />} />
+            <Route path="/terms" render={() => <DynamicPage slug="terms" />} />
+            <Route path="/return-policy" render={() => <DynamicPage slug="return-policy" />} />
+            <Route path="/cart" render={() => (
+              <CartPage
+                cartItems={cartItems}
+                removeFromCart={removeFromCart}
+                updateQuantity={updateQuantity}
+                getSubtotal={getSubtotal}
+                getDeliveryCharge={getDeliveryCharge}
+                getTotal={getTotal}
+                customerName={customerName} setCustomerName={setCustomerName}
+                customerPhone={customerPhone} setCustomerPhone={setCustomerPhone}
+                customerAddress={customerAddress} setCustomerAddress={setCustomerAddress}
+                customerDistrict={customerDistrict} setCustomerDistrict={setCustomerDistrict}
+                districts={districts}
+                isLoggedIn={isLoggedIn}
+                sendWhatsAppOrder={sendWhatsAppOrder}
+                sendBankDepositOrder={sendBankDepositOrder}
+              />
+            )} />
+          </Switch>
+        </main>
 
         <footer className="site-footer">
           <div className="footer-grid">
             <div className="footer-col-1">
               <div className="footer-logo">
-                <img src={LOGO_URL} alt="Aroma Lab" />
+                <img src={LOGO_URL} alt="Aroma Lab" loading="lazy" />
                 <div className="footer-logo-text"><div className="title">AROMA LAB</div><div className="subtitle">FINE FRAGRANCES</div></div>
               </div>
               <p className="footer-desc">Fine Fragrances based in Colombo, Sri Lanka. Premium Eau De Parfum 15ml with high quality fragrance oils, long lasting 12+ hours.</p>
@@ -946,9 +981,9 @@ function App() {
             <div className="footer-col-3">
               <div className="footer-heading">CONNECT WITH US</div>
               <div className="footer-socials">
-                <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="footer-social-btn facebook"><FacebookIcon /></a>
-                <a href="https://wa.me/94777804705" target="_blank" rel="noopener" className="footer-social-btn whatsapp"><WhatsappIcon /></a>
-                <a href={DARAZ_LINK} target="_blank" rel="noopener" className="footer-social-btn daraz"><DarazIcon /></a>
+                <a href="https://www.facebook.com/aromalabsl" target="_blank" rel="noopener noreferrer" className="footer-social-btn facebook" aria-label="Facebook"><FacebookIcon /></a>
+                <a href="https://wa.me/94777804705" target="_blank" rel="noopener" className="footer-social-btn whatsapp" aria-label="WhatsApp"><WhatsappIcon /></a>
+                <a href={DARAZ_LINK} target="_blank" rel="noopener" className="footer-social-btn daraz" aria-label="Daraz"><DarazIcon /></a>
               </div>
             </div>
             <div className="footer-col-4">
