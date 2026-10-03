@@ -58,7 +58,6 @@
   }
 }
 
-/* Badge on button */
 .gc-float-badge {
   position: absolute;
   top: -4px;
@@ -468,10 +467,11 @@
 }
 
 /* ============================================================
-   MOBILE RESPONSIVE
+   MOBILE RESPONSIVE — POPUP VERSION (web එකේ වගේම)
    ============================================================ */
 
 @media (max-width: 640px) {
+  /* Floating button — mobile එකේ පොඩ්ඩක් පොඩි කරලා */
   .gc-float-btn {
     padding: 12px 18px;
     bottom: 20px;
@@ -479,25 +479,47 @@
     font-size: 14px;
   }
   
+  .gc-float-btn.gc-open {
+    width: 46px;
+    height: 46px;
+  }
+  
+  /* Chat window — POPUP විදිහට (full screen නෙමෙයි!) */
   .gc-window {
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100vw;
-    max-width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
-    border: none;
+    position: fixed;
+    bottom: 85px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: calc(100vh - 120px);
+    min-height: 450px;
+    border-radius: 20px;
+    border: 1px solid rgba(184, 150, 62, 0.25);
+    box-shadow: 0 20px 60px rgba(10, 46, 31, 0.45);
+    animation: gcSlideUpMobile 0.35s ease;
+  }
+  
+  @keyframes gcSlideUpMobile {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
   
   .gc-header {
     padding: 14px 16px;
+    border-radius: 20px 20px 0 0;
   }
   
   .gc-header-avatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     font-size: 18px;
   }
   
@@ -505,20 +527,95 @@
     font-size: 16px;
   }
   
-  .gc-lang-selector {
-    padding: 10px 16px;
+  .gc-header-text .gc-header-subtitle {
+    font-size: 10px;
   }
   
-  .gc-msg {
-    max-width: 90%;
-    font-size: 13px;
+  .gc-close-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+  
+  .gc-lang-selector {
+    padding: 10px 14px;
+    gap: 6px;
+  }
+  
+  .gc-lang-btn {
+    padding: 5px 12px;
+    font-size: 11px;
   }
   
   .gc-messages {
     padding: 16px;
   }
   
+  .gc-msg {
+    max-width: 88%;
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+  
   .gc-input-area {
-    padding: 10px 12px;
+    padding: 12px 14px;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .gc-input {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+  
+  .gc-send-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .gc-welcome {
+    padding: 20px 16px;
+  }
+  
+  .gc-welcome-icon {
+    font-size: 40px;
+  }
+  
+  .gc-welcome-title {
+    font-size: 18px;
+  }
+  
+  .gc-welcome-desc {
+    font-size: 12px;
+  }
+  
+  .gc-quick-btn {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .gc-window {
+    bottom: 80px;
+    right: 8px;
+    left: 8px;
+    max-height: calc(100vh - 110px);
+    min-height: 400px;
+  }
+  
+  .gc-header-text .gc-header-title {
+    font-size: 15px;
+  }
+  
+  .gc-lang-btn {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+  
+  .gc-lang-label {
+    font-size: 10px;
   }
 }
