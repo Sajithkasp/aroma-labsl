@@ -39,6 +39,11 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-router-dom@5.3.4/umd/react-router-dom.min.js"></script>
 
+  <script>
+    // React Router DOM එක global variable එකක් විදියට set කරන්න
+    window.ReactRouterDOM = window.ReactRouterDOM || ReactRouterDOM || {};
+  </script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -89,6 +94,7 @@
   </script>
 </head>
 <body>
+  <h1 style="display:none;">AROMA LAB - Fine Fragrances Sri Lanka</h1>
   <div id="root"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
