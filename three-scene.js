@@ -89,23 +89,9 @@
       var w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
       renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
     }
-    
+    var ro = new ResizeObserver(resize); ro.observe(canvas); resize();
     var visible = true, raf = 0, last = performance.now();
-    var ro = null, io = null;
-
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(resize);
-      ro.observe(canvas);
-    } else {
-      window.addEventListener('resize', resize);
-    }
-    resize();
-
-    if (typeof IntersectionObserver !== 'undefined') {
-      io = new IntersectionObserver(function (es) { visible = es[0].isIntersecting; });
-      io.observe(canvas);
-    }
-
+    var io = new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }); io.observe(canvas);
     function loop(t) {
       raf = requestAnimationFrame(loop);
       if (!visible) { last = t; return; }
@@ -113,17 +99,9 @@
       tick(dt, t / 1000); renderer.render(scene, camera);
     }
     raf = requestAnimationFrame(loop);
-
     return {
       scene: scene, camera: camera,
-      dispose: function () {
-        cancelAnimationFrame(raf);
-        if (ro) ro.disconnect();
-        if (io) io.disconnect();
-        window.removeEventListener('resize', resize);
-        disposeGroup(scene);
-        renderer.dispose();
-      }
+      dispose: function () { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); disposeGroup(scene); renderer.dispose(); }
     };
   }
 
