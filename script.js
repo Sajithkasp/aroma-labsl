@@ -457,61 +457,6 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
   );
 }
 
-// ===== 3D COMPONENTS (uses three-scene.js) =====
-function Hero3D({ products }) {
-  const ref = useRef(null);
-  const api = useRef(null);
-  const key = products.map(p => p.id + '|' + p.image + '|' + p.name).join(',');
-  useEffect(() => {
-    if (!window.AromaScene) return;
-    api.current = window.AromaScene.mountHero(ref.current);
-    return () => { if (api.current) api.current.dispose(); api.current = null; };
-  }, []);
-  useEffect(() => { if (api.current) api.current.setProducts(products); }, [key]);
-  return <canvas ref={ref} className="hero-3d-canvas"></canvas>;
-}
-
-function Showcase3D({ products, addToCart }) {
-  const ref = useRef(null);
-  const api = useRef(null);
-  const [sel, setSel] = useState(0);
-  const [ok, setOk] = useState(true);
-  const key = products.map(p => p.id + '|' + p.image + '|' + p.name).join(',');
-  useEffect(() => {
-    if (!window.AromaScene) { setOk(false); return; }
-    api.current = window.AromaScene.mountShowcase(ref.current, setSel);
-    if (!api.current) { setOk(false); return; }
-    return () => { if (api.current) api.current.dispose(); api.current = null; };
-  }, []);
-  useEffect(() => { if (api.current) { api.current.setProducts(products); setSel(0); } }, [key]);
-  if (!ok || products.length === 0) return null;
-  const p = products[sel] || products[0];
-  return (
-    <div className="showcase-3d">
-      <div className="showcase-stage">
-        <canvas ref={ref} className="showcase-canvas"></canvas>
-        {products.length > 1 && <button className="showcase-arrow left" aria-label="Previous" onClick={() => api.current && api.current.prev()}><ChevronLeft /></button>}
-        {products.length > 1 && <button className="showcase-arrow right" aria-label="Next" onClick={() => api.current && api.current.next()}><ChevronRight /></button>}
-        <div className="showcase-hint">DRAG TO ROTATE</div>
-      </div>
-      <div className="showcase-info">
-        <div className="si-for">{p.for}</div>
-        <div className="si-name">{p.name}</div>
-        <div className="si-tagline">{p.tagline}</div>
-        <div className="si-price">{fmtRs(p.price)}</div>
-        {p.product_type === 'Perfume' && (p.top || p.heart || p.base) && (
-          <div className="product-notes">
-            {p.top && <div><div className="note-label">Top</div><div className="note-value">{p.top}</div></div>}
-            {p.heart && <div><div className="note-label">Heart</div><div className="note-value">{p.heart}</div></div>}
-            {p.base && <div><div className="note-label">Base</div><div className="note-value">{p.base}</div></div>}
-          </div>
-        )}
-        <button onClick={() => addToCart(p)} className="btn-add-cart">ADD TO CART</button>
-      </div>
-    </div>
-  );
-}
-
 function HomePage({ products, categories, activeFilter, heroImages, currentHeroIndex, setCurrentHeroIndex, lifestyleDetails, currentLifestyleIndex, setCurrentLifestyleIndex, collectionRef, handleFilter, addToCart, deliverySettings, isLoggedIn, reviews, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, currentReviewIndex, setCurrentReviewIndex }) {
   const filteredProducts = activeFilter === "All"
     ? products
@@ -524,7 +469,6 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
       <section className="hero-section">
         <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
-        <Hero3D products={products} />
         <div className="hero-content">
           <div className="hero-content-inner">
             <div className="hero-text">
@@ -561,7 +505,6 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
         <div className="filter-buttons">
           {filterLabels.map((label) => (<button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>{label === 'All' ? 'All' : label}</button>))}
         </div>
-        <Showcase3D products={filteredProducts} addToCart={addToCart} />
         <div className="product-grid">
           {filteredProducts.map((product) => (
             <div key={product.id} className="product-card">
@@ -706,17 +649,25 @@ function App() {
     };
   }
 
+  // ===== REVIEWS: load + auto-refresh on login =====
   useEffect(() => {
     async function loadReviews() {
       try {
-        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+        const { data: reviewsData, error } = await window.supabaseClient
+          .from('reviews')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
         if (reviewsData) setReviews(reviewsData);
-      } catch (e) { console.error(e); }
+      } catch (e) { console.error('Reviews load error:', e); }
     }
     loadReviews();
     window.__setReviews = setReviews;
+    window.__loadReviews = loadReviews;
+
     const { data: authListener } = window.supabaseClient.auth.onAuthStateChange((event, session) => {
-      setTimeout(() => { loadReviews(); }, 100);
+      // login/logout වුනාම reviews ආයේ load කරන්න
+      setTimeout(() => { loadReviews(); }, 300);
     });
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') loadReviews();
@@ -806,8 +757,8 @@ function App() {
       const { error } = await window.supabaseClient.from('reviews').insert([{ name: reviewName, email: reviewEmail, rating: parseInt(reviewRating), comment: reviewComment, user_image: userImage }]);
       if (error) throw error;
       setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
-      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-      if (reviewsData) setReviews(reviewsData);
+      // Submit කරාට පස්සේ reviews ආයේ load කරන්න
+      if (window.__loadReviews) await window.__loadReviews();
       alert('✅ Review submitted successfully!');
     } catch (err) { alert('❌ Error: ' + err.message); }
   };
@@ -819,6 +770,8 @@ function App() {
       if (!customerName) setCustomerName(user.displayName || '');
       setReviewName(user.displayName || '');
       setReviewEmail(user.email || '');
+      // Login වුනාම reviews ආයේ load කරන්න
+      if (window.__loadReviews) setTimeout(() => window.__loadReviews(), 300);
     } else {
       setIsLoggedIn(false);
       setLoggedInUser(null);
