@@ -110,5 +110,20 @@
 
   <script type="text/babel" src="script.js"></script>
   <script type="text/babel" src="gemini-chat.js"></script>
+  <script>
+  console.log('=== index.html loaded ===');
+  setTimeout(function() {
+    console.log('=== 1 second later ===');
+    console.log('React:', typeof React);
+    console.log('ReactDOM:', typeof ReactDOM);
+    console.log('ReactRouterDOM:', typeof window.ReactRouterDOM);
+    console.log('Babel:', typeof Babel);
+    console.log('Supabase:', typeof window.supabaseClient);
+    console.log('THREE:', typeof window.THREE);
+    console.log('AromaScene:', typeof window.AromaScene);
+    var root = document.getElementById('root');
+    console.log('Root div children:', root ? root.children.length : 'no root');
+  }, 1000);
+  </script>
 </body>
 </html>
