@@ -93,7 +93,6 @@
     var visible = true, raf = 0, last = performance.now();
     var ro = null, io = null;
 
-    // ResizeObserver support නැත්නම් fallback
     if (typeof ResizeObserver !== 'undefined') {
       ro = new ResizeObserver(resize);
       ro.observe(canvas);
@@ -102,7 +101,6 @@
     }
     resize();
 
-    // IntersectionObserver support නැත්නම් fallback
     if (typeof IntersectionObserver !== 'undefined') {
       io = new IntersectionObserver(function (es) { visible = es[0].isIntersecting; });
       io.observe(canvas);
