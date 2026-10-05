@@ -142,14 +142,15 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     return { success: false, error: err.message };
   }
 }
+
 function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // මෙතන scroll block කරන්නේ නෑ, menu එක page එකත් එක්කම scroll වෙන්න දෙනවා
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
+    // කිසිම overflow hidden එකක් නෑ
+    return () => {};
   }, [isOpen]);
 
   const handleNavClick = (path) => {
@@ -582,6 +583,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
     </>
   );
 }
+
 function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -666,7 +668,6 @@ function App() {
     window.__loadReviews = loadReviews;
 
     const { data: authListener } = window.supabaseClient.auth.onAuthStateChange((event, session) => {
-      // login/logout වුනාම reviews ආයේ load කරන්න
       setTimeout(() => { loadReviews(); }, 300);
     });
     function handleVisibilityChange() {
@@ -757,7 +758,6 @@ function App() {
       const { error } = await window.supabaseClient.from('reviews').insert([{ name: reviewName, email: reviewEmail, rating: parseInt(reviewRating), comment: reviewComment, user_image: userImage }]);
       if (error) throw error;
       setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
-      // Submit කරාට පස්සේ reviews ආයේ load කරන්න
       if (window.__loadReviews) await window.__loadReviews();
       alert('✅ Review submitted successfully!');
     } catch (err) { alert('❌ Error: ' + err.message); }
@@ -770,7 +770,6 @@ function App() {
       if (!customerName) setCustomerName(user.displayName || '');
       setReviewName(user.displayName || '');
       setReviewEmail(user.email || '');
-      // Login වුනාම reviews ආයේ load කරන්න
       if (window.__loadReviews) setTimeout(() => window.__loadReviews(), 300);
     } else {
       setIsLoggedIn(false);
