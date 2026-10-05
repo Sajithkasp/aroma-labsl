@@ -246,8 +246,6 @@ button { cursor: pointer; background: none; border: none; }
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
-  min-height: 100vh;
   width: 85%;
   max-width: 400px;
   background: #FFFBF5;
@@ -257,7 +255,6 @@ button { cursor: pointer; background: none; border: none; }
   transform: translateX(-100%);
   transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
   box-shadow: 8px 0 40px rgba(10, 46, 31, 0.25);
-  overflow: hidden;
 }
 .menu-drawer.open {
   transform: translateX(0);
@@ -270,9 +267,7 @@ button { cursor: pointer; background: none; border: none; }
 .menu-drawer-subtitle { font-size: 8px; letter-spacing: 0.3em; margin-top: 4px; opacity: 0.7; }
 .menu-drawer-close { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFFBF5; background: rgba(255, 251, 245, 0.08); transition: background 0.3s; flex-shrink: 0; }
 .menu-drawer-close:hover { background: #B8963E; color: #0A2E1F; }
-.menu-drawer-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px 0 24px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; min-height: 0; }
-.menu-drawer-body::-webkit-scrollbar { width: 5px; }
-.menu-drawer-body::-webkit-scrollbar-thumb { background: rgba(10, 46, 31, 0.15); border-radius: 3px; }
+.menu-drawer-body { padding: 20px 0 24px; }
 .menu-section { padding: 0 20px; margin-bottom: 24px; }
 .menu-section-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 700; color: #B8963E; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(184, 150, 62, 0.25); }
 .menu-nav { display: flex; flex-direction: column; gap: 2px; }
@@ -538,4 +533,4 @@ button { cursor: pointer; background: none; border: none; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
+                 }
