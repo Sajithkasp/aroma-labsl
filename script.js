@@ -1,6 +1,6 @@
 const { useState, useEffect, useRef } = React;
 const { createRoot } = ReactDOM;
-const { BrowserRouter, Switch, Route, Link, useHistory, useLocation } = ReactRouterDOM;
+const { BrowserRouter, Switch, Route, Link, useHistory, useLocation } = window.ReactRouterDOM || ReactRouterDOM || {};
 const useNavigate = () => {
   const history = useHistory();
   return (path) => history.push(path);
@@ -142,22 +142,30 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     return { success: false, error: err.message };
   }
 }
+
 function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   const handleNavClick = (path) => {
+    document.body.style.overflow = '';
     onClose();
     navigate(path);
   };
 
   const handleCategoryClick = (catName) => {
+    document.body.style.overflow = '';
     onClose();
     navigate('/');
     setTimeout(() => {
@@ -184,7 +192,7 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
           </button>
         </div>
 
-        <div className="menu-drawer-body">
+        <div className="menu-drawer-body" style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch', flex: 1 }}>
           <div className="menu-section">
             <div className="menu-section-label">MENU</div>
             <nav className="menu-nav">
@@ -192,7 +200,7 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
                 <span className="menu-link-icon">🏠</span>
                 <span>Home</span>
               </button>
-              <button className="menu-link" onClick={() => { onClose(); setTimeout(() => document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }), 200); }}>
+              <button className="menu-link" onClick={() => { document.body.style.overflow = ''; onClose(); setTimeout(() => document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }), 200); }}>
                 <span className="menu-link-icon">🛍️</span>
                 <span>Shop</span>
               </button>
@@ -529,7 +537,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
           <div className="hero-content-inner">
             <div className="hero-text">
               <div className="hero-eyebrow">PREMIUM EAU DE PARFUM</div>
-              <h2 className="hero-title">AROMA LAB - Fine Fragrances<br /><span className="accent">Crafted for Every Mood & Moment</span></h2>
+              <h1 className="hero-title">AROMA LAB - Fine Fragrances<br /><span className="accent">Crafted for Every Mood & Moment</span></h1>
               <p className="hero-desc">From bold and mysterious to fresh and elegant — find your perfect scent.</p>
               <button onClick={() => handleFilter("All")} className="hero-btn">SHOP NOW →</button>
             </div>
@@ -639,6 +647,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
     </>
   );
 }
+
 function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -668,6 +677,7 @@ function App() {
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
+  // Load products, categories, etc.
   useEffect(() => {
     async function loadData() {
       try {
@@ -706,24 +716,43 @@ function App() {
     };
   }
 
+  // ===== REVIEWS LOADING — FIXED =====
   useEffect(() => {
     async function loadReviews() {
       try {
-        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-        if (reviewsData) setReviews(reviewsData);
-      } catch (e) { console.error(e); }
+        const { data: reviewsData, error } = await window.supabaseClient
+          .from('reviews')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (reviewsData) {
+          setReviews(reviewsData);
+          window.__setReviews = setReviews;
+        }
+      } catch (e) {
+        console.error('Reviews load error:', e);
+      }
     }
     loadReviews();
-    window.__setReviews = setReviews;
+
+    // Supabase auth state change listener
     const { data: authListener } = window.supabaseClient.auth.onAuthStateChange((event, session) => {
-      setTimeout(() => { loadReviews(); }, 100);
+      console.log('Supabase auth event:', event);
+      setTimeout(() => { loadReviews(); }, 300);
     });
+
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') loadReviews();
     }
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Expose loadReviews for manual refresh (e.g., after review submit)
+    window.__loadReviews = loadReviews;
+
     return () => {
-      if (authListener && authListener.subscription) authListener.subscription.unsubscribe();
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
@@ -803,11 +832,17 @@ function App() {
     if (!reviewName || !reviewEmail || !reviewRating || !reviewComment) return;
     try {
       const userImage = loggedInUser?.photoURL || '';
-      const { error } = await window.supabaseClient.from('reviews').insert([{ name: reviewName, email: reviewEmail, rating: parseInt(reviewRating), comment: reviewComment, user_image: userImage }]);
+      const { error } = await window.supabaseClient.from('reviews').insert([{
+        name: reviewName,
+        email: reviewEmail,
+        rating: parseInt(reviewRating),
+        comment: reviewComment,
+        user_image: userImage
+      }]);
       if (error) throw error;
       setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
-      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
-      if (reviewsData) setReviews(reviewsData);
+      // Reload reviews immediately
+      if (window.__loadReviews) await window.__loadReviews();
       alert('✅ Review submitted successfully!');
     } catch (err) { alert('❌ Error: ' + err.message); }
   };
