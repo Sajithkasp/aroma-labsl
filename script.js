@@ -147,12 +147,6 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // මෙතන scroll block කරන්නේ නෑ, menu එක page එකත් එක්කම scroll වෙන්න දෙනවා
-  useEffect(() => {
-    // කිසිම overflow hidden එකක් නෑ
-    return () => {};
-  }, [isOpen]);
-
   const handleNavClick = (path) => {
     onClose();
     navigate(path);
@@ -524,7 +518,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
                     {product.base && <div><div className="note-label">Base</div><div className="note-value">{product.base}</div></div>}
                   </div>
                 )}
-                <button onClick={() => addToCart(product)} className="btn-add-cart">ADD TO CART</button>
+                <button onClick={(e) => addToCart(product, e)} className="btn-add-cart">ADD TO CART</button>
               </div>
             </div>
           ))}
@@ -610,9 +604,11 @@ function App() {
   const [reviewComment, setReviewComment] = useState('');
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [bubbles, setBubbles] = useState([]);
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
+  // Load data
   useEffect(() => {
     async function loadData() {
       try {
@@ -680,6 +676,49 @@ function App() {
     };
   }, []);
 
+  // ===== BUBBLE EFFECT: Click/Touch වුනාම බුබුලු උඩට යනවා =====
+  useEffect(() => {
+    const createBubbles = (x, y, count = 8) => {
+      const newBubbles = [];
+      for (let i = 0; i < count; i++) {
+        const id = Date.now() + Math.random() + i;
+        const size = 15 + Math.random() * 35;
+        const duration = 2.5 + Math.random() * 2.5;
+        const delay = Math.random() * 0.4;
+        const offsetX = (Math.random() - 0.5) * 100;
+        const offsetY = (Math.random() - 0.5) * 50;
+        const rotation = (Math.random() - 0.5) * 360;
+        newBubbles.push({ id, size, duration, delay, offsetX, offsetY, rotation, x, y });
+      }
+      setBubbles(prev => [...prev, ...newBubbles]);
+      setTimeout(() => {
+        setBubbles(prev => prev.filter(b => !newBubbles.find(nb => nb.id === b.id)));
+      }, 6000);
+    };
+
+    const handleClick = (e) => {
+      const target = e.target;
+      if (target.closest('.site-header') ||
+          target.closest('.menu-drawer') ||
+          target.closest('.menu-overlay') ||
+          target.closest('.cart-modal-overlay') ||
+          target.closest('.page-popup-overlay')) {
+        return;
+      }
+      const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      createBubbles(x, y, 8);
+    };
+
+    document.addEventListener('click', handleClick);
+    document.addEventListener('touchstart', handleClick, { passive: true });
+
+    return () => {
+      document.removeEventListener('click', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+    };
+  }, []);
+
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => { setCurrentHeroIndex(prev => (prev + 1) % heroImages.length); }, 5000);
@@ -698,14 +737,75 @@ function App() {
     return () => clearInterval(interval);
   }, [lifestyleDetails]);
 
-  const addToCart = (product) => {
+  // ===== ADD TO CART + FLY ANIMATION =====
+  const addToCart = (product, event) => {
+    // Fly to cart animation
+    if (event && event.currentTarget) {
+      const btn = event.currentTarget;
+      const card = btn.closest('.product-card');
+      if (card) {
+        const img = card.querySelector('.product-img-wrap img');
+        const cartIcon = document.querySelector('.header-icons .icon-btn[title="Cart"]');
+        
+        if (img && cartIcon) {
+          const imgRect = img.getBoundingClientRect();
+          const cartRect = cartIcon.getBoundingClientRect();
+          
+          const flyingImg = img.cloneNode(true);
+          flyingImg.classList.add('fly-to-cart');
+          flyingImg.style.position = 'fixed';
+          flyingImg.style.top = imgRect.top + 'px';
+          flyingImg.style.left = imgRect.left + 'px';
+          flyingImg.style.width = imgRect.width + 'px';
+          flyingImg.style.height = imgRect.height + 'px';
+          flyingImg.style.zIndex = '999999';
+          flyingImg.style.pointerEvents = 'none';
+          flyingImg.style.borderRadius = '8px';
+          flyingImg.style.transition = 'all 0.9s cubic-bezier(0.22, 0.61, 0.36, 1)';
+          flyingImg.style.objectFit = 'cover';
+          
+          document.body.appendChild(flyingImg);
+          
+          requestAnimationFrame(() => {
+            flyingImg.style.top = (cartRect.top + cartRect.height / 2 - 20) + 'px';
+            flyingImg.style.left = (cartRect.left + cartRect.width / 2 - 20) + 'px';
+            flyingImg.style.width = '40px';
+            flyingImg.style.height = '40px';
+            flyingImg.style.opacity = '0.3';
+            flyingImg.style.transform = 'scale(0.3) rotate(360deg)';
+          });
+          
+          setTimeout(() => {
+            if (flyingImg.parentNode) flyingImg.parentNode.removeChild(flyingImg);
+          }, 950);
+        }
+      }
+    }
+
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
       return [...prev, { ...product, quantity: 1 }];
     });
+    
     setShowAddedPopup(true);
     setTimeout(() => setShowAddedPopup(false), 2000);
+
+    // Cart icon bounce
+    const cartIconBtn = document.querySelector('.header-icons .icon-btn[title="Cart"]');
+    if (cartIconBtn) {
+      cartIconBtn.classList.add('cart-bounce');
+      setTimeout(() => cartIconBtn.classList.remove('cart-bounce'), 600);
+    }
+
+    // Cart badge pulse
+    setTimeout(() => {
+      const badge = document.querySelector('.cart-badge');
+      if (badge) {
+        badge.classList.add('cart-badge-pulse');
+        setTimeout(() => badge.classList.remove('cart-badge-pulse'), 600);
+      }
+    }, 100);
   };
 
   const removeFromCart = (id) => setCartItems(prev => prev.filter(item => item.id !== id));
@@ -785,6 +885,25 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app-root">
+        {/* Floating Bubbles */}
+        <div className="bubble-container">
+          {bubbles.map(b => (
+            <div
+              key={b.id}
+              className="bubble"
+              style={{
+                width: b.size + 'px',
+                height: b.size + 'px',
+                left: (b.x + b.offsetX) + 'px',
+                top: (b.y + b.offsetY) + 'px',
+                animationDuration: b.duration + 's',
+                animationDelay: b.delay + 's',
+                '--rotation': b.rotation + 'deg'
+              }}
+            />
+          ))}
+        </div>
+
         <MenuDrawer
           isOpen={isMenuOpen}
           onClose={() => setIsMenuOpen(false)}
