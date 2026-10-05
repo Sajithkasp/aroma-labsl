@@ -1,0 +1,37 @@
+/* AROMA LAB - 3D additions (does not change any existing style) */
+.hero-3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.showcase-3d { margin: 0 auto 48px; max-width: 1100px; }
+.showcase-stage {
+  position: relative; height: 420px; border-radius: 24px; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 35%, #145038 0%, #0A2E1F 70%);
+  box-shadow: 0 20px 50px rgba(10, 46, 31, 0.25);
+}
+.showcase-canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+.showcase-canvas:active { cursor: grabbing; }
+.showcase-hint {
+  position: absolute; left: 0; right: 0; bottom: 12px; text-align: center;
+  font-size: 10px; letter-spacing: 0.25em; color: rgba(255, 251, 245, 0.55); pointer-events: none;
+}
+.showcase-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #FFFBF5;
+  background: rgba(255, 251, 245, 0.12); backdrop-filter: blur(6px); transition: background 0.3s;
+}
+.showcase-arrow:hover { background: rgba(184, 150, 62, 0.6); }
+.showcase-arrow.left { left: 14px; }
+.showcase-arrow.right { right: 14px; }
+
+.showcase-info { text-align: center; padding: 28px 20px 0; }
+.showcase-info .si-for { font-size: 11px; letter-spacing: 0.3em; color: #B8963E; font-weight: 600; }
+.showcase-info .si-name { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; margin-top: 6px; }
+.showcase-info .si-tagline { opacity: 0.7; margin-top: 4px; }
+.showcase-info .si-price { font-size: 20px; font-weight: 600; color: #B8963E; margin: 12px 0; }
+.showcase-info .product-notes { max-width: 520px; margin: 0 auto 18px; text-align: left; }
+.showcase-info .btn-add-cart { max-width: 280px; margin: 0 auto; }
+
+@media (max-width: 767px) {
+  .showcase-stage { height: 340px; border-radius: 18px; }
+  .showcase-info .si-name { font-size: 28px; }
+  .showcase-arrow { width: 38px; height: 38px; }
+}
