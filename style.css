@@ -220,9 +220,12 @@ button { cursor: pointer; background: none; border: none; }
 
 .added-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #0A2E1F; color: #FFFBF5; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 14px; z-index: 99999; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
 
-.menu-overlay { position: fixed; inset: 0; background: rgba(10, 46, 31, 0.55); backdrop-filter: blur(3px); z-index: 9998; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
+/* ============================================================
+   MENU DRAWER — හරිගස්සපු තැන
+   ============================================================ */
+.menu-overlay { position: absolute; inset: 0; background: rgba(10, 46, 31, 0.55); backdrop-filter: blur(3px); z-index: 9998; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
 .menu-overlay.open { opacity: 1; visibility: visible; }
-.menu-drawer { position: fixed; top: 0; left: 0; height: 100vh; height: 100dvh; width: 85%; max-width: 400px; background: #FFFBF5; z-index: 9999; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1); box-shadow: 8px 0 40px rgba(10, 46, 31, 0.25); overflow: hidden; }
+.menu-drawer { position: absolute; top: 0; left: 0; height: 100%; width: 85%; max-width: 400px; background: #FFFBF5; z-index: 9999; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1); box-shadow: 8px 0 40px rgba(10, 46, 31, 0.25); overflow: hidden; }
 .menu-drawer.open { transform: translateX(0); }
 .menu-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px; border-bottom: 1px solid rgba(10, 46, 31, 0.08); background: #0A2E1F; color: #FFFBF5; flex-shrink: 0; }
 .menu-drawer-logo { display: flex; align-items: center; gap: 12px; }
@@ -333,13 +336,11 @@ button { cursor: pointer; background: none; border: none; }
    AROMA LAB — 3D ENHANCEMENT LAYER (CSS ONLY)
    ============================================================ */
 
-/* Perspective lives on app-root (NOT body) so fixed UI stays fixed */
 .app-root {
   perspective: 1600px;
   perspective-origin: 50% 30%;
 }
 
-/* ---------- Global 3D transitions ---------- */
 .product-card,
 .trust-item,
 .hero-btn,
@@ -359,14 +360,12 @@ button { cursor: pointer; background: none; border: none; }
   will-change: transform;
 }
 
-/* ---------- TOP BAR ---------- */
 .top-bar {
   position: relative;
   z-index: 50;
   box-shadow: 0 6px 20px rgba(10, 46, 31, 0.15);
 }
 
-/* ---------- HEADER ---------- */
 .site-header {
   box-shadow: 0 8px 30px rgba(10, 46, 31, 0.06);
 }
@@ -381,7 +380,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 10px 22px rgba(10, 46, 31, 0.14);
 }
 
-/* ---------- HERO ---------- */
 .hero-section {
   transform-style: preserve-3d;
 }
@@ -399,7 +397,6 @@ button { cursor: pointer; background: none; border: none; }
   transform: scale(1.4);
 }
 
-/* ---------- TRUST BADGES ---------- */
 .trust-badges {
   position: relative;
   z-index: 5;
@@ -416,7 +413,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 0 30px rgba(184, 150, 62, 0.5);
 }
 
-/* ---------- FILTER BUTTONS ---------- */
 .filter-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 24px rgba(10, 46, 31, 0.14);
@@ -425,7 +421,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 12px 28px rgba(10, 46, 31, 0.25);
 }
 
-/* ---------- PRODUCT CARDS ---------- */
 .product-grid {
   perspective: 1400px;
 }
@@ -485,7 +480,6 @@ button { cursor: pointer; background: none; border: none; }
   transform: translateY(0) scale(0.98);
 }
 
-/* ---------- LIFESTYLE SLIDER ---------- */
 .lifestyle-slider {
   perspective: 1600px;
 }
@@ -522,7 +516,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 14px 30px rgba(184, 150, 62, 0.4);
 }
 
-/* ---------- KOKO BOX ---------- */
 .koko-box:hover {
   transform: translateY(-6px);
   box-shadow: 0 24px 50px rgba(184, 150, 62, 0.25);
@@ -538,7 +531,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 12px 28px rgba(10, 46, 31, 0.2);
 }
 
-/* ---------- REVIEW CARDS ---------- */
 .review-card.active {
   animation: review3DIn 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -580,7 +572,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 14px 30px rgba(184, 150, 62, 0.4);
 }
 
-/* ---------- MENU DRAWER ---------- */
 .menu-link:hover {
   transform: translateX(6px);
   box-shadow: 0 8px 18px rgba(10, 46, 31, 0.12);
@@ -590,7 +581,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
 }
 
-/* ---------- CART PAGE ---------- */
 .cart-item {
   transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
               box-shadow 0.5s ease;
@@ -628,7 +618,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 10px 25px rgba(184, 150, 62, 0.2);
 }
 
-/* ---------- FOOTER ---------- */
 .footer-social-btn {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
@@ -650,7 +639,6 @@ button { cursor: pointer; background: none; border: none; }
   transform: translateX(6px);
 }
 
-/* ---------- ADDED POPUP ---------- */
 .added-popup {
   animation: popup3D 2s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -673,7 +661,6 @@ button { cursor: pointer; background: none; border: none; }
   }
 }
 
-/* ---------- DYNAMIC PAGE ---------- */
 .page-back-btn {
   transition: transform 0.4s ease, background 0.3s ease, box-shadow 0.4s ease;
 }
@@ -682,7 +669,6 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 0 10px 22px rgba(10, 46, 31, 0.15);
 }
 
-/* ---------- COLLECTION TITLE ---------- */
 .collection-title {
   text-shadow: 0 4px 18px rgba(10, 46, 31, 0.08);
   transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -691,7 +677,6 @@ button { cursor: pointer; background: none; border: none; }
   transform: scale(1.02);
 }
 
-/* ---------- FLOAT-IN ANIMATION ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .product-card,
   .trust-item,
@@ -710,10 +695,6 @@ button { cursor: pointer; background: none; border: none; }
   }
 }
 
-/* ============================================================
-   FIXED / FLOATING ELEMENTS — protect from 3D perspective
-   Ask Aroma button, popups, drawer, overlays, etc.
-   ============================================================ */
 .ask-aroma-btn,
 .ask-aroma-button,
 .ask-aroma,
@@ -733,7 +714,6 @@ button { cursor: pointer; background: none; border: none; }
   backface-visibility: visible !important;
 }
 
-/* Also protect any element that positions itself fixed */
 .added-popup,
 .menu-overlay,
 .menu-drawer,
@@ -743,7 +723,6 @@ button { cursor: pointer; background: none; border: none; }
   perspective: none;
 }
 
-/* ---------- MOBILE — tame 3D for performance ---------- */
 @media (max-width: 639px) {
   .app-root {
     perspective: 1000px;
@@ -761,7 +740,6 @@ button { cursor: pointer; background: none; border: none; }
   }
 }
 
-/* ---------- Reduced motion accessibility ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
