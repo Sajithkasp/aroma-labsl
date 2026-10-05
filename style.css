@@ -10,7 +10,7 @@ img, video { max-width: 100%; height: auto; display: block; }
 button, input, select, textarea { font-family: inherit; font-size: 100%; color: inherit; margin: 0; padding: 0; }
 button { cursor: pointer; background: none; border: none; }
 
-.app-root { min-height: 100vh; background-color: #FFFBF5; color: #0A2E1F; }
+.app-root { min-height: 100vh; background-color: #FFFBF5; color: #0A2E1F; position: relative; }
 
 @keyframes fadeSlideIn {
   0% { opacity: 0; transform: translateX(30px); }
@@ -220,10 +220,49 @@ button { cursor: pointer; background: none; border: none; }
 
 .added-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #0A2E1F; color: #FFFBF5; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 14px; z-index: 99999; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
 
-.menu-overlay { position: fixed; inset: 0; background: rgba(10, 46, 31, 0.55); backdrop-filter: blur(3px); z-index: 9998; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
-.menu-overlay.open { opacity: 1; visibility: visible; }
-.menu-drawer { position: fixed; top: 0; left: 0; height: 100vh; height: 100dvh; width: 85%; max-width: 400px; background: #FFFBF5; z-index: 9999; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1); box-shadow: 8px 0 40px rgba(10, 46, 31, 0.25); overflow: hidden; }
-.menu-drawer.open { transform: translateX(0); }
+/* ============================================================
+   MENU DRAWER — Page එකත් එක්කම scroll වෙන විදියට
+   ============================================================ */
+
+.menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 46, 31, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.menu-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  min-height: 100vh;
+  width: 85%;
+  max-width: 400px;
+  background: #FFFBF5;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  box-shadow: 8px 0 40px rgba(10, 46, 31, 0.25);
+  overflow: hidden;
+}
+.menu-drawer.open {
+  transform: translateX(0);
+}
+
 .menu-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px; border-bottom: 1px solid rgba(10, 46, 31, 0.08); background: #0A2E1F; color: #FFFBF5; flex-shrink: 0; }
 .menu-drawer-logo { display: flex; align-items: center; gap: 12px; }
 .menu-drawer-logo img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #B8963E; }
@@ -231,7 +270,7 @@ button { cursor: pointer; background: none; border: none; }
 .menu-drawer-subtitle { font-size: 8px; letter-spacing: 0.3em; margin-top: 4px; opacity: 0.7; }
 .menu-drawer-close { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFFBF5; background: rgba(255, 251, 245, 0.08); transition: background 0.3s; flex-shrink: 0; }
 .menu-drawer-close:hover { background: #B8963E; color: #0A2E1F; }
-.menu-drawer-body { flex: 1; overflow-y: auto; padding: 20px 0 24px; -webkit-overflow-scrolling: touch; }
+.menu-drawer-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px 0 24px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; min-height: 0; }
 .menu-drawer-body::-webkit-scrollbar { width: 5px; }
 .menu-drawer-body::-webkit-scrollbar-thumb { background: rgba(10, 46, 31, 0.15); border-radius: 3px; }
 .menu-section { padding: 0 20px; margin-bottom: 24px; }
@@ -499,4 +538,4 @@ button { cursor: pointer; background: none; border: none; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-                   }
+}
