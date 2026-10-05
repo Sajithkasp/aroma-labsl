@@ -148,10 +148,10 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const location = useLocation();
 
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
+  // CSS එකෙන් menu එක page එකට අලවලා තියෙන නිසා
+  // body scroll එක block කරන්නේ නෑ
+  return () => {};
+}, [isOpen]);
 
   const handleNavClick = (path) => {
     onClose();
