@@ -610,7 +610,6 @@ function App() {
   const [reviewComment, setReviewComment] = useState('');
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [bubbles, setBubbles] = useState([]);
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
@@ -677,47 +676,6 @@ function App() {
     return () => {
       if (authListener && authListener.subscription) authListener.subscription.unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
-  // ===== BUBBLE EFFECT =====
-  useEffect(() => {
-    const createBubbles = (x, y, count = 8) => {
-      const newBubbles = [];
-      for (let i = 0; i < count; i++) {
-        const id = Date.now() + Math.random() + i;
-        const size = 15 + Math.random() * 35;
-        const duration = 2 + Math.random() * 1.5;
-        const delay = Math.random() * 0.3;
-        const driftX = (Math.random() - 0.5) * 150;
-        newBubbles.push({ id, size, duration, delay, driftX, x, y });
-      }
-      setBubbles(prev => [...prev, ...newBubbles]);
-      setTimeout(() => {
-        setBubbles(prev => prev.filter(b => !newBubbles.find(nb => nb.id === b.id)));
-      }, 4500);
-    };
-
-    const handleClick = (e) => {
-      const target = e.target;
-      if (target.closest('.site-header') ||
-          target.closest('.menu-drawer') ||
-          target.closest('.menu-overlay') ||
-          target.closest('.cart-modal-overlay') ||
-          target.closest('.page-popup-overlay')) {
-        return;
-      }
-      const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-      const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-      createBubbles(x, y, 8);
-    };
-
-    document.addEventListener('click', handleClick);
-    document.addEventListener('touchstart', handleClick, { passive: true });
-
-    return () => {
-      document.removeEventListener('click', handleClick);
-      document.removeEventListener('touchstart', handleClick);
     };
   }, []);
 
@@ -883,23 +841,6 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app-root">
-        <div className="bubble-container">
-          {bubbles.map(b => (
-            <div
-              key={b.id}
-              className="bubble"
-              style={{
-                width: b.size + 'px',
-                height: b.size + 'px',
-                left: b.x + 'px',
-                top: b.y + 'px',
-                animation: `bubbleFloat ${b.duration}s ease-out ${b.delay}s forwards`,
-                '--driftX': b.driftX + 'px'
-              }}
-            />
-          ))}
-        </div>
-
         <MenuDrawer
           isOpen={isMenuOpen}
           onClose={() => setIsMenuOpen(false)}
