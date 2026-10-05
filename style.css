@@ -856,3 +856,553 @@ button { cursor: pointer; background: none; border: none; }
   .cart-page-title { font-size: 30px; }
   .menu-drawer { width: 85%; }
 }
+/* ============================================================
+   AROMA LAB — 3D ENHANCEMENT LAYER (CSS ONLY)
+   Adds depth, perspective & motion without touching HTML/JS
+   ============================================================ */
+
+/* ---------- Global 3D Scene Setup ---------- */
+body {
+  perspective: 1600px;
+  perspective-origin: 50% 30%;
+  overflow-x: hidden;
+}
+
+.app-root {
+  transform-style: preserve-3d;
+}
+
+/* Smooth 3D transitions everywhere */
+.product-card,
+.trust-item,
+.hero-btn,
+.btn-add-cart,
+.filter-btn,
+.review-card,
+.koko-box,
+.footer-social-btn,
+.icon-btn,
+.menu-link,
+.hero-img,
+.lifestyle-slide {
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+              box-shadow 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+              background 0.4s ease,
+              color 0.4s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ---------- TOP BAR — subtle float ---------- */
+.top-bar {
+  position: relative;
+  z-index: 50;
+  box-shadow: 0 6px 20px rgba(10, 46, 31, 0.15);
+}
+
+/* ---------- HEADER — glassy 3D lift ---------- */
+.site-header {
+  box-shadow: 0 8px 30px rgba(10, 46, 31, 0.06);
+  transform: translateZ(0);
+}
+.header-logo img {
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.header-logo:hover img {
+  transform: rotateY(360deg) scale(1.08);
+}
+.icon-btn {
+  transform-style: preserve-3d;
+}
+.icon-btn:hover {
+  transform: translateY(-3px) translateZ(20px) rotateX(-8deg);
+  box-shadow: 0 10px 22px rgba(10, 46, 31, 0.14);
+}
+
+/* ---------- HERO — parallax depth stack ---------- */
+.hero-section {
+  transform-style: preserve-3d;
+  perspective: 1200px;
+}
+.hero-img {
+  transform: translateZ(-60px) scale(1.08);
+}
+.hero-overlay {
+  transform: translateZ(-30px);
+}
+.hero-content {
+  transform: translateZ(40px);
+}
+.hero-title {
+  text-shadow: 0 6px 24px rgba(10, 46, 31, 0.35);
+  transform: translateZ(30px);
+}
+.hero-eyebrow {
+  transform: translateZ(50px);
+}
+.hero-desc {
+  transform: translateZ(20px);
+}
+.hero-btn {
+  transform: translateZ(60px);
+  box-shadow: 0 10px 24px rgba(184, 150, 62, 0.35);
+}
+.hero-btn:hover {
+  transform: translateZ(80px) translateY(-4px);
+  box-shadow: 0 18px 40px rgba(184, 150, 62, 0.5);
+}
+.hero-dot {
+  transition: all 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.hero-dot:hover {
+  transform: scale(1.4);
+}
+
+/* ---------- TRUST BADGES — tilt on hover ---------- */
+.trust-badges {
+  position: relative;
+  z-index: 5;
+  box-shadow: 0 20px 50px rgba(10, 46, 31, 0.18);
+}
+.trust-item {
+  transform-style: preserve-3d;
+}
+.trust-item:hover {
+  transform: translateY(-6px) rotateX(6deg);
+}
+.trust-icon {
+  transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.trust-item:hover .trust-icon {
+  transform: rotateY(360deg) scale(1.1);
+  box-shadow: 0 0 30px rgba(184, 150, 62, 0.5);
+}
+
+/* ---------- FILTER BUTTONS — press depth ---------- */
+.filter-btn {
+  transform-style: preserve-3d;
+}
+.filter-btn:hover {
+  transform: translateY(-3px) translateZ(15px);
+  box-shadow: 0 10px 24px rgba(10, 46, 31, 0.14);
+}
+.filter-btn.active {
+  transform: translateZ(20px);
+  box-shadow: 0 12px 28px rgba(10, 46, 31, 0.25);
+}
+
+/* ---------- PRODUCT CARDS — main 3D stars ---------- */
+.product-grid {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+.product-card {
+  transform: translateZ(0) rotateX(0) rotateY(0);
+  transform-style: preserve-3d;
+  position: relative;
+}
+.product-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(184,150,62,0.15), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.product-card:hover {
+  transform: translateY(-12px) translateZ(40px) rotateX(6deg) rotateY(-4deg);
+  box-shadow: 0 30px 60px rgba(10, 46, 31, 0.20),
+              0 0 0 1px rgba(184, 150, 62, 0.25);
+}
+.product-card:hover::before {
+  opacity: 1;
+}
+.product-img-wrap {
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+.product-img-wrap img {
+  transition: transform 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.product-card:hover .product-img-wrap img {
+  transform: scale(1.08) translateZ(30px);
+}
+.product-badge-price {
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.product-card:hover .product-badge-price {
+  transform: translateZ(50px) scale(1.08);
+}
+.product-badge-for {
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.product-card:hover .product-badge-for {
+  transform: translateZ(50px);
+}
+.product-info {
+  transform-style: preserve-3d;
+}
+.product-name {
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.product-card:hover .product-name {
+  transform: translateZ(25px);
+}
+.product-notes {
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.product-card:hover .product-notes {
+  transform: translateZ(20px);
+}
+.btn-add-cart {
+  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+}
+.btn-add-cart::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: left 0.7s ease;
+}
+.btn-add-cart:hover::after {
+  left: 100%;
+}
+.btn-add-cart:hover {
+  transform: translateZ(35px) translateY(-3px);
+  box-shadow: 0 14px 30px rgba(10, 46, 31, 0.3);
+}
+.btn-add-cart:active {
+  transform: translateZ(15px) translateY(0) scale(0.98);
+}
+
+/* ---------- LIFESTYLE SLIDER — 3D flip feel ---------- */
+.lifestyle-slider {
+  perspective: 1600px;
+}
+.lifestyle-slider-inner {
+  transform-style: preserve-3d;
+}
+.lifestyle-slide {
+  transform-style: preserve-3d;
+}
+.lifestyle-slide.active {
+  animation: slide3DIn 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes slide3DIn {
+  0% {
+    opacity: 0;
+    transform: rotateY(-12deg) translateZ(-80px) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(0) translateZ(0) scale(1);
+  }
+}
+.lifestyle-slide-img {
+  transform-style: preserve-3d;
+}
+.lifestyle-slide-img img {
+  transition: transform 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.lifestyle-slide:hover .lifestyle-slide-img img {
+  transform: scale(1.06);
+}
+.lifestyle-title {
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.btn-gold,
+.btn-white {
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.btn-gold:hover,
+.btn-white:hover {
+  transform: translateY(-4px) translateZ(30px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.35);
+}
+.lifestyle-nav {
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 20px rgba(10, 46, 31, 0.2);
+}
+.lifestyle-nav:hover {
+  transform: translateZ(30px) scale(1.08);
+  box-shadow: 0 14px 30px rgba(184, 150, 62, 0.4);
+}
+
+/* ---------- KOKO BOX — lift ---------- */
+.koko-box {
+  transform-style: preserve-3d;
+}
+.koko-box:hover {
+  transform: translateY(-6px) translateZ(25px);
+  box-shadow: 0 24px 50px rgba(184, 150, 62, 0.25);
+}
+.koko-logo {
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.koko-box:hover .koko-logo {
+  transform: rotateY(360deg);
+}
+.btn-koko-order {
+  transform-style: preserve-3d;
+}
+.btn-koko-order:hover {
+  transform: translateZ(30px) translateY(-3px);
+  box-shadow: 0 12px 28px rgba(10, 46, 31, 0.2);
+}
+
+/* ---------- REVIEW CARDS — 3D entrance ---------- */
+.review-card.active {
+  animation: review3DIn 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+@keyframes review3DIn {
+  0% {
+    opacity: 0;
+    transform: rotateX(-10deg) translateZ(-60px) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0) translateZ(0) translateY(0);
+  }
+}
+.review-card {
+  transform-style: preserve-3d;
+}
+.review-card:hover {
+  transform: translateY(-6px) rotateX(3deg);
+  box-shadow: 0 20px 45px rgba(10, 46, 31, 0.12);
+}
+.review-avatar {
+  transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.review-card:hover .review-avatar {
+  transform: scale(1.15) rotate(-6deg);
+}
+.review-submit {
+  transform-style: preserve-3d;
+}
+.review-submit:hover {
+  transform: translateZ(25px) translateY(-3px);
+  box-shadow: 0 14px 30px rgba(184, 150, 62, 0.45);
+}
+.review-input {
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s ease;
+}
+.review-input:focus {
+  transform: translateZ(15px);
+  box-shadow: 0 10px 25px rgba(184, 150, 62, 0.2);
+}
+.reviews-nav {
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 20px rgba(10, 46, 31, 0.2);
+}
+.reviews-nav:hover {
+  transform: translateZ(25px) scale(1.1);
+  box-shadow: 0 14px 30px rgba(184, 150, 62, 0.4);
+}
+
+/* ---------- MENU DRAWER — 3D slide ---------- */
+.menu-drawer {
+  transform: translateX(-100%) rotateY(15deg);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+.menu-drawer.open {
+  transform: translateX(0) rotateY(0deg);
+}
+.menu-link {
+  transform-style: preserve-3d;
+}
+.menu-link:hover {
+  transform: translateX(6px) translateZ(20px);
+  box-shadow: 0 8px 18px rgba(10, 46, 31, 0.12);
+}
+.menu-cta {
+  transform-style: preserve-3d;
+}
+.menu-cta:hover {
+  transform: translateX(6px) translateZ(25px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+}
+
+/* ---------- CART PAGE ---------- */
+.cart-item {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+              box-shadow 0.5s ease;
+}
+.cart-item:hover {
+  transform: translateZ(25px) translateY(-3px);
+  box-shadow: 0 16px 35px rgba(10, 46, 31, 0.12);
+}
+.cart-item-img {
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.cart-item:hover .cart-item-img {
+  transform: scale(1.1) rotate(-4deg);
+}
+.cart-btn {
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+}
+.cart-btn:hover {
+  transform: translateZ(25px) translateY(-3px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+}
+.cart-btn:active {
+  transform: translateZ(10px) translateY(0) scale(0.98);
+}
+.cart-totals {
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.cart-totals:hover {
+  transform: translateZ(20px);
+  box-shadow: 0 16px 35px rgba(10, 46, 31, 0.1);
+}
+.cart-form-input {
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s ease;
+}
+.cart-form-input:focus {
+  transform: translateZ(15px);
+  box-shadow: 0 10px 25px rgba(184, 150, 62, 0.2);
+}
+
+/* ---------- FOOTER — 3D social buttons ---------- */
+.footer-social-btn {
+  transform-style: preserve-3d;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+.footer-social-btn:hover {
+  transform: translateY(-6px) translateZ(30px) rotateY(360deg);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+}
+.footer-logo img {
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.footer-logo:hover img {
+  transform: rotateY(360deg) scale(1.08);
+}
+.footer-links a {
+  transition: transform 0.35s ease, color 0.3s ease;
+  display: inline-block;
+}
+.footer-links a:hover {
+  transform: translateX(6px) translateZ(15px);
+}
+
+/* ---------- ADDED POPUP — 3D bounce ---------- */
+.added-popup {
+  animation: popup3D 2s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-style: preserve-3d;
+}
+@keyframes popup3D {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px) rotateX(-40deg) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) rotateX(0deg) scale(1.05);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) rotateX(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) rotateX(30deg) scale(0.85);
+  }
+}
+
+/* ---------- DYNAMIC PAGE — soft lift ---------- */
+.dynamic-page-content {
+  transition: transform 0.5s ease;
+}
+.dynamic-page-content:hover {
+  transform: translateZ(10px);
+}
+.page-back-btn {
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease, background 0.3s ease, box-shadow 0.4s ease;
+}
+.page-back-btn:hover {
+  transform: translateX(-4px) translateZ(20px);
+  box-shadow: 0 10px 22px rgba(10, 46, 31, 0.15);
+}
+
+/* ---------- COLLECTION SECTION — subtle 3D header ---------- */
+.collection-title {
+  text-shadow: 0 4px 18px rgba(10, 46, 31, 0.08);
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.collection-title:hover {
+  transform: translateZ(30px) scale(1.02);
+}
+
+/* ---------- SCROLL REVEAL via pure CSS where supported ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .product-card,
+  .trust-item,
+  .review-card,
+  .koko-box {
+    animation: floatIn 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+}
+@keyframes floatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) rotateX(8deg) translateZ(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0) translateZ(0);
+  }
+}
+
+/* ---------- MOBILE — tame the 3D so it stays smooth ---------- */
+@media (max-width: 639px) {
+  body {
+    perspective: 1000px;
+  }
+  .product-card:hover {
+    transform: translateY(-6px) rotateX(3deg);
+  }
+  .hero-img {
+    transform: translateZ(-30px) scale(1.05);
+  }
+  .hero-content {
+    transform: translateZ(20px);
+  }
+  .trust-item:hover,
+  .koko-box:hover,
+  .cart-item:hover {
+    transform: translateY(-4px);
+  }
+  .footer-social-btn:hover {
+    transform: translateY(-4px) scale(1.08);
+  }
+}
+
+/* ---------- Reduced motion accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
