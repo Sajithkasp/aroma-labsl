@@ -147,6 +147,12 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   const handleNavClick = (path) => {
     onClose();
     navigate(path);
@@ -608,7 +614,6 @@ function App() {
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
-  // Load data
   useEffect(() => {
     async function loadData() {
       try {
@@ -647,7 +652,6 @@ function App() {
     };
   }
 
-  // ===== REVIEWS: load + auto-refresh on login =====
   useEffect(() => {
     async function loadReviews() {
       try {
@@ -676,24 +680,22 @@ function App() {
     };
   }, []);
 
-  // ===== BUBBLE EFFECT: Click/Touch වුනාම බුබුලු උඩට යනවා =====
+  // ===== BUBBLE EFFECT =====
   useEffect(() => {
     const createBubbles = (x, y, count = 8) => {
       const newBubbles = [];
       for (let i = 0; i < count; i++) {
         const id = Date.now() + Math.random() + i;
         const size = 15 + Math.random() * 35;
-        const duration = 2.5 + Math.random() * 2.5;
-        const delay = Math.random() * 0.4;
-        const offsetX = (Math.random() - 0.5) * 100;
-        const offsetY = (Math.random() - 0.5) * 50;
-        const rotation = (Math.random() - 0.5) * 360;
-        newBubbles.push({ id, size, duration, delay, offsetX, offsetY, rotation, x, y });
+        const duration = 2 + Math.random() * 1.5;
+        const delay = Math.random() * 0.3;
+        const driftX = (Math.random() - 0.5) * 150;
+        newBubbles.push({ id, size, duration, delay, driftX, x, y });
       }
       setBubbles(prev => [...prev, ...newBubbles]);
       setTimeout(() => {
         setBubbles(prev => prev.filter(b => !newBubbles.find(nb => nb.id === b.id)));
-      }, 6000);
+      }, 4500);
     };
 
     const handleClick = (e) => {
@@ -737,9 +739,7 @@ function App() {
     return () => clearInterval(interval);
   }, [lifestyleDetails]);
 
-  // ===== ADD TO CART + FLY ANIMATION =====
   const addToCart = (product, event) => {
-    // Fly to cart animation
     if (event && event.currentTarget) {
       const btn = event.currentTarget;
       const card = btn.closest('.product-card');
@@ -791,14 +791,12 @@ function App() {
     setShowAddedPopup(true);
     setTimeout(() => setShowAddedPopup(false), 2000);
 
-    // Cart icon bounce
     const cartIconBtn = document.querySelector('.header-icons .icon-btn[title="Cart"]');
     if (cartIconBtn) {
       cartIconBtn.classList.add('cart-bounce');
       setTimeout(() => cartIconBtn.classList.remove('cart-bounce'), 600);
     }
 
-    // Cart badge pulse
     setTimeout(() => {
       const badge = document.querySelector('.cart-badge');
       if (badge) {
@@ -885,7 +883,6 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app-root">
-        {/* Floating Bubbles */}
         <div className="bubble-container">
           {bubbles.map(b => (
             <div
@@ -894,11 +891,10 @@ function App() {
               style={{
                 width: b.size + 'px',
                 height: b.size + 'px',
-                left: (b.x + b.offsetX) + 'px',
-                top: (b.y + b.offsetY) + 'px',
-                animationDuration: b.duration + 's',
-                animationDelay: b.delay + 's',
-                '--rotation': b.rotation + 'deg'
+                left: b.x + 'px',
+                top: b.y + 'px',
+                animation: `bubbleFloat ${b.duration}s ease-out ${b.delay}s forwards`,
+                '--driftX': b.driftX + 'px'
               }}
             />
           ))}
