@@ -10,7 +10,7 @@ img, video { max-width: 100%; height: auto; display: block; }
 button, input, select, textarea { font-family: inherit; font-size: 100%; color: inherit; margin: 0; padding: 0; }
 button { cursor: pointer; background: none; border: none; }
 
-.app-root { min-height: 100vh; background-color: #FFFBF5; color: #0A2E1F; }
+.app-root { min-height: 100vh; background-color: #FFFBF5; color: #0A2E1F; position: relative; z-index: 0; }
 
 @keyframes fadeSlideIn {
   0% { opacity: 0; transform: translateX(30px); }
@@ -220,9 +220,6 @@ button { cursor: pointer; background: none; border: none; }
 
 .added-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #0A2E1F; color: #FFFBF5; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 14px; z-index: 99999; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
 
-/* ============================================================
-   MENU DRAWER
-   ============================================================ */
 .menu-overlay { position: fixed; inset: 0; background: rgba(10, 46, 31, 0.55); backdrop-filter: blur(3px); z-index: 9998; opacity: 0; visibility: hidden; transition: opacity 0.35s ease, visibility 0.35s ease; }
 .menu-overlay.open { opacity: 1; visibility: visible; }
 .menu-drawer { position: fixed; top: 0; left: 0; height: 100vh; height: 100dvh; width: 85%; max-width: 400px; background: #FFFBF5; z-index: 9999; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1); box-shadow: 8px 0 40px rgba(10, 46, 31, 0.25); overflow: hidden; }
@@ -440,14 +437,14 @@ button { cursor: pointer; background: none; border: none; }
 @keyframes floatIn { 0% { opacity: 0; transform: translateY(30px) rotateX(8deg); } 100% { opacity: 1; transform: translateY(0) rotateX(0); } }
 
 /* ============================================================
-   FLOATING GOLD BUBBLES — Click/Touch වුනාම උඩට යනවා
+   FLOATING GOLD BUBBLES — Page content එකට යටින්
    ============================================================ */
 
 .bubble-container {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 999999;
+  z-index: 0;
   overflow: hidden;
 }
 
@@ -458,26 +455,22 @@ button { cursor: pointer; background: none; border: none; }
   box-shadow: 
     inset 0 0 15px rgba(255, 255, 255, 0.7),
     0 0 25px rgba(184, 150, 62, 0.4);
-  animation: bubbleFloat ease-out forwards;
   will-change: transform, opacity;
   pointer-events: none;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes bubbleFloat {
   0% {
-    transform: translate(0, 0) scale(0.3) rotate(0deg);
+    transform: translate(-50%, -50%) scale(0.2);
     opacity: 0;
   }
   15% {
     opacity: 1;
-    transform: translate(0, -10px) scale(1) rotate(calc(var(--rotation) * 0.2));
-  }
-  60% {
-    opacity: 0.8;
-    transform: translate(calc(var(--rotation) * 0.5px), -120px) scale(1.1) rotate(calc(var(--rotation) * 0.5));
+    transform: translate(-50%, -50%) scale(1);
   }
   100% {
-    transform: translate(calc(var(--rotation) * 1px), -250px) scale(1.4) rotate(var(--rotation));
+    transform: translate(-50%, -50%) translateY(-250px) translateX(var(--driftX, 0px)) scale(1.3);
     opacity: 0;
   }
 }
@@ -518,7 +511,7 @@ button { cursor: pointer; background: none; border: none; }
 }
 
 /* ============================================================
-   LAYER ORDER — Products, header, footer ඔක්කොම bubble එකට උඩින්
+   LAYER ORDER — Page content එකට උඩින්, bubbles එකට යටින්
    ============================================================ */
 
 .site-header,
@@ -534,15 +527,11 @@ button { cursor: pointer; background: none; border: none; }
 .menu-overlay,
 .added-popup {
   position: relative;
-  z-index: 2;
-}
-
-.bubble-container {
-  z-index: 999999;
+  z-index: 1;
 }
 
 /* ============================================================
-   PROTECT FIXED ELEMENTS FROM 3D PERSPECTIVE
+   PROTECT FIXED ELEMENTS
    ============================================================ */
 
 .ask-aroma-btn, .ask-aroma-button, .ask-aroma, .chat-fab, .chat-button, .floating-btn, .floating-button, .gemini-chat-btn, .gemini-chat-button, .gemini-fab, [class*="ask-aroma"], [class*="chat-fab"], [class*="floating-btn"], [class*="gemini-chat"] {
@@ -570,4 +559,4 @@ button { cursor: pointer; background: none; border: none; }
     transition-duration: 0.01ms !important;
   }
   .bubble { display: none; }
-                 }
+}
