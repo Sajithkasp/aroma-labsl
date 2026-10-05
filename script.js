@@ -9,7 +9,6 @@ const useNavigate = () => {
 const DARAZ_LINK = "https://www.daraz.lk/products/aroma-lab-fine-fragrances-eau-de-parfum-15ml-5-scents-collection-long-lasting-12-hours-for-men-women-i1772233780-s12967079838.html";
 const WHATSAPP_LINK = "https://wa.me/94777804705";
 const LOGO_URL = "https://sajithkasp.github.io/aroma-labsl/logo.png";
-const ADMIN_EMAIL = "sajith.kasp@gmail.com";
 
 const DEFAULT_HERO = "https://sajithkasp.github.io/aroma-labsl/hero.jpg";
 const DEFAULT_LIFESTYLE_1 = "https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg";
@@ -28,9 +27,6 @@ const defaultProducts = [
   { id: "vanilla", name: "Vanilla", for: "FOR UNISEX", filter: "Unisex", product_type: "Perfume", price: 1500, selling_price: 1500, tagline: "Warm, Sweet & Cozy", top: "Vanilla Orchid, Mandarin", heart: "Vanilla, Jasmine", base: "Sandalwood, Musk", image: "https://sajithkasp.github.io/aroma-labsl/vanilla.jpg", accent: "#D4B896" }
 ];
 
-// ============================================================
-// SVG ICONS
-// ============================================================
 const SearchIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>);
 const UserIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>);
 const LogoutIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>);
@@ -45,17 +41,11 @@ const MapPinIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="
 const MenuIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>);
 const CloseIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
 
-// ============================================================
-// HELPERS
-// ============================================================
 function fmtRs(num) {
   const n = Number(num) || 0;
   return 'Rs. ' + n.toLocaleString('en-LK', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
-// ============================================================
-// DATABASE — Supabase
-// ============================================================
 async function dbGetCategories() {
   const { data, error } = await window.supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
   if (error) return [];
@@ -77,9 +67,6 @@ async function dbGetDeliverySettings() {
   return data || { base_charge: 350, free_delivery_threshold: 3 };
 }
 
-// ============================================================
-// ORDER SAVE — UNCHANGED
-// ============================================================
 async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
   try {
     const sb = window.supabaseClient;
@@ -155,10 +142,6 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     return { success: false, error: err.message };
   }
 }
-
-// ============================================================
-// MENU DRAWER
-// ============================================================
 function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -275,9 +258,6 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   );
 }
 
-// ============================================================
-// DYNAMIC PAGE
-// ============================================================
 function DynamicPage({ slug }) {
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -337,9 +317,6 @@ function DynamicPage({ slug }) {
   );
 }
 
-// ============================================================
-// CART PAGE
-// ============================================================
 function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getDeliveryCharge, getTotal, customerName, setCustomerName, customerPhone, setCustomerPhone, customerAddress, setCustomerAddress, customerDistrict, setCustomerDistrict, districts, isLoggedIn, sendWhatsAppOrder, sendBankDepositOrder }) {
   const navigate = useNavigate();
 
@@ -430,9 +407,6 @@ function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getD
   );
 }
 
-// ============================================================
-// REVIEW SECTION — UNCHANGED
-// ============================================================
 function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex }) {
   return (
     <section className="review-section">
@@ -483,9 +457,61 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
   );
 }
 
-// ============================================================
-// HOME PAGE
-// ============================================================
+// ===== 3D COMPONENTS (uses three-scene.js) =====
+function Hero3D({ products }) {
+  const ref = useRef(null);
+  const api = useRef(null);
+  const key = products.map(p => p.id + '|' + p.image + '|' + p.name).join(',');
+  useEffect(() => {
+    if (!window.AromaScene) return;
+    api.current = window.AromaScene.mountHero(ref.current);
+    return () => { if (api.current) api.current.dispose(); api.current = null; };
+  }, []);
+  useEffect(() => { if (api.current) api.current.setProducts(products); }, [key]);
+  return <canvas ref={ref} className="hero-3d-canvas"></canvas>;
+}
+
+function Showcase3D({ products, addToCart }) {
+  const ref = useRef(null);
+  const api = useRef(null);
+  const [sel, setSel] = useState(0);
+  const [ok, setOk] = useState(true);
+  const key = products.map(p => p.id + '|' + p.image + '|' + p.name).join(',');
+  useEffect(() => {
+    if (!window.AromaScene) { setOk(false); return; }
+    api.current = window.AromaScene.mountShowcase(ref.current, setSel);
+    if (!api.current) { setOk(false); return; }
+    return () => { if (api.current) api.current.dispose(); api.current = null; };
+  }, []);
+  useEffect(() => { if (api.current) { api.current.setProducts(products); setSel(0); } }, [key]);
+  if (!ok || products.length === 0) return null;
+  const p = products[sel] || products[0];
+  return (
+    <div className="showcase-3d">
+      <div className="showcase-stage">
+        <canvas ref={ref} className="showcase-canvas"></canvas>
+        {products.length > 1 && <button className="showcase-arrow left" aria-label="Previous" onClick={() => api.current && api.current.prev()}><ChevronLeft /></button>}
+        {products.length > 1 && <button className="showcase-arrow right" aria-label="Next" onClick={() => api.current && api.current.next()}><ChevronRight /></button>}
+        <div className="showcase-hint">DRAG TO ROTATE</div>
+      </div>
+      <div className="showcase-info">
+        <div className="si-for">{p.for}</div>
+        <div className="si-name">{p.name}</div>
+        <div className="si-tagline">{p.tagline}</div>
+        <div className="si-price">{fmtRs(p.price)}</div>
+        {p.product_type === 'Perfume' && (p.top || p.heart || p.base) && (
+          <div className="product-notes">
+            {p.top && <div><div className="note-label">Top</div><div className="note-value">{p.top}</div></div>}
+            {p.heart && <div><div className="note-label">Heart</div><div className="note-value">{p.heart}</div></div>}
+            {p.base && <div><div className="note-label">Base</div><div className="note-value">{p.base}</div></div>}
+          </div>
+        )}
+        <button onClick={() => addToCart(p)} className="btn-add-cart">ADD TO CART</button>
+      </div>
+    </div>
+  );
+}
+
 function HomePage({ products, categories, activeFilter, heroImages, currentHeroIndex, setCurrentHeroIndex, lifestyleDetails, currentLifestyleIndex, setCurrentLifestyleIndex, collectionRef, handleFilter, addToCart, deliverySettings, isLoggedIn, reviews, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, currentReviewIndex, setCurrentReviewIndex }) {
   const filteredProducts = activeFilter === "All"
     ? products
@@ -498,6 +524,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
       <section className="hero-section">
         <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
+        <Hero3D products={products} />
         <div className="hero-content">
           <div className="hero-content-inner">
             <div className="hero-text">
@@ -534,6 +561,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
         <div className="filter-buttons">
           {filterLabels.map((label) => (<button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>{label === 'All' ? 'All' : label}</button>))}
         </div>
+        <Showcase3D products={filteredProducts} addToCart={addToCart} />
         <div className="product-grid">
           {filteredProducts.map((product) => (
             <div key={product.id} className="product-card">
@@ -553,7 +581,6 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
                   </div>
                 )}
                 <button onClick={() => addToCart(product)} className="btn-add-cart">ADD TO CART</button>
-                
               </div>
             </div>
           ))}
@@ -612,10 +639,6 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
     </>
   );
 }
-
-// ============================================================
-// MAIN APP
-// ============================================================
 function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -800,10 +823,6 @@ function App() {
       setIsLoggedIn(false);
       setLoggedInUser(null);
     }
-  };
-
-  window.checkAdmin = function(email) {
-    // Admin moved to separate subdomain
   };
 
   const handleFilter = (filter) => {
