@@ -38,11 +38,9 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- React Router DOM - jsdelivr එකෙන් load කරමු -->
   <script src="https://cdn.jsdelivr.net/npm/react-router-dom@5.3.4/umd/react-router-dom.min.js"></script>
   <script>
     window.ReactRouterDOM = window.ReactRouterDOM || ReactRouterDOM || {};
-    console.log('ReactRouterDOM check:', window.ReactRouterDOM);
   </script>
 
   <script type="module">
@@ -110,20 +108,5 @@
 
   <script type="text/babel" src="script.js"></script>
   <script type="text/babel" src="gemini-chat.js"></script>
-  <script>
-  console.log('=== index.html loaded ===');
-  setTimeout(function() {
-    console.log('=== 1 second later ===');
-    console.log('React:', typeof React);
-    console.log('ReactDOM:', typeof ReactDOM);
-    console.log('ReactRouterDOM:', typeof window.ReactRouterDOM);
-    console.log('Babel:', typeof Babel);
-    console.log('Supabase:', typeof window.supabaseClient);
-    console.log('THREE:', typeof window.THREE);
-    console.log('AromaScene:', typeof window.AromaScene);
-    var root = document.getElementById('root');
-    console.log('Root div children:', root ? root.children.length : 'no root');
-  }, 1000);
-  </script>
 </body>
 </html>
