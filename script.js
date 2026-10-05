@@ -1,6 +1,6 @@
 const { useState, useEffect, useRef } = React;
 const { createRoot } = ReactDOM;
-const { BrowserRouter, Switch, Route, Link, useHistory, useLocation } = window.ReactRouterDOM || ReactRouterDOM || {};
+const { BrowserRouter, Switch, Route, Link, useHistory, useLocation } = ReactRouterDOM;
 const useNavigate = () => {
   const history = useHistory();
   return (path) => history.push(path);
@@ -142,30 +142,22 @@ async function saveOrderToSupabaseDirect(orderData, cartItems, deliveryCharge) {
     return { success: false, error: err.message };
   }
 }
-
 function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   const handleNavClick = (path) => {
-    document.body.style.overflow = '';
     onClose();
     navigate(path);
   };
 
   const handleCategoryClick = (catName) => {
-    document.body.style.overflow = '';
     onClose();
     navigate('/');
     setTimeout(() => {
@@ -192,7 +184,7 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
           </button>
         </div>
 
-        <div className="menu-drawer-body" style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch', flex: 1 }}>
+        <div className="menu-drawer-body">
           <div className="menu-section">
             <div className="menu-section-label">MENU</div>
             <nav className="menu-nav">
@@ -200,7 +192,7 @@ function MenuDrawer({ isOpen, onClose, categories, productTypes, onFilter }) {
                 <span className="menu-link-icon">🏠</span>
                 <span>Home</span>
               </button>
-              <button className="menu-link" onClick={() => { document.body.style.overflow = ''; onClose(); setTimeout(() => document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }), 200); }}>
+              <button className="menu-link" onClick={() => { onClose(); setTimeout(() => document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' }), 200); }}>
                 <span className="menu-link-icon">🛍️</span>
                 <span>Shop</span>
               </button>
@@ -465,6 +457,61 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
   );
 }
 
+// ===== 3D COMPONENTS (uses three-scene.js) =====
+function Hero3D({ products }) {
+  const ref = useRef(null);
+  const api = useRef(null);
+  const key = products.map(p => p.id + '|' + p.image + '|' + p.name).join(',');
+  useEffect(() => {
+    if (!window.AromaScene) return;
+    api.current = window.AromaScene.mountHero(ref.current);
+    return () => { if (api.current) api.current.dispose(); api.current = null; };
+  }, []);
+  useEffect(() => { if (api.current) api.current.setProducts(products); }, [key]);
+  return <canvas ref={ref} className="hero-3d-canvas"></canvas>;
+}
+
+function Showcase3D({ products, addToCart }) {
+  const ref = useRef(null);
+  const api = useRef(null);
+  const [sel, setSel] = useState(0);
+  const [ok, setOk] = useState(true);
+  const key = products.map(p => p.id + '|' + p.image + '|' + p.name).join(',');
+  useEffect(() => {
+    if (!window.AromaScene) { setOk(false); return; }
+    api.current = window.AromaScene.mountShowcase(ref.current, setSel);
+    if (!api.current) { setOk(false); return; }
+    return () => { if (api.current) api.current.dispose(); api.current = null; };
+  }, []);
+  useEffect(() => { if (api.current) { api.current.setProducts(products); setSel(0); } }, [key]);
+  if (!ok || products.length === 0) return null;
+  const p = products[sel] || products[0];
+  return (
+    <div className="showcase-3d">
+      <div className="showcase-stage">
+        <canvas ref={ref} className="showcase-canvas"></canvas>
+        {products.length > 1 && <button className="showcase-arrow left" aria-label="Previous" onClick={() => api.current && api.current.prev()}><ChevronLeft /></button>}
+        {products.length > 1 && <button className="showcase-arrow right" aria-label="Next" onClick={() => api.current && api.current.next()}><ChevronRight /></button>}
+        <div className="showcase-hint">DRAG TO ROTATE</div>
+      </div>
+      <div className="showcase-info">
+        <div className="si-for">{p.for}</div>
+        <div className="si-name">{p.name}</div>
+        <div className="si-tagline">{p.tagline}</div>
+        <div className="si-price">{fmtRs(p.price)}</div>
+        {p.product_type === 'Perfume' && (p.top || p.heart || p.base) && (
+          <div className="product-notes">
+            {p.top && <div><div className="note-label">Top</div><div className="note-value">{p.top}</div></div>}
+            {p.heart && <div><div className="note-label">Heart</div><div className="note-value">{p.heart}</div></div>}
+            {p.base && <div><div className="note-label">Base</div><div className="note-value">{p.base}</div></div>}
+          </div>
+        )}
+        <button onClick={() => addToCart(p)} className="btn-add-cart">ADD TO CART</button>
+      </div>
+    </div>
+  );
+}
+
 function HomePage({ products, categories, activeFilter, heroImages, currentHeroIndex, setCurrentHeroIndex, lifestyleDetails, currentLifestyleIndex, setCurrentLifestyleIndex, collectionRef, handleFilter, addToCart, deliverySettings, isLoggedIn, reviews, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, currentReviewIndex, setCurrentReviewIndex }) {
   const filteredProducts = activeFilter === "All"
     ? products
@@ -477,11 +524,12 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
       <section className="hero-section">
         <img key={currentHeroIndex} src={heroImages[currentHeroIndex]} alt="Aroma Lab" className="hero-img" />
         <div className="hero-overlay"></div>
+        <Hero3D products={products} />
         <div className="hero-content">
           <div className="hero-content-inner">
             <div className="hero-text">
               <div className="hero-eyebrow">PREMIUM EAU DE PARFUM</div>
-              <h1 className="hero-title">AROMA LAB - Fine Fragrances<br /><span className="accent">Crafted for Every Mood & Moment</span></h1>
+              <h2 className="hero-title">AROMA LAB - Fine Fragrances<br /><span className="accent">Crafted for Every Mood & Moment</span></h2>
               <p className="hero-desc">From bold and mysterious to fresh and elegant — find your perfect scent.</p>
               <button onClick={() => handleFilter("All")} className="hero-btn">SHOP NOW →</button>
             </div>
@@ -513,6 +561,7 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
         <div className="filter-buttons">
           {filterLabels.map((label) => (<button key={label} onClick={() => handleFilter(label)} className={`filter-btn ${activeFilter === label ? 'active' : ''}`}>{label === 'All' ? 'All' : label}</button>))}
         </div>
+        <Showcase3D products={filteredProducts} addToCart={addToCart} />
         <div className="product-grid">
           {filteredProducts.map((product) => (
             <div key={product.id} className="product-card">
@@ -590,7 +639,6 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
     </>
   );
 }
-
 function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -661,37 +709,21 @@ function App() {
   useEffect(() => {
     async function loadReviews() {
       try {
-        const { data: reviewsData, error } = await window.supabaseClient
-          .from('reviews')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (reviewsData) {
-          setReviews(reviewsData);
-          window.__setReviews = setReviews;
-        }
-      } catch (e) {
-        console.error('Reviews load error:', e);
-      }
+        const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+        if (reviewsData) setReviews(reviewsData);
+      } catch (e) { console.error(e); }
     }
     loadReviews();
-
+    window.__setReviews = setReviews;
     const { data: authListener } = window.supabaseClient.auth.onAuthStateChange((event, session) => {
-      console.log('Supabase auth event:', event);
-      setTimeout(() => { loadReviews(); }, 300);
+      setTimeout(() => { loadReviews(); }, 100);
     });
-
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') loadReviews();
     }
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    window.__loadReviews = loadReviews;
-
     return () => {
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
+      if (authListener && authListener.subscription) authListener.subscription.unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
@@ -771,16 +803,11 @@ function App() {
     if (!reviewName || !reviewEmail || !reviewRating || !reviewComment) return;
     try {
       const userImage = loggedInUser?.photoURL || '';
-      const { error } = await window.supabaseClient.from('reviews').insert([{
-        name: reviewName,
-        email: reviewEmail,
-        rating: parseInt(reviewRating),
-        comment: reviewComment,
-        user_image: userImage
-      }]);
+      const { error } = await window.supabaseClient.from('reviews').insert([{ name: reviewName, email: reviewEmail, rating: parseInt(reviewRating), comment: reviewComment, user_image: userImage }]);
       if (error) throw error;
       setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
-      if (window.__loadReviews) await window.__loadReviews();
+      const { data: reviewsData } = await window.supabaseClient.from('reviews').select('*').order('created_at', { ascending: false });
+      if (reviewsData) setReviews(reviewsData);
       alert('✅ Review submitted successfully!');
     } catch (err) { alert('❌ Error: ' + err.message); }
   };
