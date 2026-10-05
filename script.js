@@ -465,7 +465,6 @@ function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, set
   );
 }
 
-// ===== 3D COMPONENTS (uses three-scene.js) =====
 function Hero3D({ products }) {
   const ref = useRef(null);
   const api = useRef(null);
@@ -677,7 +676,6 @@ function App() {
 
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
-  // Load products, categories, etc.
   useEffect(() => {
     async function loadData() {
       try {
@@ -716,7 +714,6 @@ function App() {
     };
   }
 
-  // ===== REVIEWS LOADING — FIXED =====
   useEffect(() => {
     async function loadReviews() {
       try {
@@ -735,7 +732,6 @@ function App() {
     }
     loadReviews();
 
-    // Supabase auth state change listener
     const { data: authListener } = window.supabaseClient.auth.onAuthStateChange((event, session) => {
       console.log('Supabase auth event:', event);
       setTimeout(() => { loadReviews(); }, 300);
@@ -746,7 +742,6 @@ function App() {
     }
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Expose loadReviews for manual refresh (e.g., after review submit)
     window.__loadReviews = loadReviews;
 
     return () => {
@@ -841,7 +836,6 @@ function App() {
       }]);
       if (error) throw error;
       setReviewName(''); setReviewEmail(''); setReviewRating(''); setReviewComment('');
-      // Reload reviews immediately
       if (window.__loadReviews) await window.__loadReviews();
       alert('✅ Review submitted successfully!');
     } catch (err) { alert('❌ Error: ' + err.message); }
