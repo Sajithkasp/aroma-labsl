@@ -628,6 +628,8 @@ function HomePage({ products, categories, activeFilter, heroImages, currentHeroI
         </div>
       </section>
 
+          <FAQSection />
+          
       <ReviewSection
         isLoggedIn={isLoggedIn}
         reviewName={reviewName} setReviewName={setReviewName}
