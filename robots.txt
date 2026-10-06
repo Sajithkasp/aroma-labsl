@@ -1,3 +1,81 @@
+# ============================================================
+# AROMA LAB - Fine Fragrances Sri Lanka
+# Website: https://aromalabsl.lk
+# ============================================================
+
+# ---------- සාමාන්‍ය Search Engines ----------
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /api/
+Disallow: /*?*cart=
+Disallow: /*?*checkout=
+
+# ---------- Google ----------
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# ---------- Bing ----------
+User-agent: Bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# ---------- AI Crawlers (GEO සඳහා) ----------
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Google-CloudVertexBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# ---------- Social Media Crawlers ----------
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# ---------- Sitemap ----------
 Sitemap: https://aromalabsl.lk/sitemap.xml
