@@ -408,6 +408,65 @@ function CartPage({ cartItems, removeFromCart, updateQuantity, getSubtotal, getD
   );
 }
 
+// ============================================================
+// FAQ SECTION (AEO - Answer Engine Optimization)
+// ============================================================
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const faqs = [
+    {
+      q: "What is AROMA LAB?",
+      a: "AROMA LAB is a premium fine fragrance brand based in Colombo, Sri Lanka. We offer high-quality Eau De Parfum with long-lasting 12+ hours fragrance."
+    },
+    {
+      q: "How long does AROMA LAB perfume last?",
+      a: "AROMA LAB Eau De Parfum lasts 12+ hours on skin and even longer on clothes. It is made with high-quality fragrance oils that ensure long-lasting performance throughout the day."
+    },
+    {
+      q: "How much does AROMA LAB perfume cost?",
+      a: "AROMA LAB Eau De Parfum 15ml is priced at starting Rs. 1,500 per bottle."
+    },
+    {
+      q: "Do you deliver island-wide in Sri Lanka?",
+      a: "Yes, AROMA LAB offers island-wide delivery across Sri Lanka. Free delivery on orders of 3+ items. Delivery charge is Rs. 350 for orders below 3 items."
+    },
+    {
+      q: "How can I order AROMA LAB perfume?",
+      a: "You can order AROMA LAB perfume through our website, via WhatsApp (+94 77 780 4705), or on Daraz Sri Lanka. We accept Cash on Delivery, Bank Transfer, and KOKO Pay Later."
+    },
+    {
+      q: "Are AROMA LAB perfumes original?",
+      a: "Yes, all AROMA LAB perfumes are 100% original and made with premium quality fragrance oils in Sri Lanka. We do not sell imitation or fake products."
+    }
+  ];
+
+  const toggleFaq = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <section className="faq-section" id="faq">
+      <div className="faq-header">
+        <div className="faq-eyebrow">FREQUENTLY ASKED QUESTIONS</div>
+        <h2 className="faq-title">Everything You Need to Know</h2>
+      </div>
+      <div className="faq-list">
+        {faqs.map((faq, index) => (
+          <div key={index} className={`faq-item ${openIndex === index ? 'open' : ''}`}>
+            <button className="faq-question" onClick={() => toggleFaq(index)}>
+              <span className="faq-q-text">{faq.q}</span>
+              <span className="faq-icon">{openIndex === index ? '−' : '+'}</span>
+            </button>
+            <div className="faq-answer">
+              <p>{faq.a}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 function ReviewSection({ isLoggedIn, reviewName, setReviewName, reviewEmail, setReviewEmail, reviewRating, setReviewRating, reviewComment, setReviewComment, handleReviewSubmit, reviews, currentReviewIndex, setCurrentReviewIndex }) {
   return (
     <section className="review-section">
