@@ -4,101 +4,125 @@
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- ===== HOME PAGE ===== -->
+  <!-- ============================================================
+       HOME PAGE
+       ============================================================ -->
   <url>
     <loc>https://aromalabsl.lk/</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    
-    <!-- Product Images -->
+
+    <!-- Hero Image -->
     <image:image>
       <image:loc>https://sajithkasp.github.io/aroma-labsl/hero.jpg</image:loc>
       <image:title>AROMA LAB - Fine Fragrances Sri Lanka</image:title>
-      <image:caption>Premium Eau De Parfum - Long Lasting 12+ Hours</image:caption>
+      <image:caption>Premium Eau De Parfum in Sri Lanka - Long Lasting 12+ Hours</image:caption>
     </image:image>
-    
-    <image:image>
-      <image:loc>https://sajithkasp.github.io/aroma-labsl/goodgirl.jpg</image:loc>
-      <image:title>Good Girl Perfume - Aroma Lab</image:title>
-      <image:caption>Sweet, Floral &amp; Sensual - Eau De Parfum 15ml</image:caption>
-    </image:image>
-    
-    <image:image>
-      <image:loc>https://sajithkasp.github.io/aroma-labsl/black.jpg</image:loc>
-      <image:title>Black Temptation Perfume - Aroma Lab</image:title>
-      <image:caption>Dark, Mysterious &amp; Seductive - Eau De Parfum 15ml</image:caption>
-    </image:image>
-    
-    <image:image>
-      <image:loc>https://sajithkasp.github.io/aroma-labsl/hunter.jpg</image:loc>
-      <image:title>Hunters Dusk Perfume - Aroma Lab</image:title>
-      <image:caption>Woody, Smoky &amp; Adventurous - Eau De Parfum 15ml</image:caption>
-    </image:image>
-    
-    <image:image>
-      <image:loc>https://sajithkasp.github.io/aroma-labsl/gold.jpg</image:loc>
-      <image:title>Million Gold Perfume - Aroma Lab</image:title>
-      <image:caption>Rich, Luxurious &amp; Powerful - Eau De Parfum 15ml</image:caption>
-    </image:image>
-    
-    <image:image>
-      <image:loc>https://sajithkasp.github.io/aroma-labsl/vanilla.jpg</image:loc>
-      <image:title>Vanilla Perfume - Aroma Lab</image:title>
-      <image:caption>Warm, Sweet &amp; Cozy - Eau De Parfum 15ml</image:caption>
-    </image:image>
-    
+
+    <!-- Logo -->
     <image:image>
       <image:loc>https://sajithkasp.github.io/aroma-labsl/logo.png</image:loc>
       <image:title>AROMA LAB Logo</image:title>
+      <image:caption>AROMA LAB Fine Fragrances - Sri Lanka</image:caption>
     </image:image>
-    
+
+    <!-- Product: Good Girl -->
+    <image:image>
+      <image:loc>https://sajithkasp.github.io/aroma-labsl/goodgirl.jpg</image:loc>
+      <image:title>Good Girl Perfume - AROMA LAB</image:title>
+      <image:caption>Good Girl Eau De Parfum 15ml - Sweet, Floral &amp; Sensual - Rs. 1,500</image:caption>
+    </image:image>
+
+    <!-- Product: Black Temptation -->
+    <image:image>
+      <image:loc>https://sajithkasp.github.io/aroma-labsl/black.jpg</image:loc>
+      <image:title>Black Temptation Perfume - AROMA LAB</image:title>
+      <image:caption>Black Temptation Eau De Parfum 15ml - Dark, Mysterious &amp; Seductive - Rs. 1,500</image:caption>
+    </image:image>
+
+    <!-- Product: Hunters Dusk -->
+    <image:image>
+      <image:loc>https://sajithkasp.github.io/aroma-labsl/hunter.jpg</image:loc>
+      <image:title>Hunters Dusk Perfume - AROMA LAB</image:title>
+      <image:caption>Hunters Dusk Eau De Parfum 15ml - Woody, Smoky &amp; Adventurous - Rs. 1,500</image:caption>
+    </image:image>
+
+    <!-- Product: Million Gold -->
+    <image:image>
+      <image:loc>https://sajithkasp.github.io/aroma-labsl/gold.jpg</image:loc>
+      <image:title>Million Gold Perfume - AROMA LAB</image:title>
+      <image:caption>Million Gold Eau De Parfum 15ml - Rich, Luxurious &amp; Powerful - Rs. 1,500</image:caption>
+    </image:image>
+
+    <!-- Product: Vanilla -->
+    <image:image>
+      <image:loc>https://sajithkasp.github.io/aroma-labsl/vanilla.jpg</image:loc>
+      <image:title>Vanilla Perfume - AROMA LAB</image:title>
+      <image:caption>Vanilla Eau De Parfum 15ml - Warm, Sweet &amp; Cozy - Rs. 1,500</image:caption>
+    </image:image>
+
+    <!-- Lifestyle: Black Temptation -->
     <image:image>
       <image:loc>https://sajithkasp.github.io/aroma-labsl/lifestyle.jpg</image:loc>
-      <image:title>Black Temptation - Lifestyle</image:title>
+      <image:title>Black Temptation Lifestyle - AROMA LAB</image:title>
+      <image:caption>Black Temptation - Dark, mysterious &amp; seductive fragrance</image:caption>
     </image:image>
-    
+
+    <!-- Lifestyle: Hunters Dusk -->
     <image:image>
       <image:loc>https://sajithkasp.github.io/aroma-labsl/lifestyle2.jpg</image:loc>
-      <image:title>Hunters Dusk - Lifestyle</image:title>
+      <image:title>Hunters Dusk Lifestyle - AROMA LAB</image:title>
+      <image:caption>Hunters Dusk - Woody, smoky &amp; adventurous fragrance</image:caption>
     </image:image>
+
   </url>
 
-  <!-- ===== ABOUT PAGE ===== -->
+  <!-- ============================================================
+       ABOUT PAGE
+       ============================================================ -->
   <url>
-    <loc>https://aromalabsl.lk/about</loc>
+    <loc>https://aromalabsl.lk/page.html?slug=about</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- ===== CONTACT PAGE ===== -->
+  <!-- ============================================================
+       CONTACT PAGE
+       ============================================================ -->
   <url>
-    <loc>https://aromalabsl.lk/contact</loc>
+    <loc>https://aromalabsl.lk/page.html?slug=contact</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- ===== PRIVACY POLICY ===== -->
+  <!-- ============================================================
+       PRIVACY POLICY
+       ============================================================ -->
   <url>
-    <loc>https://aromalabsl.lk/privacy</loc>
+    <loc>https://aromalabsl.lk/page.html?slug=privacy</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
-  <!-- ===== TERMS & CONDITIONS ===== -->
+  <!-- ============================================================
+       TERMS & CONDITIONS
+       ============================================================ -->
   <url>
-    <loc>https://aromalabsl.lk/terms</loc>
+    <loc>https://aromalabsl.lk/page.html?slug=terms</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
-  <!-- ===== RETURN POLICY ===== -->
+  <!-- ============================================================
+       RETURN POLICY
+       ============================================================ -->
   <url>
-    <loc>https://aromalabsl.lk/return-policy</loc>
+    <loc>https://aromalabsl.lk/page.html?slug=return-policy</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
