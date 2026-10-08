@@ -326,42 +326,6 @@ button { cursor: pointer; background: none; border: none; }
   .product-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-@media (max-width: 639px) {
-  .header-inner { padding: 16px; }
-  .header-logo img { width: 44px; height: 44px; }
-  .header-logo-text .title { font-size: 18px; }
-  .header-logo-text .subtitle { font-size: 8px; letter-spacing: 0.25em; }
-  .icon-btn { width: 36px; height: 36px; }
-  .icon-btn svg { width: 18px; height: 18px; }
-  .hero-title { font-size: 40px; }
-  .hero-content-inner { padding: 0 24px; }
-  .collection-section { padding: 48px 20px; }
-  .collection-title { font-size: 36px; }
-  .lifestyle-section { padding: 24px 16px; }
-  .lifestyle-slider-inner { min-height: auto; }
-  .lifestyle-slide { grid-template-columns: 1fr; }
-  .lifestyle-slide-img { min-height: 280px; }
-  .lifestyle-slide-content { padding: 28px 20px; }
-  .lifestyle-title { font-size: 28px; margin-bottom: 16px; }
-  .lifestyle-desc { font-size: 13px; margin-bottom: 20px; }
-  .lifestyle-buttons { gap: 8px; }
-  .lifestyle-nav { width: 36px; height: 36px; }
-  .lifestyle-nav svg { width: 20px; height: 20px; }
-  .koko-section { padding: 24px 16px; }
-  .site-footer { padding: 48px 24px 0; }
-  .review-section { padding: 48px 20px; }
-  .review-title { font-size: 32px; }
-  .reviews-slider { gap: 8px; }
-  .reviews-nav { width: 36px; height: 36px; }
-  .reviews-nav svg { width: 20px; height: 20px; }
-  .review-card { padding: 20px; }
-  .dynamic-page { padding: 40px 20px 60px; }
-  .dynamic-page-title { font-size: 32px; }
-  .cart-page { padding: 32px 16px 80px; }
-  .cart-page-title { font-size: 30px; }
-  .menu-drawer { width: 85%; }
-  .product-notes { grid-template-columns: 1fr; gap: 12px; }
-}
 
 /* ============================================================
    3D ENHANCEMENT LAYER
